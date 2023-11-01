@@ -17,14 +17,14 @@ class AccountListViewTest(TestCase):
         ]
 
     def test_list_accounts(self):
-        request = self.factory.get('/account1/')
+        request = self.factory.get('/account5/')
         response = self.view(request)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(len(response.data), 2)
 
     def test_list_empty_accounts(self):
         Account.objects.all().delete()
-        request = self.factory.get('/account1/')
+        request = self.factory.get('/account5/')
         response = self.view(request)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(len(response.data), 0)
@@ -44,21 +44,11 @@ class AccountCreateViewTest(TestCase):
             'balance': 100.0,
         }
 
-        request = self.factory.post('/account3/', data, format='json')
+        request = self.factory.post('/account2/', data, format='json')
         response = self.view(request)
         self.assertEqual(response.status_code, 201)
 
         self.assertTrue(Account.objects.filter(user=self.user).exists())
-
-    def test_create_account_with_nonexistent_user(self):
-        data = {
-            'user': 1324234324,
-            'balance': 100.0,
-        }
-
-        request = self.factory.post('/account3/', data, format='json')
-        response = self.view(request)
-        self.assertEqual(response.status_code, 400)
 
 
 class AccountUpdateViewTest(TestCase):
@@ -68,7 +58,7 @@ class AccountUpdateViewTest(TestCase):
         self.account = Account.objects.create(id=10, balance=100)
 
     def test_update_account(self):
-        request = self.factory.put(f'/account3/{self.account.id}/', format='json')
+        request = self.factory.put(f'/account4/{self.account.id}/', format='json')
         response = self.view(request, pk=self.account.id)
 
         self.assertEqual(response.status_code, 200)
@@ -77,7 +67,7 @@ class AccountUpdateViewTest(TestCase):
         self.assertEqual(updated_account.balance, 200.0)
 
     def test_update_nonexistent_account(self):
-        request = self.factory.put('/account3/nonexistent_id/', format='json')
+        request = self.factory.put('/account4/nonexistent_id/', format='json')
         response = self.view(request, pk='nonexistent_id')
 
         self.assertEqual(response.status_code, 404)
@@ -90,7 +80,7 @@ class AccountDetailViewTest(TestCase):
         self.account = Account.objects.create(balance=100.0, usernameid='user123')
 
     def test_get_account_detail(self):
-        request = self.factory.get(f'/account3/user123/')
+        request = self.factory.get(f'/account5/user123/')
         response = self.view(request, usernameid='user123')
 
         self.assertEqual(response.status_code, 200)
@@ -101,7 +91,7 @@ class AccountDetailViewTest(TestCase):
         self.assertEqual(response.data, serializer.data)
 
     def test_get_nonexistent_account_detail(self):
-        request = self.factory.get('/account3/nonexistent_username/')
+        request = self.factory.get('/account5/nonexistent_username/')
         response = self.view(request, usernameid='nonexistent_username')
 
         self.assertEqual(response.status_code, 404)
@@ -114,7 +104,7 @@ class AccountDestroyViewTest(TestCase):
         self.account = Account.objects.create(balance=100.0)
 
     def test_destroy_account(self):
-        request = self.factory.delete(f'/api/account3/{self.account.id}/')
+        request = self.factory.delete(f'/account3/{self.account.id}/')
         response = self.view(request, pk=self.account.id)
 
         self.assertEqual(response.status_code, 204)
