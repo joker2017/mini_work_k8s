@@ -117,8 +117,7 @@ jobs:
         docker push cr.yandex/$CR_REGISTRY/$CR_REPOSITORY:$IMAGE_TAG
 
   deploy:
-    needs:
-      - build
+   # needs:  [job1, job2]
     runs-on: ubuntu-latest
     steps:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
