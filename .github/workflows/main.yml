@@ -43,6 +43,9 @@ jobs:
       with:
         sparse-checkout: |
           account
+    - name: Get directory
+      run: ls
+
     - name: Yandex Cloud CR "Login" Action for GitHub Actions
       uses: yc-actions/yc-cr-login@v1
       with:
