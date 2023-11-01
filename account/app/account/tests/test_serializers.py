@@ -1,9 +1,9 @@
-from django.test import TestCase
+from django.test import TestCase, SimpleTestCase
 from ..models import Account
 from ..serializers import AccountSerializer
 
 
-class AccountSerializerTest(TestCase):
+class AccountSerializerTest(SimpleTestCase):
     def setUp(self):
         self.account = Account.objects.create(
             balance=100.00,

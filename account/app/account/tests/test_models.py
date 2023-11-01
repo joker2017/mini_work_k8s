@@ -1,9 +1,10 @@
 from django.db import IntegrityError
-from django.test import TestCase
+from django.test import TestCase, SimpleTestCase
+
 from ..models import Users, Account
+from django.test import SimpleTestCase
 
-
-class UsersModelTest(TestCase):
+class UsersModelTest(SimpleTestCase):
     def setUp(self):
         self.user_data = {
             'id': '12345',

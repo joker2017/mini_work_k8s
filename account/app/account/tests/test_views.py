@@ -1,4 +1,4 @@
-from django.test import TestCase
+from django.test import TestCase, SimpleTestCase
 from rest_framework.test import APIRequestFactory
 
 from ..serializers import AccountSerializer
@@ -7,7 +7,7 @@ from ..views import AccountList, AccountCreate, AccountUpdate, \
 from ..models import Account, Users  # Замените на правильный импорт вашей модели
 
 
-class AccountListViewTest(TestCase):
+class AccountListViewTest(SimpleTestCase):
     def setUp(self):
         self.factory = APIRequestFactory()
         self.view = AccountList.as_view({'get': 'list'})
@@ -30,7 +30,7 @@ class AccountListViewTest(TestCase):
         self.assertEqual(len(response.data), 0)
 
 
-class AccountCreateViewTest(TestCase):
+class AccountCreateViewTest(SimpleTestCase):
     def setUp(self):
         self.factory = APIRequestFactory()
         self.view = AccountCreate.as_view({'post': 'create'})
@@ -51,7 +51,7 @@ class AccountCreateViewTest(TestCase):
         self.assertTrue(Account.objects.filter(user=self.user).exists())
 
 
-class AccountUpdateViewTest(TestCase):
+class AccountUpdateViewTest(SimpleTestCase):
     def setUp(self):
         self.factory = APIRequestFactory()
         self.view = AccountUpdate.as_view()
@@ -73,7 +73,7 @@ class AccountUpdateViewTest(TestCase):
         self.assertEqual(response.status_code, 404)
 
 
-class AccountDetailViewTest(TestCase):
+class AccountDetailViewTest(SimpleTestCase):
     def setUp(self):
         self.factory = APIRequestFactory()
         self.view = AccountDetail.as_view()
@@ -97,7 +97,7 @@ class AccountDetailViewTest(TestCase):
         self.assertEqual(response.status_code, 404)
 
 
-class AccountDestroyViewTest(TestCase):
+class AccountDestroyViewTest(SimpleTestCase):
     def setUp(self):
         self.factory = APIRequestFactory()
         self.view = AccountDestroy.as_view()
