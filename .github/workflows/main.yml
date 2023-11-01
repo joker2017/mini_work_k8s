@@ -16,8 +16,7 @@ jobs:
     steps:
     - uses: actions/checkout@v4
     - run: |
-        git fetch --prune --shallow
-      #--unshallow
+        git fetch --prune --unshallow
     - name: Set up Python 3.8
       uses: actions/setup-python@v4
       with:
