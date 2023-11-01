@@ -116,21 +116,5 @@ jobs:
         docker build -t cr.yandex/$CR_REGISTRY/$CR_REPOSITORY:$IMAGE_TAG .
         docker push cr.yandex/$CR_REGISTRY/$CR_REPOSITORY:$IMAGE_TAG
 
-  deploy:
-    runs-on: ubuntu-latest
-    steps:
-      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
 
-     - name: Deploy COI VM
-       id: deploy-coi
-       uses: yc-actions/yc-coi-deploy@v1
-       env:
-          IMAGE_URL: cr.yandex/crpk28lsfu91rns28316/yc-coi-github-action:${{ github.sha }}
-          SSH_KEY: ${{ secrets.SSH_KEY }}
-       with:
-          yc-sa-json-credentials: ${{ secrets.YC_SA_JSON_CREDENTIALS }}
-          folder-id: epdmfcl5k4arb97fhqn1
-          vm-name: miniwork
-          vm-service-account-id: ajeonnjt1mrracl7n71u
-          user-data-path: './user-data.yaml'
-          docker-compose-path: './docker-compose.prod.yaml'
+
