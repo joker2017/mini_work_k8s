@@ -6,13 +6,18 @@ jobs:
   build:
 
     runs-on: ubuntu-latest
+    env:
+      working-directory: ./account
     steps:
       - uses: actions/checkout@v4
       - name: Set up Python
+        run: ls -R
+        working-directory: ${{env.working-directory}}
         uses: actions/setup-python@v4
         with:
           python-version: '3.x'
       - name: Install dependencies
+        working-directory: ${{env.working-directory}}
         run: |
           python -m pip install --upgrade pip
-          pip install -r account\requirements.txt
+          pip install -r requirements.txt
