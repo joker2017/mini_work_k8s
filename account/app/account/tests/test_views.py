@@ -1,4 +1,4 @@
-from django.test import TestCase, SimpleTestCase
+from django.test import SimpleTestCase
 from rest_framework.test import APIRequestFactory
 
 from ..serializers import AccountSerializer

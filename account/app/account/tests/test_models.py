@@ -1,5 +1,5 @@
 from django.db import IntegrityError
-from django.test import TestCase, SimpleTestCase
+
 
 from ..models import Users, Account
 from django.test import SimpleTestCase
@@ -28,7 +28,7 @@ class UsersModelTest(SimpleTestCase):
             Users.objects.create(**self.user_data)
 
 
-class AccountModelTest(TestCase):
+class AccountModelTest(SimpleTestCase):
     def setUp(self):
         self.user_data = {
             'id': '12345',
