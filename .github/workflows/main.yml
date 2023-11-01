@@ -36,14 +36,10 @@ jobs:
       run: |
         python account/app/manage.py test
 
-    - name: Checkout action
-      uses: actions/checkout@v2
-    - name: Django Coverage action
-      uses: actions/python-django-coverage-github-action@0.9
-      with:
-          django-app: 'account'
-          minimum-coverage: '86'
-        
+    - name: Python Django Coverage GitHub Action
+      uses: dc740/django-coveragepy-github-action@0.9
+
+
 
   test_profile:
     runs-on: ubuntu-latest
