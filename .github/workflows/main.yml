@@ -46,72 +46,43 @@ jobs:
           cd ./profile/app
           #echo "SECRET_KEY = 'django-insecure-dummy-secret'" > ./proj/secrets.py
           python3 manage.py test
-  build-profile:
+ 
+
+  build-and-push-account:
     runs-on: ubuntu-latest
-
+    needs: run_unittests_account
     steps:
-    - uses: actions/checkout@v4
-      with:
-        sparse-checkout: |
-          .github
-           profile
-    - name: Login to Yandex Cloud Container Registry
-      id: login-cr
-      uses: yc-actions/yc-cr-login@v1
-      with:
-        yc-sa-json-credentials: ${{ secrets.YC_SA_JSON_CREDENTIALS }}
+      - uses: actions/checkout@v2
+      - uses: raisultan/ycr-push@main
+        env:
+          KEY_JSON: ${{ secrets.YC_SA_JSON_CREDENTIALS }}
+          REGISTRY_ID: crpq5hg8snv82fhgppum
+          DOCKERFILE_PATH: ./account
+          IMAGE_NAME: my-cr-repo_miniwork_account
+          IMAGE_TAG: ${{ github.sha }}
 
-    - name: Build, tag, and push image to Yandex Cloud Container Registry
-      env:
-        CR_REGISTRY: crpq5hg8snv82fhgppum
-        CR_REPOSITORY: my-cr-repo_miniwork_profile
-        IMAGE_TAG: ${{ github.sha }}
-      run: |
-        docker build -t cr.yandex/$CR_REGISTRY/$CR_REPOSITORY:$IMAGE_TAG .
-        docker push cr.yandex/$CR_REGISTRY/$CR_REPOSITORY:$IMAGE_TAG
-
-  build-account:
+  build-and-push-profile:
     runs-on: ubuntu-latest
+    needs: run_unittests_profile
     steps:
-    - uses: actions/checkout@v4
-      with:
-        sparse-checkout: |
-          .github
-           account
-    - name: Login to Yandex Cloud Container Registry
-      id: login-cr
-      uses: yc-actions/yc-cr-login@v1
-      with:
-        yc-sa-json-credentials: ${{ secrets.YC_SA_JSON_CREDENTIALS }}
+      - uses: actions/checkout@v2
+      - uses: raisultan/ycr-push@main
+        env:
+          KEY_JSON: ${{ secrets.YC_SA_JSON_CREDENTIALS }}
+          REGISTRY_ID: crpq5hg8snv82fhgppum
+          DOCKERFILE_PATH: ./profile
+          IMAGE_NAME: my-cr-repo_miniwork_profile
+          IMAGE_TAG: ${{ github.sha }}
 
-    - name: Build, tag, and push image to Yandex Cloud Container Registry
-      env:
-        CR_REGISTRY: crpq5hg8snv82fhgppum
-        CR_REPOSITORY: my-cr-repo_miniwork_account
-        IMAGE_TAG: ${{ github.sha }}
-      run: |
-        docker build -t cr.yandex/$CR_REGISTRY/$CR_REPOSITORY:$IMAGE_TAG .
-        docker push cr.yandex/$CR_REGISTRY/$CR_REPOSITORY:$IMAGE_TAG
-
-  build-nginx:
+  build-and-push-engix:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v4
-      with:
-        sparse-checkout: |
-          .github
-           account
-    - name: Login to Yandex Cloud Container Registry
-      id: login-cr
-      uses: yc-actions/yc-cr-login@v1
-      with:
-        yc-sa-json-credentials: ${{ secrets.YC_SA_JSON_CREDENTIALS }}
+      - uses: actions/checkout@v2
+      - uses: raisultan/ycr-push@main
+        env:
+          KEY_JSON: ${{ secrets.YC_SA_JSON_CREDENTIALS }}
+          REGISTRY_ID: crpq5hg8snv82fhgppum
+          DOCKERFILE_PATH: ./eginx
+          IMAGE_NAME: my-cr-repo_miniwork_enginx
+          IMAGE_TAG: ${{ github.sha }}
 
-    - name: Build, tag, and push image to Yandex Cloud Container Registry
-      env:
-        CR_REGISTRY: crpq5hg8snv82fhgppum
-        CR_REPOSITORY: my-cr-repo_miniwork_nginx
-        IMAGE_TAG: ${{ github.sha }}
-      run: |
-        docker build -t cr.yandex/$CR_REGISTRY/$CR_REPOSITORY:$IMAGE_TAG .
-        docker push cr.yandex/$CR_REGISTRY/$CR_REPOSITORY:$IMAGE_TAG
