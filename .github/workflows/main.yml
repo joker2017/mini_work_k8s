@@ -10,9 +10,8 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: Set up Python
-        run: ls -R
-        working-directory: ${{env.working-directory}}
       - name: Install dependencies  
         run: |
+          working-directory: ${{env.working-directory}}
           python -m pip install --upgrade pip
           pip install -r requirements.txt
