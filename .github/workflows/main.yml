@@ -22,7 +22,7 @@ jobs:
       - name: Run Tests
         run: |
           cd ./account/app
-          #echo "SECRET_KEY = 'django-insecure-dummy-secret'" > ./proj/secrets.py
+
           python3 manage.py test
   run_unittests_profile:
     runs-on: ubuntu-latest
@@ -44,7 +44,7 @@ jobs:
       - name: Run Tests
         run: |
           cd ./profile/app
-          #echo "SECRET_KEY = 'django-insecure-dummy-secret'" > ./proj/secrets.py
+
           python3 manage.py test
   build-profile:
     runs-on: ubuntu-latest
@@ -117,7 +117,7 @@ jobs:
         docker push cr.yandex/$CR_REGISTRY/$CR_REPOSITORY:$IMAGE_TAG
 
   deploy:
-   # needs:  [job1, job2]
+
     runs-on: ubuntu-latest
     steps:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
