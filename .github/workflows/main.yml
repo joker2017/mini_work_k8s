@@ -12,9 +12,7 @@ jobs:
       - name: Check out repository code
         uses: actions/checkout@v4
         with:
-          sparse-checkout: |
-            .github
-            account
+          sparse-checkout: account
       - name: Set up Python ${{ matrix.python-version }}
         uses: actions/setup-python@v4
         with:
