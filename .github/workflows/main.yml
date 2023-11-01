@@ -13,8 +13,8 @@ jobs:
         uses: actions/checkout@v4
         with:
           sparse-checkout: |
-            .github
             account
+            .github
       - name: Set up Python ${{ matrix.python-version }}
         uses: actions/setup-python@v4
         with:
