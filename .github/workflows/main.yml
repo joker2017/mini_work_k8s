@@ -18,8 +18,8 @@ jobs:
       - name: Install Dependencies
 
         run: | 
-          python3 -m pip install --upgrade pip
-          python3 -m pip install -r account/requirements.txt
+
+          python -m pip install -r account/requirements.txt
 
       - name: Run Tests
         run: |
