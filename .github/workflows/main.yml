@@ -16,7 +16,8 @@ jobs:
     steps:
     - uses: actions/checkout@v4
     - run: |
-        git fetch --prune --unshallow
+        git fetch --prune --shallow
+      #--unshallow
     - name: Set up Python 3.8
       uses: actions/setup-python@v4
       with:
@@ -36,14 +37,39 @@ jobs:
       run: |
         python account/app/manage.py test
 
-    - name: Python Django Coverage GitHub Action
-      uses: dc740/django-coveragepy-github-action@0.9
+    #- name: Python Django Coverage GitHub Action
+    #  uses: dc740/django-coveragepy-github-action@0.9
+
+    - uses: actions/checkout@v4
+      with:
+        sparse-checkout: |
+          account
+    - name: Yandex Cloud CR "Login" Action for GitHub Actions
+      uses: yc-actions/yc-cr-login@v1
+      with:
+        yc-sa-json-credentials: ${{ secrets.YC_SA_JSON_CREDENTIALS }}
+    - name: Build, tag, and push image to Yandex Cloud Container Registry
+      env:
+        CR_REGISTRY: crpq5hg8snv82fhgppum
+        CR_REPO: my-cr-repo_miniwork_account
+        IMAGE_TAG: ${{ github.sha }}
+      run: |
+        docker build -t cr.yandex/$CR_REGISTRY/$CR_REPO:$IMAGE_TAG .
+        docker push cr.yandex/$CR_REGISTRY/$CR_REPO:$IMAGE_TAG
+
+
+
+
+
+
+
+
+
 
 
 
   test_profile:
     runs-on: ubuntu-latest
-
     steps:
       - uses: actions/checkout@v4
       - run: |
@@ -66,3 +92,10 @@ jobs:
       - name: Test with pytest
         run: |
           python profile/app/manage.py test
+       
+          
+          
+          
+          
+          
+

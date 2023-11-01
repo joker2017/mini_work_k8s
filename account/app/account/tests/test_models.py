@@ -4,6 +4,7 @@ from django.db import IntegrityError
 from ..models import Users, Account
 from django.test import SimpleTestCase
 
+
 class UsersModelTest(SimpleTestCase):
     def setUp(self):
         self.user_data = {
