@@ -34,7 +34,7 @@ jobs:
         flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
     - name: Test with pytest
       run: |
-        python account/app/manage.py test -k
+        python account/app/manage.py test
 
     - name: Python Django Coverage GitHub Action
       uses: dc740/django-coveragepy-github-action@0.9
