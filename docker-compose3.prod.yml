@@ -55,7 +55,6 @@ services:
       # Задание переменных окружения для контейнера с postgres
       environment:
          - POSTGRES_PASSWORD=postgres
-         
       networks:
          - db_network 
       #entrypoint: chown -R 999:999 /var/lib/postgresql/data

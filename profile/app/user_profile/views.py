@@ -11,18 +11,6 @@ from rest_framework.response import Response
 from rest_framework import status
 from django.db.models.deletion import ProtectedError
 from django.db import IntegrityError
-'''
-class UserViewSet(#mixins.CreateModelMixin,
-                   mixins.RetrieveModelMixin,
-                   mixins.UpdateModelMixin,
-                   #mixins.ListModelMixin,
-                   mixins.DestroyModelMixin,
-                   GenericViewSet):
-    queryset = Users.objects.all()
-    serializer_class = UsersSerializer
-'''
-
-
 
 #https://ilyachch.gitbook.io/django-rest-framework-russian-documentation/overview/navigaciya-po-api/filtering
 class UsersListView(generics.ListAPIView):
@@ -34,9 +22,6 @@ class UsersListView(generics.ListAPIView):
 class UsersCreate(viewsets.GenericViewSet, mixins.CreateModelMixin):
     queryset = Users.objects.all()
     serializer_class = UsersSerializer
-    #lookup_fields = 'usernameid'
-    #lookup_url_kwargs = 'username'
-
 
     def create(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
@@ -46,8 +31,7 @@ class UsersCreate(viewsets.GenericViewSet, mixins.CreateModelMixin):
         serializer.save(id=id)
         headers = self.get_success_headers(serializer.data)
         return Response(serializer.data, status=status.HTTP_201_CREATED,
-                        headers=headers)
-    
+                        headers=headers)  
 
 class UsersUpdate(generics.UpdateAPIView, generics.RetrieveAPIView):
     queryset = Users.objects.all()
@@ -66,8 +50,6 @@ class UsersDetail(generics.ListAPIView):
         return self.queryset.filter(
             id=self.kwargs['id'])
 
-    
-
 class UsersDestroy(generics.DestroyAPIView, generics.RetrieveAPIView):
     queryset = Users.objects.all()
     serializer_class = UsersSerializer
@@ -77,13 +59,12 @@ class UsersDestroy(generics.DestroyAPIView, generics.RetrieveAPIView):
         queryset = Users.objects.filter(id=self.kwargs['pk'])
         return queryset
            
-
     def destroy(self, request, *args, **kwargs):
         instance = self.get_object()
-        print("HHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHH")
+
         try:
             self.perform_destroy(instance)
         except ProtectedError as e:
-            return Response("Нельзя удалить клиента с привязхаными счетами", status=status.HTTP_403_FORBIDDEN)
+            return Response("Нельзя удалить клиента привязаными счетами", status=status.HTTP_403_FORBIDDEN)
         return Response(status=status.HTTP_204_NO_CONTENT)
     

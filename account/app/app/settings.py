@@ -39,11 +39,10 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'account',
+    'flags',
     'rest_framework',
-    'django.contrib.postgres', #это модуль Django, который предоставляет интеграцию с базой данных PostgreSQL
-    'shortuuid',
-    'polymorphic',# https://django-polymorphic.readthedocs.io/en/stable/quickstart.html
-    #'django.contrib.contenttypes', #cпроблемы с удалением моделей
+    'django.contrib.postgres', 
+
 ]
 
 MIDDLEWARE = [
@@ -87,36 +86,10 @@ WSGI_APPLICATION = 'app.wsgi.application'
 #    }
 #}
 
-'''
+
 # For PosgreSQL
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.postgresql',   # Используется PostgreSQL
-        'NAME': 'postgres', # Имя базы данных
-        'USER': 'postgres', # Имя пользователя
-        'PASSWORD': 'postgres', # Пароль пользователя
-        'HOST': 'pgdb', # Наименование контейнера для базы данных в Docker Compose
-        'PORT': '5432',  # Порт базы данных
-    }
-}
-
-
-
-#DATABASES = {
-#    "default": {
-#        "ENGINE": "django.db.backends.postgresql",
-#        "NAME": os.environ.get('DB_NAME'),
-#        "USER": os.environ.get('DB_USER'),
-#        "PASSWORD": os.environ.get('DB_USER_PASSWORD'),
-#        "HOST": os.environ.get('DB_HOST'),
-#        "PORT": os.environ.get('DB_PORT'),
-#    }
-#}
-'''
-
-DATABASES = {
-    'default': {
-        #'ENGINE': os.getenv('DB_ENGINE', 'django.db.backends.postgresql'),  'django.db.backends.postgresql_psycopg2'
         'ENGINE': os.getenv('DB_ENGINE', 'django.db.backends.postgresql_psycopg2'),
         'NAME': os.getenv('DB_NAME', 'postgres'),
         'USER': os.getenv('DB_USER', 'postgres'),
@@ -124,6 +97,16 @@ DATABASES = {
         'HOST': os.getenv('DB_HOST', 'localhost'),
         'PORT': os.getenv('DB_PORT', '5432'),
     }
+}
+
+
+FLAGS = {
+'ACCOUNT_LIST_FLAG': [],
+'ACCOUNT_CREATE_FLAG': [],
+'ACCOUNT_UPDATE_FLAG': [],
+'ACCOUNT_DESTROY_FLAG': [],
+'USERS_DESTROY_FLAG': [],
+'ACCOUNT_DETAIL_FLAG': [],
 }
 
 
