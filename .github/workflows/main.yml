@@ -11,9 +11,6 @@ jobs:
       steps:
       - name: Check out repository code
       - uses: actions/checkout@v4
-        with:
-          sparse-checkout: |
-            account
       - name: Set up Python ${{ matrix.python-version }}
         uses: actions/setup-python@v4
         with:
@@ -21,6 +18,7 @@ jobs:
       - name: Install Dependencies
       - run: echo $GITHUB_WORKSPACE
       - name: Main
+      - context: ./nginx
         run: |
           python -m pip install --upgrade pip setuptools wheel
           
