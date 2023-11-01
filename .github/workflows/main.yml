@@ -120,14 +120,14 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
-      - uses: actions/checkout@v2
-      - name: Deploy COI VM
-        id: deploy-coi
-        uses: yc-actions/yc-coi-deploy@v1
-        env:
+     - uses: actions/checkout@v2
+     - name: Deploy COI VM
+       id: deploy-coi
+       uses: yc-actions/yc-coi-deploy@v1
+       env:
           IMAGE_URL: cr.yandex/crpk28lsfu91rns28316/yc-coi-github-action:${{ github.sha }}
           SSH_KEY: ${{ secrets.SSH_KEY }}
-        with:
+       with:
           yc-sa-json-credentials: ${{ secrets.YC_SA_JSON_CREDENTIALS }}
           folder-id: epdmfcl5k4arb97fhqn1
           vm-name: miniwork
