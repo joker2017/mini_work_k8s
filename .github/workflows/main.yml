@@ -16,10 +16,11 @@ jobs:
         with:
           python-version: ${{ matrix.python-version }}
       - name: Install Dependencies
-        #working-directory: ./account
+        working-directory: .github/account
         run: | 
           python3 -m pip install --upgrade pip
-          pip install -r .github/requirements.txt
+          #pip install -r .github/account/requirements.txt
+          pip freeze > requirements.txt
       - name: Run Tests
         run: |
           cd ./account/app
