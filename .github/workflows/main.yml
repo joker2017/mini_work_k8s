@@ -19,7 +19,7 @@ jobs:
         #working-directory: .github/account
         run: | 
           python3 -m pip install --upgrade pip
-          pip install -r account/requirements.txt
+          python3 -m pip install -r account/requirements.txt
 
       - name: Run Tests
         run: |
