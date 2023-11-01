@@ -40,7 +40,7 @@ jobs:
       uses: johanvanhelden/gha-clover-test-coverage-check@v1
       with:
          percentage: "70"
-         filename: "coverage.xml 
+
     - name: Test coverage
       run: echo "${{ steps.test-coverage.outputs.coverage }}"
         
