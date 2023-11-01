@@ -7,3 +7,4 @@ django-filter>=23.3
 psycopg[binary,pool]
 gunicorn>=21.2.0
 shortuuid>=1.0.11
+django-flags>=5.0.13

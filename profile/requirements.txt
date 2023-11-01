@@ -6,4 +6,5 @@ django-filter>=23.3
 # psycopg2-binary>=2.9.9
 psycopg[binary,pool]
 gunicorn>=21.2.0
-django-flags
+django-flags>=5.0.13
+shortuuid>=1.0.11
