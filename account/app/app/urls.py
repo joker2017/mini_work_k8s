@@ -1,7 +1,7 @@
 
 from django.contrib import admin
 from django.urls import path, include
-from account.view import *
+from account.views import *
 from rest_framework import routers
 from rest_framework import routers
 from flags.urls import flagged_path, flagged_paths, flagged_re_path, flagged_re_paths
