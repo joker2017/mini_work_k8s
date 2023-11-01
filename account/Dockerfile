@@ -29,4 +29,5 @@ RUN chmod -R 777 /vol/web
 #RUN chown -R 999 /app/account/migrations
 USER user
 #CMD ["gunicorn", "app.wsgi:application", "--bind" "0.0.0.0:8000"]
-ENTRYPOINT ["/app/entrypoint.sh"]
+#ENTRYPOINT ["/app/entrypoint.sh"]
+ENTRYPOINT ["entrypoint.sh"]
