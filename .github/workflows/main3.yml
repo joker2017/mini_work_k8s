@@ -33,8 +33,8 @@ jobs:
         with:
           context: "{{defaultContext}}:account"
           push: true
-          #tags: user/app:latest
-          tags: ${{ steps.meta.outputs.tags }}
+          tags: user/app:latest
+          #tags: ${{ steps.meta.outputs.tags }}
           #labels: ${{ steps.meta.outputs.labels }}
           #github-token: ${{ secrets.GITHUB_TOKEN }}
 
