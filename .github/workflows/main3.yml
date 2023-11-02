@@ -16,8 +16,9 @@ jobs:
   docker:
     runs-on: ubuntu-latest
     permissions:
-     contents: read
-     packages: read
+        contents: read
+        packages: write
+
     steps:
       - uses: actions/checkout@v4
 
@@ -51,10 +52,10 @@ jobs:
         uses: docker/build-push-action@v5
         with:
               push: true
-              tags: cr.yandex/$CR_REGISTRY/$CR_REPOSITORY:$IMAGE_TAG
+              #tags: cr.yandex/$CR_REGISTRY/$CR_REPOSITORY:$IMAGE_TAG
               #labels: account
           #/account/${{ github.sha }}
               context: "{{defaultContext}}:account"
               #file: ./account/Dockerfile`
-
-
+              tags: ghcr.io/${{ env.REPO }}:${{ github.sha }
+              labels: account
