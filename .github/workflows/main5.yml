@@ -1,0 +1,66 @@
+name: Docker Image CI
+
+on:
+  push:
+    branches: [ "main" ]
+  workflow_dispatch:
+    inputs:
+      reason:
+        description: 'why'
+        required: false
+        default: 'just for fun'
+
+env:
+  FRONTEND_IMAGE: ${{ secrets.DOCKER_HUB_USERNAME }}/text-to-image-frontend:${{ github.sha }}
+  BACKEND_IMAGE: ${{ secrets.DOCKER_HUB_USERNAME }}/text-to-image-api:${{ github.sha }}
+  NGINX_IMAGE: ${{ secrets.DOCKER_HUB_USERNAME }}/text-to-image-nginx:${{ github.sha }}
+
+jobs:
+  build-backend:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v3
+
+    - name: Login to Dockerhub
+      uses: docker/login-action@v2
+      with:
+        username: ${{ secrets.DOCKER_HUB_USERNAME }}
+        password: ${{ secrets.DOCKER_HUB_ACCESS_TOKEN }}
+
+    - name: Setup Buildx
+      uses: docker/setup-buildx-action@v2
+
+    - name: Build Backend
+      uses: docker/build-push-action@v3
+      with:
+        context: ./src/backend
+        file: ./src/backend/Dockerfile
+        push: true
+        tags: ${{ env.BACKEND_IMAGE }}
+
+  build-frontend:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Login to Dockerhub
+        uses: docker/login-action@v2
+        with:
+          username: ${{ secrets.DOCKER_HUB_USERNAME }}
+          password: ${{ secrets.DOCKER_HUB_ACCESS_TOKEN }}
+
+
+      - name: Setup Buildx
+        uses: docker/setup-buildx-action@v2
+
+      - name: Build Frontend
+        uses: docker/build-push-action@v3
+        with:
+          context: src/frontend
+          file: ./src/frontend/Dockerfile
+          push: true
+          build-args: SERVER_URL=${{ secrets.API_SERVER_URL }}
+          tags: ${{ env.FRONTEND_IMAGE }}
