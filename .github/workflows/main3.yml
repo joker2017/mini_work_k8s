@@ -24,7 +24,8 @@ jobs:
         uses: docker/login-action@v3
         with:
             registry: ghcr.io
-            username: ${{ github.actor }}
+            username: ${{ github.repository_owner }}
+          #${{ github.actor }}
             password: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Build and push
@@ -32,8 +33,10 @@ jobs:
         with:
           context: "{{defaultContext}}:account"
           push: true
-          tags: user/app:latest
-          github-token: ${{ secrets.GITHUB_TOKEN }}
+          #tags: user/app:latest
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          #github-token: ${{ secrets.GITHUB_TOKEN }}
 
 
 
