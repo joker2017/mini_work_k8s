@@ -69,6 +69,7 @@ jobs:
       - name: Build and push
         uses: docker/build-push-action@v5
         with:
+          context: "{{defaultContext}}:account"
           push: true
           tags: user/app:latest
 
