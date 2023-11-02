@@ -37,7 +37,7 @@ jobs:
         uses: docker/build-push-action@v5
         with:
               push: true
-              tags: ghcr.io/${{ env.REPO }}:account:${{ github.sha }}
+              tags: ghcr.io/${{ env.REPO }}/account/${{ github.sha }}
               context: "{{defaultContext}}:account"
               #file: ./account/Dockerfile`
 
