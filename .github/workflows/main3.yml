@@ -1,0 +1,90 @@
+name: Test
+
+on:
+  workflow_dispatch
+ # push:
+  #  branches:
+  #  - dev
+  #pull_request:
+  #  branches:
+  #  - dev
+jobs:
+  test_account:
+
+    runs-on: ubuntu-latest
+
+
+env:
+  REGISTRY: ghcr.io
+  IMAGE_NAME: ${{ github.repository }}
+Определяет две пользовательские переменные среды для рабочего процесса. Они используются для домена реестра контейнеров и имени образа Docker, который создает этот рабочий процесс.
+
+jobs:
+  build-and-push-image:
+    runs-on: ubuntu-latest
+В этом рабочем процессе есть одно задание. Он настроен для работы в последней доступной версии Ubuntu.
+
+    permissions:
+      contents: read
+      packages: write
+Устанавливает разрешения, предоставленные для GITHUB_TOKENдействий в этом задании.
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      - name: Log in to the Container registry
+        uses: docker/login-action@65b78e6e13532edd9afa3aa52ac7964289d1a9c1
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+Использует docker/login-actionдействие для входа в реестр реестра контейнеров, используя учетную запись и пароль, которые будут публиковать пакеты. После публикации пакеты распространяются на учетную запись, определенную здесь.
+
+      - name: Extract metadata (tags, labels) for Docker
+        id: meta
+        uses: docker/metadata-action@9ec57ed1fcdbf14dcef7dfbe97b2010124a938b7
+        with:
+          images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
+На этом шаге используется действие docker/metadata-action для извлечения тегов и меток, которые будут применены к указанному изображению. « idМета» позволяет ссылаться на результаты этого шага на последующем шаге. Значение imagesпредоставляет базовое имя для тегов и меток.
+
+      - name: Build and push Docker image
+        uses: docker/build-push-action@f2a1d5e99d037542a71f64918e516c093c6f3fc4
+        with:
+          context: .
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+
+
+   
+    - name: Yandex Cloud CR "Login" Action for GitHub Actions
+      uses: yc-actions/yc-cr-login@v1
+      with:
+        yc-sa-json-credentials: ${{ secrets.YC_SA_JSON_CREDENTIALS }}
+    - name: Build, tag, and push image to Yandex Cloud Container Registry
+      env:
+        CR_REGISTRY: crpq5hg8snv82fhgppum
+        CR_REPO: my-cr-repo-miniwork-account
+        IMAGE_TAG: ${{ github.sha }}
+      run: |
+        account/docker build -t cr.yandex/$CR_REGISTRY/$CR_REPO:$IMAGE_TAG .
+        account/docker push cr.yandex/$CR_REGISTRY/$CR_REPO:$IMAGE_TAG
+
+
+
+
+
+
+
+
+
+
+
+
+       
+          
+          
+          
+          
+          
+
