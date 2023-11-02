@@ -39,13 +39,10 @@ jobs:
     #- name: Python Django Coverage GitHub Action
     #  uses: dc740/django-coveragepy-github-action@0.9
 
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
       with:
-        sparse-checkout: |
-          account
+        sparse-checkout: .
     - name: Get directory
-      run: cd /account
-    - name: Get directory2
       run: ls
     - name: Yandex Cloud CR "Login" Action for GitHub Actions
       uses: yc-actions/yc-cr-login@v1
@@ -57,8 +54,8 @@ jobs:
         CR_REPO: my-cr-repo-miniwork-account
         IMAGE_TAG: ${{ github.sha }}
       run: |
-        docker build -t cr.yandex/$CR_REGISTRY/$CR_REPO:$IMAGE_TAG .
-        docker push cr.yandex/$CR_REGISTRY/$CR_REPO:$IMAGE_TAG
+        account/docker build -t cr.yandex/$CR_REGISTRY/$CR_REPO:$IMAGE_TAG .
+        account/docker push cr.yandex/$CR_REGISTRY/$CR_REPO:$IMAGE_TAG
 
 
 
