@@ -70,6 +70,7 @@ jobs:
         with:
           push: false
           tags: user/app:latest
+      - name: Build
         run: account/docker push cr.yandex/$CR_REGISTRY/$CR_REPO:$IMAGE_TAG
 
 
