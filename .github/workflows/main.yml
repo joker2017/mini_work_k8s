@@ -39,7 +39,7 @@ jobs:
     #- name: Python Django Coverage GitHub Action
     #  uses: dc740/django-coveragepy-github-action@0.9
 
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@v3
       with:
         sparse-checkout: |
           account
