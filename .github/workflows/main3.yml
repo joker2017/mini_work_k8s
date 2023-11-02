@@ -57,5 +57,5 @@ jobs:
           #/account/${{ github.sha }}
               context: "{{defaultContext}}:account"
               #file: ./account/Dockerfile`
-              tags: ghcr.io/${{ env.REPO }}:${{ github.sha }
+              tags: ghcr.io/${{ env.REPO }}:${{ github.sha }}
               labels: account
