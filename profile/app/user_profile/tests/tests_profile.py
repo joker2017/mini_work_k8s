@@ -2,7 +2,7 @@ import unittest
 from unittest.mock import Mock
 from ..views import UsersListView, UsersCreate, UsersUpdate, UsersDetail, UsersDestroy
 from ..serializers import UsersSerializer
-
+from django.test import SimpleTestCase
 
 class UsersSerializerTest(unittest.TestCase):
     def test_serializer_fields(self):

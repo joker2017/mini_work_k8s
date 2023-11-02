@@ -5,7 +5,7 @@ from rest_framework.test import APIRequestFactory
 from rest_framework.serializers import Serializer
 from rest_framework.views import APIView
 from rest_framework.status import HTTP_201_CREATED, HTTP_200_OK, HTTP_204_NO_CONTENT, HTTP_404_NOT_FOUND
-
+from django.test import SimpleTestCase
 
 # пример Account модели для использования в тестах
 class Account:
