@@ -71,7 +71,7 @@ jobs:
         with:
           context: "{{defaultContext}}:account"
           push: ${{ github.event_name != 'pull_request' }} # Don't push on PR
-          tags: ${{ steps.meta.outputs.tags }}
+          tags: ${{ github.sha }}
         #  labels: ${{ steps.meta.outputs.labels }}
         #  cache-from: type=gha
          # cache-to: type=gha,mode=max
