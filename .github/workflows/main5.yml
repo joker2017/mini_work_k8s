@@ -16,7 +16,7 @@ env:
   NGINX_IMAGE: ${{ secrets.DOCKER_HUB_USERNAME }}/text-to-image-nginx:${{ github.sha }}
 
 jobs:
-  build-backend:
+  account:
     runs-on: ubuntu-latest
 
     steps:
@@ -40,7 +40,7 @@ jobs:
         push: true
         tags: ${{ env.BACKEND_IMAGE }}
 
-  build-frontend:
+  profile:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
