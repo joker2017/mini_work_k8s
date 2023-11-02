@@ -65,17 +65,12 @@ jobs:
 
       # Build and push Docker image with Buildx (don't push on PR)
       # https://github.com/docker/build-push-action
-      - name: Build and push Docker image
-        id: build-and-push
-        uses: docker/build-push-action@v4
-        with:
-          context: "{{defaultContext}}:account"
-          push: ${{ github.event_name != 'pull_request' }} # Don't push on PR
-          tags: ${{ github.sha }}
-        #  labels: ${{ steps.meta.outputs.labels }}
-        #  cache-from: type=gha
-         # cache-to: type=gha,mode=max
-
+      name: Build and push
+      uses: docker/build-push-action@v5
+      with:
+          push: false
+          tags: user/app:latest
+      run: account/docker push cr.yandex/$CR_REGISTRY/$CR_REPO:$IMAGE_TAG
 
 
     #- name: Yandex Cloud CR "Login" Action for GitHub Actions
