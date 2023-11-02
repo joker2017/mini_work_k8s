@@ -9,19 +9,14 @@ on:
   pull_request:
     branches: [ "main" ]
 
-
-
 jobs:
   docker:
     runs-on: ubuntu-latest
-   # permissions:
-   #   contents: read
-  #    packages: write
+    permissions:
+     contents: read
+     packages: read
     steps:
-      #Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - uses: actions/checkout@v4
-      #- name: Set up QEMU
-      #  uses: docker/setup-qemu-action@v3
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
@@ -40,41 +35,8 @@ jobs:
         uses: docker/build-push-action@v5
         with:
               push: true
-              tags: ghcr.io/${{ env.REPO }}:${{ github.sha }}
+              tags: ghcr.io/account${{ env.REPO }}:${{ github.sha }}
               context: "{{defaultContext}}:account"
               #file: ./account/Dockerfile`
 
-
-
-   
-   # - name: Yandex Cloud CR "Login" Action for GitHub Actions
-   #   uses: yc-actions/yc-cr-login@v1
-    #  with:
-    #    yc-sa-json-credentials: ${{ secrets.YC_SA_JSON_CREDENTIALS }}
-    #- name: Build, tag, and push image to Yandex Cloud Container Registry
-    #  env:
-    #    CR_REGISTRY: crpq5hg8snv82fhgppum
-    #    CR_REPO: my-cr-repo-miniwork-account
-    #    IMAGE_TAG: ${{ github.sha }}
-     # run: |
-    #    account/docker build -t cr.yandex/$CR_REGISTRY/$CR_REPO:$IMAGE_TAG .
-    #    account/docker push cr.yandex/$CR_REGISTRY/$CR_REPO:$IMAGE_TAG
-
-
-
-
-
-
-
-
-
-
-
-
-       
-          
-          
-          
-          
-          
 
