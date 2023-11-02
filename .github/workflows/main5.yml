@@ -35,8 +35,8 @@ jobs:
     - name: Build Backend
       uses: docker/build-push-action@v3
       with:
-        context: ./src/backend
-        file: ./src/backend/Dockerfile
+        context: ./account
+        file: ./account/Dockerfile
         push: true
         tags: ${{ env.BACKEND_IMAGE }}
 
@@ -59,8 +59,8 @@ jobs:
       - name: Build Frontend
         uses: docker/build-push-action@v3
         with:
-          context: src/frontend
-          file: ./src/frontend/Dockerfile
+          context: ./profile
+          file: ./profile/Dockerfile
           push: true
           build-args: SERVER_URL=${{ secrets.API_SERVER_URL }}
           tags: ${{ env.FRONTEND_IMAGE }}
