@@ -9,10 +9,6 @@ on:
   pull_request:
     branches: [ "main" ]
 
-env:
-  REGISTRY: ghcr.io
-  IMAGE_NAME: ${{ github.repository }}-dev
-  DEV_BRANCH: dev
 
 
 jobs:
@@ -45,7 +41,8 @@ jobs:
         with:
               push: true
               tags: ghcr.io/${{ env.REPO }}:${{ github.sha }}
-              file: ./account/Dockerfile`
+              context: "{{defaultContext}}:account"
+              #file: ./account/Dockerfile`
 
 
 
