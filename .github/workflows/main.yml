@@ -44,7 +44,7 @@ jobs:
         sparse-checkout: |
           account
     - name: Get directory
-      run: cd account
+      run: cd /account
     - name: Get directory2
       run: ls
     - name: Yandex Cloud CR "Login" Action for GitHub Actions
