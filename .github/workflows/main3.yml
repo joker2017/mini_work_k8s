@@ -33,7 +33,7 @@ jobs:
           context: "{{defaultContext}}:account"
           push: true
           tags: user/app:latest
-
+          github-token: ${{ secrets.GITHUB_TOKEN }}
 
 
 
