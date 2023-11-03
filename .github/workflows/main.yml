@@ -40,7 +40,7 @@ jobs:
       #  cd app
         ls
         echo "CCCCCCCCCCCCCCCCCCCCC"
-        python manage.py test account
+        python app/manage.py test account
 
     - name: Python Django Coverage GitHub Action
       uses: dc740/django-coveragepy-github-action@0.9
