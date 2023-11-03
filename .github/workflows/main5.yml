@@ -98,7 +98,7 @@ jobs:
 
       - name: Deploy COI VM
         id: deploy-coi
-        uses: yc-actions/yc-coi-deploy@v1.0.1
+        uses: yc-actions/yc-coi-deploy@v2
         env:
           ACCOUNT_IMAGE: ${{ env.ACCOUNT_IMAGE }}
           PROFILE_IMAGE: ${{ env.PROFILE_IMAGE }}
