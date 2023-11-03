@@ -1,0 +1,80 @@
+version: '3.8'
+services:
+
+
+  account:
+      image: {{ env.ACCOUNT_IMAGE }}
+      container_name: account
+      networks:
+       - nginx_network
+       - db_network
+      volumes:
+         - static_volume:/vol/web/static
+      command: gunicorn app.wsgi:application --bind 0.0.0.0:8001 --workers 3 -t 0
+      depends_on:
+        - pgdb
+      env_file: .env
+      environment:
+        - DEBUG=TRUE  #только в режиме разработки
+        - DJANGO_SUPERUSER_USERNAME=admin
+        - DJANGO_SUPERUSER_PASSWORD=admin
+        - DJANGO_SUPERUSER_EMAIL=admin@example.com
+
+
+  profile:
+      image: {{ env.PROFILE_IMAGE }}
+      container_name: profile
+      networks:
+       - nginx_network
+       - db_network
+      volumes:
+         - static_volume:/vol/web/static
+      command: gunicorn app.wsgi:application --bind 0.0.0.0:8002 --workers 3 -t 0
+      depends_on:
+        - pgdb
+      env_file: .env
+      environment:
+        - DEBUG=TRUE  #только в режиме разработки
+        - DJANGO_SUPERUSER_USERNAME=admin
+        - DJANGO_SUPERUSER_PASSWORD=admin
+        - DJANGO_SUPERUSER_EMAIL=admin@example.com
+
+  pgdb:
+      image: postgres:14
+      container_name: pgdb
+      environment:
+         - POSTGRES_PASSWORD=postgres
+      networks:
+         - db_network
+      volumes:
+         - postgres_data:/var/lib/postgresql/data/
+
+
+
+  nginx:
+    image: {{ env.NGINX_IMAGE }}
+    container_name: nginx
+    ports:
+      - 8002:80
+      - 8001:80
+
+    volumes:
+      - static_volume:/var/www/html/static/
+    depends_on:
+      - account
+      - profile
+    networks:
+      - nginx_network
+
+networks:
+  nginx_network:
+    driver: bridge
+  db_network:
+    driver: bridge
+
+volumes:
+  postgres_data:
+  static_volume:
+
+
+
