@@ -17,7 +17,6 @@ env:
 jobs:
   account:
     runs-on: ubuntu-latest
-
     steps:
     - name: Checkout
       uses: actions/checkout@v3
@@ -103,21 +102,17 @@ jobs:
           ACCOUNT_IMAGE: ${{ env.ACCOUNT_IMAGE }}
           PROFILE_IMAGE: ${{ env.PROFILE_IMAGE }}
           NGINX_IMAGE: ${{ env.NGINX_IMAGE }}
-          FRONTEND_ORIGINS: ${{ secrets.PROFILE_ORIGINS }}
+          #PROFILE_ORIGINS: ${{ secrets.PROFILE_ORIGINS }}
           YC_VM_SSH: ${{ secrets.YC_VM_SSH }}
           YC_VM_USERNAME: ${{ secrets.YC_VM_USERNAME }}
-          NGINX_CERT: ${{ secrets.NGINX_CERT }}
-          NGINX_CERT_KEY: ${{ secrets.NGINX_CERT_KEY }}
+          #NGINX_CERT: ${{ secrets.NGINX_CERT }}
+          #NGINX_CERT_KEY: ${{ secrets.NGINX_CERT_KEY }}
         with:
           yc-sa-json-credentials: ${{ secrets.YC_SA_JSON_CREDENTIALS }}
           folder-id: ${{ secrets.YC_FOLDER_ID }}
           VM-name: ${{ secrets.YC_VM_NAME }}
           vm-service-account-id: ${{ secrets.YC_SERVICE_ACCOUNT_ID }}
-          vm-cores: 2
-          vm-platform-id: 'standard-v2'
-          vm-memory: 512Mb
-          vm-disk-size: 30Gb
-          vm-core-fraction: 5
+
           vm-subnet-id: ${{ secrets.YC_SUBNET_ID }}
           docker-compose-path: './docker-compose.yc.yaml'
           user-data-path: './user-data.yaml'
