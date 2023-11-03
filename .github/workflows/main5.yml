@@ -10,9 +10,9 @@ on:
         default: 'just for fun'
 
 env:
-  PROFILE_IMAGE: ${{ secrets.DOCKER_HUB_USERNAME }}/text-to-image-profile:${{ github.sha }}
-  ACCOUNT_IMAGE: ${{ secrets.DOCKER_HUB_USERNAME }}/text-to-image-account:${{ github.sha }}
-  NGINX_IMAGE: ${{ secrets.DOCKER_HUB_USERNAME }}/text-to-image-nginx:${{ github.sha }}
+  PROFILE_IMAGE: ${{ secrets.DOCKER_HUB_USERNAME }}/profile:${{ github.sha }}
+  ACCOUNT_IMAGE: ${{ secrets.DOCKER_HUB_USERNAME }}/account:${{ github.sha }}
+  NGINX_IMAGE: ${{ secrets.DOCKER_HUB_USERNAME }}/nginx:${{ github.sha }}
 
 jobs:
   account:
