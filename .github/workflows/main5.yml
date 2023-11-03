@@ -15,7 +15,7 @@ env:
   NGINX_IMAGE: ${{ secrets.DOCKER_HUB_USERNAME }}/nginx:${{ github.sha }}
 
 jobs:
-  account:
+  build-account:
     runs-on: ubuntu-latest
     steps:
     - name: Checkout
@@ -38,7 +38,7 @@ jobs:
         push: true
         tags: ${{ env.ACCOUNT_IMAGE }}
 
-  profile:
+  build-profile:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -90,7 +90,7 @@ jobs:
 
   update-yc:
     runs-on: ubuntu-latest
-    needs: [ build-backend, build-frontend, build-nginx ]
+    needs: [ build-account, build-profile, build-nginx ]
     steps:
       - name: Checkout
         uses: actions/checkout@v3
