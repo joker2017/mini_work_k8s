@@ -40,7 +40,7 @@ jobs:
         cd /app
         ls
         echo "CCCCCCCCCCCCCCCCCCCCC"
-        python manage.py test
+        python manage.py test account
 
     - name: Python Django Coverage GitHub Action
       uses: dc740/django-coveragepy-github-action@0.9
@@ -80,7 +80,7 @@ jobs:
       #    flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
       - name: Test with pytest
         run: |
-          python profile/app/manage.py test account
+          python profile/app/manage.py test profile
       - name: Python Django Coverage GitHub Action
         uses: dc740/django-coveragepy-github-action@0.9
        
