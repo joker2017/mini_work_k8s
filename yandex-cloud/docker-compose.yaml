@@ -1,7 +1,6 @@
 version: '3.8'
 services:
 
-
   account:
       image: {{ env.ACCOUNT_IMAGE }}
       container_name: account
