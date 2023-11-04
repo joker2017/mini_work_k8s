@@ -22,4 +22,4 @@ RUN chmod -R 777 /vol/web
 
 USER user
 #CMD ["gunicorn", "app.wsgi:application", "--bind" "0.0.0.0:8001"]
-ENTRYPOINT ["/app/entrypoint.sh"]
+#ENTRYPOINT ["\app/entrypoint.sh"]
