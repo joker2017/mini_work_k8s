@@ -13,7 +13,7 @@ services:
       command: gunicorn app.wsgi:application --bind 0.0.0.0:8001 --workers 3 -t 0
       depends_on:
         - pgdb
-      env_file: .env
+      #env_file: .env
       environment:
         - DEBUG=TRUE  #только в режиме разработки
         - DJANGO_SUPERUSER_USERNAME=admin
@@ -32,7 +32,7 @@ services:
       command: gunicorn app.wsgi:application --bind 0.0.0.0:8002 --workers 3 -t 0
       depends_on:
         - pgdb
-      env_file: .env
+      #env_file: .env
       environment:
         - DEBUG=TRUE  #только в режиме разработки
         - DJANGO_SUPERUSER_USERNAME=admin
@@ -55,5 +55,18 @@ services:
     image: {{ env.NGINX_IMAGE }}
     container_name: nginx
     ports:
-      - 8002:80
-      - 8001:80
+      - '80:80'
+      - '443:443'
+    restart: always
+    depends_on:
+      - account
+      - profile
+
+
+networks:
+  nginx_network:
+  db_network:
+
+volumes:
+  static_volume:
+  postgres_data:
