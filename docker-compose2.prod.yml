@@ -5,7 +5,7 @@ services:
 
 
   account:
-      build: ./account
+      build: depsemt2009/account:latest
       container_name: account
       networks:
        - nginx_network      # proxy and app must be in same network
@@ -29,7 +29,7 @@ services:
 
 
   profile:
-      build: ./profile
+      build: depsemt2009/profile:latest
       container_name: profile
       networks:
        - nginx_network      # proxy and app must be in same network
