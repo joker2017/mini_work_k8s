@@ -60,11 +60,6 @@ services:
     ports:
       - "5050:80"
     restart: unless-stopped
-    deploy:
-      resources:
-        limits:
-          cpus: '0.5'
-          memory: 1G
     networks:
       - db_network
 
@@ -89,3 +84,4 @@ networks:
 volumes:
   static_volume:
   postgres_data:
+  pgadmin-data:
