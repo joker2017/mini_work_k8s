@@ -3,7 +3,7 @@ services:
 
   account:
       image: {{ env.ACCOUNT_IMAGE }}
-      container_name: account
+      #container_name: account
       networks:
        - nginx_network
        - db_network
@@ -22,7 +22,7 @@ services:
 
   profile:
       image: {{ env.PROFILE_IMAGE }}
-      container_name: profile
+      #container_name: profile
       networks:
        - nginx_network
        - db_network
