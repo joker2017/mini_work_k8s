@@ -16,4 +16,4 @@ jobs:
           port: ${{ secrets.PORT }}
           passphrase: ${{ secrets.PASSPHRASE }}
           source: "./docker-compose.yaml"
-          target: ./usr
+          target: /tmp
