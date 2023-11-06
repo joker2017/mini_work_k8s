@@ -11,7 +11,7 @@ jobs:
             uses: appleboy/ssh-action@v1.0.0
             with:
               host: 158.160.127.41
-              username: ${{ secrets.USERNAME }}
+              #username: ${{ secrets.USERNAME }}
               key: ${{ secrets.KEY }}
               port: ${{ secrets.PORT }}
               passphrase: ${{ secrets.PASSPHRASE }}
