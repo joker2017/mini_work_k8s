@@ -19,4 +19,4 @@ jobs:
               script_stop: true
               script: |
                 echo "Nice Job!!!"
-                docker ps -f name=profile -q | tail -n1
+                whoami
