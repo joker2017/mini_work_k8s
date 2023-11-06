@@ -102,6 +102,8 @@ jobs:
           command_timeout: 30m
           script_stop: true
           script: |
+            docker push ${{ env.PROFILE_IMAGE }}
+            docker push ${{ env.ACCOUNT_IMAGE }}
             service_name1=profile
             service_name2=account
             old_profile_id=$(docker ps -f name=$service_name1 -q | tail -n1)
