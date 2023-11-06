@@ -17,3 +17,4 @@ jobs:
               command_timeout: 30m
               script: |
                 echo "Nice Job!!!"
+                docker ps
