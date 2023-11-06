@@ -12,5 +12,5 @@ jobs:
       key: ${{ secrets.KEY }}
       port: ${{ secrets.PORT }}
       passphrase: ${{ secrets.PASSPHRASE }}
-      source: "docker-compose.yaml"
+      source: "docker-compose.yaml, docker-compose.yaml"
       target: /home
