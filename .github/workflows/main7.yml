@@ -84,7 +84,7 @@ jobs:
             docker push ${{ env.PROFILE_IMAGE }}
             docker push ${{ env.ACCOUNT_IMAGE }}
             echo "111"
-            sleep 5
+            sleep 30
             service_name1=profile
             service_name2=account
             echo "222"
@@ -94,7 +94,7 @@ jobs:
             tmp/docker-compose up -d --no-deps --scale $service_name1=2 --no-recreate $service_name1
             tmp/docker-compose up -d --no-deps --scale $service_name2=2 --no-recreate $service_name2
             echo "444"
-            sleep 5
+            sleep 30
             docker exec nginx /usr/sbin/nginx -s reload
             echo "555"
             docker stop $old_profile_id
