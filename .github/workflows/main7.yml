@@ -82,8 +82,8 @@ jobs:
           script_stop: true
           script: |
             sleep 30
-            docker push depsemt2009/profile:${{ env.PROFILE_IMAGE }}
-            docker push depsemt2009/account:${{ env.ACCOUNT_IMAGE }}
+            docker push depsemt2009/profile:latest
+            docker push depsemt2009/account:latest
             echo "111"
             
             service_name1=profile
