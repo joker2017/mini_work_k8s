@@ -81,6 +81,9 @@ jobs:
           command_timeout: 30m
           script_stop: true
           script: |
+            echo "{{ env.PROFILE_IMAGE }}"
+            echo "${{ secrets.DOCKER_HUB_USERNAME }}"
+            echo "${{ github.sha }}"
             sleep 30
             docker push depsemt2009/profile:latest
             docker push depsemt2009/account:latest
