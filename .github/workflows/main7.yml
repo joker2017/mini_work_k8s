@@ -85,8 +85,8 @@ jobs:
             echo "${{ secrets.DOCKER_HUB_USERNAME }}"
             echo "${{ github.sha }}"
             sleep 30
-            docker push depsemt2009/profile:latest
-            docker push depsemt2009/account:latest
+            docker push depsemt2009/profile:${{ github.sha }}
+            docker push depsemt2009/account:${{ github.sha }}
             echo "111"
             
             service_name1=profile
