@@ -12,7 +12,7 @@ on:
 env:
   PROFILE_IMAGE: ${{ secrets.DOCKER_HUB_USERNAME }}/profile:${{ github.sha }}
   ACCOUNT_IMAGE: ${{ secrets.DOCKER_HUB_USERNAME }}/account:${{ github.sha }}
-  NGINX_IMAGE: ${{ secrets.DOCKER_HUB_USERNAME }}/nginx:${{ github.sha }}
+  #NGINX_IMAGE: ${{ secrets.DOCKER_HUB_USERNAME }}/nginx:${{ github.sha }}
 
 jobs:
   build-account:
@@ -81,10 +81,11 @@ jobs:
           command_timeout: 30m
           script_stop: true
           script: |
+            sleep 30
             docker push ${{ env.PROFILE_IMAGE }}
             docker push ${{ env.ACCOUNT_IMAGE }}
             echo "111"
-            sleep 30
+            
             service_name1=profile
             service_name2=account
             echo "222"
