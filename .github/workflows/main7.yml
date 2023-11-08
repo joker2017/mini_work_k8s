@@ -85,9 +85,7 @@ jobs:
           command_timeout: 30m
           script_stop: true
           script: |
-            #echo "{{ env.PROFILE_IMAGE }}"
-            #echo "${{ secrets.DOCKER_HUB_USERNAME }}"
-            #echo "${{ github.sha }}"
+            docker system prune --all --force --volumes
             docker pull ${{ env.PROFILE_IMAGE }}
             docker pull ${{ env.ACCOUNT_IMAGE }}
             echo "111"
@@ -98,8 +96,9 @@ jobs:
             old_profile_id=$(docker ps -f name=$service_name1 -q | tail -n1)
             old_account_id=$(docker ps -f name=$service_name2 -q | tail -n1)
             echo "333"
-            ./tmp/docker-compose up -d --no-deps --scale $service_name1=2 --no-recreate $service_name1
-            ./tmp/docker-compose up -d --no-deps --scale $service_name2=2 --no-recreate $service_name2
+            cd /tmp
+            docker-compose up -d --no-deps --scale $service_name1=2 --no-recreate $service_name1
+            docker-compose up -d --no-deps --scale $service_name2=2 --no-recreate $service_name2
             echo "444"
             sleep 30
             docker exec nginx /usr/sbin/nginx -s reload
@@ -110,8 +109,8 @@ jobs:
             docker stop $old_account_id
             docker rm $old_account_id
             echo "777"
-            tmp/docker-compose up -d --no-deps --scale $service_name1=1 --no-recreate $service_name1
-            tmp/docker-compose up -d --no-deps --scale $service_name2=1 --no-recreate $service_name2
+            docker-compose up -d --no-deps --scale $service_name1=1 --no-recreate $service_name1
+            docker-compose up -d --no-deps --scale $service_name2=1 --no-recreate $service_name2
             echo "888"
             docker exec nginx /usr/sbin/nginx -s reload
             echo "succesfully redeployed $service_name"
