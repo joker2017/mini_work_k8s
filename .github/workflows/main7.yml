@@ -98,8 +98,8 @@ jobs:
             old_profile_id=$(docker ps -f name=$service_name1 -q | tail -n1)
             old_account_id=$(docker ps -f name=$service_name2 -q | tail -n1)
             echo "333"
-            tmp/docker-compose up -d --no-deps --scale $service_name1=2 --no-recreate $service_name1
-            tmp/docker-compose up -d --no-deps --scale $service_name2=2 --no-recreate $service_name2
+            ./tmp/docker-compose up -d --no-deps --scale $service_name1=2 --no-recreate $service_name1
+            ./tmp/docker-compose up -d --no-deps --scale $service_name2=2 --no-recreate $service_name2
             echo "444"
             sleep 30
             docker exec nginx /usr/sbin/nginx -s reload
