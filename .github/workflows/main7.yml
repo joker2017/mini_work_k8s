@@ -36,8 +36,8 @@ jobs:
         context: ./account
         file: ./account/Dockerfile
         push: true
-        #tags: ${{ env.ACCOUNT_IMAGE }}
-        tags: depsemt2009/account:latest
+        tags: ${{ env.ACCOUNT_IMAGE }}
+        #tags: depsemt2009/account:${{ steps.meta.outputs.version }}
 
   build-profile:
     runs-on: ubuntu-latest
@@ -62,8 +62,8 @@ jobs:
           file: ./profile/Dockerfile
           push: true
           #build-args: SERVER_URL=${{ secrets.API_SERVER_URL }}
-          #tags: ${{ env.PROFILE_IMAGE }}
-          tags: depsemt2009/profile:latest
+          tags: ${{ env.PROFILE_IMAGE }}
+          #tags: depsemt2009/profile:${{ steps.meta.outputs.version }}
           #quay.io/siddhesh_ghadi/multi-arch-gha:latest
           #hub.docker.com/depsemt2009/profile:latest
 
@@ -88,8 +88,8 @@ jobs:
             #echo "{{ env.PROFILE_IMAGE }}"
             #echo "${{ secrets.DOCKER_HUB_USERNAME }}"
             #echo "${{ github.sha }}"
-            docker pull depsemt2009/account:tagname
-            docker pull depsemt2009/profile:tagname
+            docker pull ${{ env.PROFILE_IMAGE }}
+            docker pull ${{ env.ACCOUNT_IMAGE }}
             echo "111"
             sleep 30
             service_name1=profile
