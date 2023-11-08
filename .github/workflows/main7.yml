@@ -86,8 +86,8 @@ jobs:
           script_stop: true
           script: |
             docker system prune --all --force --volumes
-            #docker pull ${{ env.PROFILE_IMAGE }}
-            #docker pull ${{ env.ACCOUNT_IMAGE }}
+            docker pull ${{ env.PROFILE_IMAGE }}
+            docker pull ${{ env.ACCOUNT_IMAGE }}
             echo "111"
             sleep 30
             service_name1=profile
