@@ -65,7 +65,7 @@ jobs:
           #tags: ${{ env.PROFILE_IMAGE }}
           tags: hub.docker.com/depsemt2009/profile:latest
           #quay.io/siddhesh_ghadi/multi-arch-gha:latest
-          hub.docker.com/depsemt2009/profile:latest
+          #hub.docker.com/depsemt2009/profile:latest
 
 
 
@@ -88,8 +88,8 @@ jobs:
             #echo "{{ env.PROFILE_IMAGE }}"
             #echo "${{ secrets.DOCKER_HUB_USERNAME }}"
             #echo "${{ github.sha }}"
-            docker push depsemt2009/account:tagname
-            docker push depsemt2009/profile:tagname
+            docker pull depsemt2009/account:tagname
+            docker pull depsemt2009/profile:tagname
             echo "111"
             sleep 30
             service_name1=profile
