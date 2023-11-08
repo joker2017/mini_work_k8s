@@ -2,7 +2,7 @@ version: '3.8'
 services:
 
   account:
-      image: depsemt2009/account:latest
+      image: depsemt2009/account
       #container_name: account
       networks:
        - nginx_network
@@ -21,7 +21,7 @@ services:
 
 
   profile:
-      image: depsemt2009/profile:latest
+      image: depsemt2009/profile
       #container_name: profile
       networks:
        - nginx_network
@@ -66,7 +66,7 @@ services:
       - db_network
 
   nginx:
-    image: depsemt2009/nginx:latest
+    image: depsemt2009/nginx
     container_name: nginx
     ports:
       - 8002:80
