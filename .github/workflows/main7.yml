@@ -37,7 +37,7 @@ jobs:
         file: ./account/Dockerfile
         push: true
         #tags: ${{ env.ACCOUNT_IMAGE }}
-        tags: hub.docker.com/depsemt2009/account:latest
+        tags: depsemt2009/account:latest
 
   build-profile:
     runs-on: ubuntu-latest
@@ -63,7 +63,7 @@ jobs:
           push: true
           #build-args: SERVER_URL=${{ secrets.API_SERVER_URL }}
           #tags: ${{ env.PROFILE_IMAGE }}
-          tags: hub.docker.com/depsemt2009/profile:latest
+          tags: depsemt2009/profile:latest
           #quay.io/siddhesh_ghadi/multi-arch-gha:latest
           #hub.docker.com/depsemt2009/profile:latest
 
