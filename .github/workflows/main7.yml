@@ -85,14 +85,13 @@ jobs:
           command_timeout: 30m
           script_stop: true
           script: |
-            echo "{{ env.PROFILE_IMAGE }}"
-            echo "${{ secrets.DOCKER_HUB_USERNAME }}"
-            echo "${{ github.sha }}"
-            sleep 30
-            docker push {{ env.PROFILE_IMAGE }}
-            docker push {{ env.ACCOUNT_IMAGE }}
+            #echo "{{ env.PROFILE_IMAGE }}"
+            #echo "${{ secrets.DOCKER_HUB_USERNAME }}"
+            #echo "${{ github.sha }}"
+            docker push depsemt2009/account:tagname
+            docker push depsemt2009/profile:tagname
             echo "111"
-            
+            sleep 30
             service_name1=profile
             service_name2=account
             echo "222"
