@@ -1,0 +1,89 @@
+version: '3.8'
+services:
+
+  account:
+      image: depsemt2009/account:${TAG}
+      #container_name: account
+      networks:
+       - nginx_network
+       - db_network
+      volumes:
+         - static_volume:/vol/web/static
+      command: gunicorn app.wsgi:application --bind 0.0.0.0:8001 --workers 3 -t 0
+      depends_on:
+        - pgdb
+      #env_file: .env
+      environment:
+        - DEBUG=TRUE  #только в режиме разработки
+        - DJANGO_SUPERUSER_USERNAME=admin
+        - DJANGO_SUPERUSER_PASSWORD=admin
+        - DJANGO_SUPERUSER_EMAIL=admin@example.com
+
+
+  profile:
+      image: depsemt2009/profile:${TAG}
+      #container_name: profile
+      networks:
+       - nginx_network
+       - db_network
+      volumes:
+         - static_volume:/vol/web/static
+      command: gunicorn app.wsgi:application --bind 0.0.0.0:8002 --workers 3 -t 0
+      depends_on:
+        - pgdb
+      #env_file: .env
+      environment:
+        - DEBUG=TRUE  #только в режиме разработки
+        - DJANGO_SUPERUSER_USERNAME=admin
+        - DJANGO_SUPERUSER_PASSWORD=admin
+        - DJANGO_SUPERUSER_EMAIL=admin@example.com
+
+  pgdb:
+      image: postgres:14
+      container_name: pgdb
+      environment:
+         - POSTGRES_PASSWORD=postgres
+      networks:
+         - db_network
+      volumes:
+         - postgres_data:/var/lib/postgresql/data/
+      ports:
+        - 5432:5432
+
+  pgadmin:
+    container_name: pgadmin_container
+    image: dpage/pgadmin4:7.2
+    environment:
+      PGADMIN_DEFAULT_EMAIL: "habrpguser@habr.com"
+      PGADMIN_DEFAULT_PASSWORD: "pgadminpwd4habr"
+      PGADMIN_CONFIG_SERVER_MODE: "False"
+    volumes:
+      - pgadmin-data:/var/lib/pgadmin
+    ports:
+      - "5050:80"
+    restart: unless-stopped
+    networks:
+      - db_network
+
+  nginx:
+    image: depsemt2009/nginx
+    container_name: nginx
+    ports:
+      - 8002:80
+      - 8001:80
+    restart: always
+    networks:
+      - nginx_network
+    depends_on:
+      - account
+      - profile
+
+
+networks:
+  nginx_network:
+  db_network:
+
+volumes:
+  static_volume:
+  postgres_data:
+  pgadmin-data:
