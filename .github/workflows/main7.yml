@@ -10,7 +10,7 @@ on:
         default: 'just for fun'
 
 env:
-  TAG: ${{ github.sha }}
+  TAG1: ${{ github.sha }}
   PROFILE_IMAGE: ${{ secrets.DOCKER_HUB_USERNAME }}/profile:${{ TAG }}
   ACCOUNT_IMAGE: ${{ secrets.DOCKER_HUB_USERNAME }}/account:${{ TAG }}
   #NGINX_IMAGE: ${{ secrets.DOCKER_HUB_USERNAME }}/nginx:${{ github.sha }}
@@ -91,7 +91,7 @@ jobs:
             #docker pull ${{ env.ACCOUNT_IMAGE }}
             echo "111"
             #sleep 30
-            TAG=prod docker compose up -d --build
+            #TAG=prod docker compose up -d --build
             
             
             
@@ -104,7 +104,7 @@ jobs:
             cd /tmp
             #docker-compose up -d --no-deps --scale $service_name1=2 --no-recreate $service_name1
             #docker-compose up -d --no-deps --scale $service_name2=2 --no-recreate $service_name2
-            TAG=${{ env.TAG }} docker-compose up -d --no-deps --no-recreate $service_name1 $service_name2
+            TAG=${{ env.TAG1 }} docker-compose up -d --no-deps --no-recreate $service_name1 $service_name2
             echo "444"
             
             #TAG=${{ env.TAG }} docker-compose up -d --no-deps --no-recreate $service_name1 $service_name2
