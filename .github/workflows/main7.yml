@@ -11,8 +11,8 @@ on:
 
 env:
   TAG: ${{ github.sha }}
-  PROFILE_IMAGE: ${{ secrets.DOCKER_HUB_USERNAME }}/profile:${{ env.TAG }}
-  ACCOUNT_IMAGE: ${{ secrets.DOCKER_HUB_USERNAME }}/account:${{ env.TAG }}
+  PROFILE_IMAGE: ${{ secrets.DOCKER_HUB_USERNAME }}/profile:${{ TAG }}
+  ACCOUNT_IMAGE: ${{ secrets.DOCKER_HUB_USERNAME }}/account:${{ TAG }}
   #NGINX_IMAGE: ${{ secrets.DOCKER_HUB_USERNAME }}/nginx:${{ github.sha }}
 
 jobs:
