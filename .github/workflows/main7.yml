@@ -10,8 +10,9 @@ on:
         default: 'just for fun'
 
 env:
-  PROFILE_IMAGE: ${{ secrets.DOCKER_HUB_USERNAME }}/profile:${{ github.sha }}
-  ACCOUNT_IMAGE: ${{ secrets.DOCKER_HUB_USERNAME }}/account:${{ github.sha }}
+  TAG: ${{ github.sha }}
+  PROFILE_IMAGE: ${{ secrets.DOCKER_HUB_USERNAME }}/profile:${{ env.TAG }}
+  ACCOUNT_IMAGE: ${{ secrets.DOCKER_HUB_USERNAME }}/account:${{ env.TAG }}
   #NGINX_IMAGE: ${{ secrets.DOCKER_HUB_USERNAME }}/nginx:${{ github.sha }}
 
 jobs:
@@ -90,6 +91,10 @@ jobs:
             #docker pull ${{ env.ACCOUNT_IMAGE }}
             echo "111"
             #sleep 30
+            TAG=prod docker compose up -d --build
+            
+            
+            
             service_name1=profile
             service_name2=account
             echo "222"
@@ -97,10 +102,13 @@ jobs:
             old_account_id=$(docker ps -f name=$service_name2 -q | tail -n1)
             echo "333"
             cd /tmp
-            docker-compose up -d ${{ env.PROFILE_IMAGE }} --no-deps --scale $service_name1=2 --no-recreate $service_name1
-            docker-compose up -d ${{ env.ACCOUNT_IMAGE }} --no-deps --scale $service_name2=2 --no-recreate $service_name2
+            #docker-compose up -d --no-deps --scale $service_name1=2 --no-recreate $service_name1
+            #docker-compose up -d --no-deps --scale $service_name2=2 --no-recreate $service_name2
+            TAG=${{ env.TAG }} docker-compose up -d --no-deps --no-recreate $service_name1 $service_name2
             echo "444"
-            sleep 30
+            
+            #TAG=${{ env.TAG }} docker-compose up -d --no-deps --no-recreate $service_name1 $service_name2
+            #sleep 30
             docker exec nginx /usr/sbin/nginx -s reload
             echo "555"
             docker stop $old_profile_id
@@ -109,8 +117,8 @@ jobs:
             docker stop $old_account_id
             docker rm $old_account_id
             echo "777"
-            docker-compose up -d --no-deps --scale $service_name1=1 --no-recreate $service_name1
-            docker-compose up -d --no-deps --scale $service_name2=1 --no-recreate $service_name2
+            #docker-compose up -d --no-deps --scale $service_name1=1 --no-recreate $service_name1
+            #docker-compose up -d --no-deps --scale $service_name2=1 --no-recreate $service_name2
             echo "888"
             docker exec nginx /usr/sbin/nginx -s reload
             echo "succesfully redeployed $service_name1 and $service_name2"
