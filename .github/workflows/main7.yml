@@ -86,8 +86,8 @@ jobs:
           script_stop: true
           script: |
             docker system prune --all --force --volumes
-            docker pull ${{ env.PROFILE_IMAGE }}
-            docker pull ${{ env.ACCOUNT_IMAGE }}
+            #docker pull ${{ env.PROFILE_IMAGE }}
+            #docker pull ${{ env.ACCOUNT_IMAGE }}
             echo "111"
             sleep 30
             service_name1=profile
@@ -97,8 +97,8 @@ jobs:
             old_account_id=$(docker ps -f name=$service_name2 -q | tail -n1)
             echo "333"
             cd /tmp
-            docker-compose up -d --no-deps --scale $service_name1=2 --no-recreate $service_name1
-            docker-compose up -d --no-deps --scale $service_name2=2 --no-recreate $service_name2
+            docker-compose up -d ${{ env.PROFILE_IMAGE }} --no-deps --scale $service_name1=2 --no-recreate $service_name1
+            docker-compose up -d ${{ env.ACCOUNT_IMAGE }} --no-deps --scale $service_name2=2 --no-recreate $service_name2
             echo "444"
             sleep 30
             docker exec nginx /usr/sbin/nginx -s reload
