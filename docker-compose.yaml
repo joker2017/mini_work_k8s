@@ -2,7 +2,7 @@ version: '3.8'
 services:
 
   account:
-      image: depsemt2009/account
+      image: depsemt2009/account:${TAGAC:-latest}
       #container_name: account
       networks:
        - nginx_network
@@ -21,7 +21,7 @@ services:
 
 
   profile:
-      image: depsemt2009/profile
+      image: depsemt2009/profile:${TAGPR:-latest}
       #container_name: profile
       networks:
        - nginx_network
