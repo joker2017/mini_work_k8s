@@ -101,10 +101,15 @@ jobs:
             old_profile_id=$(docker ps -f name=$service_name1 -q | tail -n1)
             old_account_id=$(docker ps -f name=$service_name2 -q | tail -n1)
             echo "333"
-            cd /tmp
+            #cd /tmp
             #docker-compose up -d --no-deps --scale $service_name1=2 --no-recreate $service_name1
             #docker-compose up -d --no-deps --scale $service_name2=2 --no-recreate $service_name2
-            TAG=${{ env.TAG1 }} docker-compose up -d --no-deps --no-recreate $service_name1 $service_name2
+            
+            network_mode=$(docker inspect $old_profile_id --format '{{ .HostConfig.NetworkMode }}')
+            docker run --name green_profile -it -d --network=$network_mode ${{ env.PROFILE_IMAGE }}
+            docker run --name green_account -it -d --network=$network_mode ${{ env.ACCOUNT_IMAGE }}
+            
+            #TAG=${{ env.TAG1 }} docker-compose up -d --no-deps --no-recreate $service_name1 $service_name2
             echo "444"
             
             #TAG=${{ env.TAG }} docker-compose up -d --no-deps --no-recreate $service_name1 $service_name2

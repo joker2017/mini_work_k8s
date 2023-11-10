@@ -79,9 +79,15 @@ services:
       - profile
 
 
+#networks:
+#  nginx_network:
+#  db_network:
+
 networks:
   nginx_network:
+    driver: bridge
   db_network:
+    driver: bridge
 
 volumes:
   static_volume:
