@@ -104,8 +104,9 @@ jobs:
             #cd /tmp
             #docker-compose up -d --no-deps --scale $service_name1=2 --no-recreate $service_name1
             #docker-compose up -d --no-deps --scale $service_name2=2 --no-recreate $service_name2
-            
+            echo "33333333  ${{ env.PROFILE_IMAGE }}  33333333"
             network_mode=$(docker inspect $old_profile_id --format '{{ .HostConfig.NetworkMode }}')
+            echo "network_mode = $network_mode"
             docker run --name green_profile -it -d --network=$network_mode ${{ env.PROFILE_IMAGE }}
             docker run --name green_account -it -d --network=$network_mode ${{ env.ACCOUNT_IMAGE }}
             
