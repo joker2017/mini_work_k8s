@@ -10,9 +10,9 @@ on:
         default: 'just for fun'
 
 env:
-  TAG1: ${{ github.sha }}
-  #PROFILE_IMAGE: ${{ secrets.DOCKER_HUB_USERNAME }}
-  #ACCOUNT_IMAGE: ${{ secrets.DOCKER_HUB_USERNAME }}
+  #TAG1: ${{ github.sha }}
+  PROFILE_IMAGE: ${{ secrets.DOCKER_HUB_USERNAME }}
+  ACCOUNT_IMAGE: ${{ secrets.DOCKER_HUB_USERNAME }}
   #NGINX_IMAGE: ${{ secrets.DOCKER_HUB_USERNAME }}/nginx:${{ github.sha }}
 
 jobs:
@@ -37,8 +37,8 @@ jobs:
         context: ./account
         file: ./account/Dockerfile
         push: true
-        #tags: ${{ env.ACCOUNT_IMAGE }}
-        tags: ${{ secrets.DOCKER_HUB_USERNAME }}/account:${{ env.TAG1 }}
+        tags: ${{ env.ACCOUNT_IMAGE }}
+        #tags: ${{ secrets.DOCKER_HUB_USERNAME }}/account:${{ env.TAG1 }}
 
   build-profile:
     runs-on: ubuntu-latest
@@ -63,8 +63,8 @@ jobs:
           file: ./profile/Dockerfile
           push: true
           #build-args: SERVER_URL=${{ secrets.API_SERVER_URL }}
-          #tags: ${{ env.PROFILE_IMAGE }}
-          tags: ${{ secrets.DOCKER_HUB_USERNAME }}/profile:${{ env.TAG1 }}
+          tags: ${{ env.PROFILE_IMAGE }}
+          #tags: ${{ secrets.DOCKER_HUB_USERNAME }}/profile:${{ env.TAG1 }}
           #quay.io/siddhesh_ghadi/multi-arch-gha:latest
           #hub.docker.com/depsemt2009/profile:latest
 
