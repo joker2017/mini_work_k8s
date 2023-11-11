@@ -89,21 +89,16 @@ jobs:
             docker system prune --all --force --volumes
             #docker pull ${{ env.PROFILE_IMAGE }}
             #docker pull ${{ env.ACCOUNT_IMAGE }}
-            echo "111"
-            #sleep 30
-            #TAG=prod docker compose up -d --build
-            
-            
-            
+            echo "111"          
+                        
             service_name1=profile
             service_name2=account
             echo "222"
             old_profile_id=$(docker ps -f name=$service_name1 -q | tail -n1)
             old_account_id=$(docker ps -f name=$service_name2 -q | tail -n1)
             echo "333"
-            #cd /tmp
-            #docker-compose up -d --no-deps --scale $service_name1=2 --no-recreate $service_name1
-            #docker-compose up -d --no-deps --scale $service_name2=2 --no-recreate $service_name2
+           
+            
             echo "33333333  ${{ env.PROFILE_IMAGE }}  33333333"
             network_mode=$(docker inspect $old_profile_id --format '{{ .HostConfig.NetworkMode }}')
             echo "network_mode = $network_mode"
@@ -113,8 +108,7 @@ jobs:
             #TAG=${{ env.TAG1 }} docker-compose up -d --no-deps --no-recreate $service_name1 $service_name2
             echo "444"
             
-            #TAG=${{ env.TAG }} docker-compose up -d --no-deps --no-recreate $service_name1 $service_name2
-            #sleep 30
+     
             docker exec nginx /usr/sbin/nginx -s reload
             echo "555"
             docker stop $old_profile_id
@@ -123,8 +117,7 @@ jobs:
             docker stop $old_account_id
             docker rm $old_account_id
             echo "777"
-            #docker-compose up -d --no-deps --scale $service_name1=1 --no-recreate $service_name1
-            #docker-compose up -d --no-deps --scale $service_name2=1 --no-recreate $service_name2
-            echo "888"
+            docker rename green_profile blue_profile
+            docker rename green_account blue_account
             docker exec nginx /usr/sbin/nginx -s reload
             echo "succesfully redeployed $service_name1 and $service_name2"
