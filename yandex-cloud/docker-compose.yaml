@@ -9,11 +9,12 @@ services:
        - db_network
       volumes:
          - static_volume:/vol/web/static
-      command: gunicorn app.wsgi:application --bind 0.0.0.0:8001 --workers 3 -t 0
+      command: gunicorn app.wsgi:application --bind 0.0.0.0 #:8001 --workers 3 -t 0
       depends_on:
         - pgdb
       #env_file: .env
       environment:
+        - VIRTUAL_HOST=account
         - DEBUG=TRUE  #только в режиме разработки
         - DJANGO_SUPERUSER_USERNAME=admin
         - DJANGO_SUPERUSER_PASSWORD=admin
@@ -28,11 +29,12 @@ services:
        - db_network
       volumes:
          - static_volume:/vol/web/static
-      command: gunicorn app.wsgi:application --bind 0.0.0.0:8002 --workers 3 -t 0
+      command: gunicorn app.wsgi:application --bind 0.0.0.0 #:8002 --workers 3 -t 0
       depends_on:
         - pgdb
       #env_file: .env
       environment:
+        - VIRTUAL_HOST=profile
         - DEBUG=TRUE  #только в режиме разработки
         - DJANGO_SUPERUSER_USERNAME=admin
         - DJANGO_SUPERUSER_PASSWORD=admin
@@ -66,12 +68,16 @@ services:
       - db_network
 
   nginx:
-    image: {{ env.NGINX_IMAGE }}
-    container_name: nginx
+    #image: {{ env.NGINX_IMAGE }}
+    #container_name: nginx
+    image: nginxproxy/nginx-proxy
+    volumes:
+      - /var/run/docker.sock:/tmp/docker.sock:ro
     ports:
-      - 8002:80
-      - 8001:80
-    restart: always
+      #- 8002:80
+      #- 8001:80
+      - 80:80
+    #restart: always
     networks:
       - nginx_network
     depends_on:
