@@ -86,6 +86,8 @@ jobs:
           command_timeout: 30m
           script_stop: true
           script: |
+            #curl https://raw.githubusercontent.com/joker2017/Miniwork/main/docker-compose.yaml -o tmp/docker-compose.yaml
+            #curl https://raw.githubusercontent.com/joker2017/Miniwork/main/docker-compose.yaml -o home/depsemt2009/docker-compose.yml
             docker system prune --all --force --volumes
             #docker pull ${{ env.PROFILE_IMAGE }}
             #docker pull ${{ env.ACCOUNT_IMAGE }}
@@ -108,7 +110,7 @@ jobs:
             #TAG=${{ env.TAG1 }} docker-compose up -d --no-deps --no-recreate $service_name1 $service_name2
             echo "444"
             
-     
+            TAG=3af887d0095d9cae571d89af921b47c497305633 docker rollout -f docker-compose.yml coi-account-1
             docker exec nginx /usr/sbin/nginx -s reload
             echo "555"
             docker stop $old_profile_id

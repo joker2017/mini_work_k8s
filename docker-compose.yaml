@@ -40,32 +40,32 @@ services:
         - DJANGO_SUPERUSER_PASSWORD=admin
         - DJANGO_SUPERUSER_EMAIL=admin@example.com
 
-  pgdb:
-      image: postgres:14
-      container_name: pgdb
-      environment:
-         - POSTGRES_PASSWORD=postgres
-      networks:
-         - db_network
-      volumes:
-         - postgres_data:/var/lib/postgresql/data/
-      ports:
-        - 5432:5432
-
-  pgadmin:
-    container_name: pgadmin_container
-    image: dpage/pgadmin4:7.2
-    environment:
-      PGADMIN_DEFAULT_EMAIL: "habrpguser@habr.com"
-      PGADMIN_DEFAULT_PASSWORD: "pgadminpwd4habr"
-      PGADMIN_CONFIG_SERVER_MODE: "False"
-    volumes:
-      - pgadmin-data:/var/lib/pgadmin
-    ports:
-      - "5050:80"
-    restart: unless-stopped
-    networks:
-      - db_network
+#  pgdb:
+#      image: postgres:14
+#      container_name: pgdb
+#      environment:
+#         - POSTGRES_PASSWORD=postgres
+#      networks:
+#         - db_network
+#      volumes:
+#         - postgres_data:/var/lib/postgresql/data/
+#      ports:
+#        - 5432:5432
+#
+#  pgadmin:
+#    container_name: pgadmin_container
+#    image: dpage/pgadmin4:7.2
+#    environment:
+#      PGADMIN_DEFAULT_EMAIL: "habrpguser@habr.com"
+#      PGADMIN_DEFAULT_PASSWORD: "pgadminpwd4habr"
+#      PGADMIN_CONFIG_SERVER_MODE: "False"
+#    volumes:
+#      - pgadmin-data:/var/lib/pgadmin
+#    ports:
+#      - "5050:80"
+#    restart: unless-stopped
+#    networks:
+#      - db_network
 
   nginx:
     #image: {{ env.NGINX_IMAGE }}
