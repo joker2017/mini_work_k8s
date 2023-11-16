@@ -14,8 +14,8 @@ services:
      #   - pgdb
       #env_file: .env
       environment:
-        - VIRTUAL_HOST=account
-        - VIRTUAL_PATH=/account
+      #  - VIRTUAL_HOST=account
+      #  - VIRTUAL_PATH=/account
         - DEBUG=TRUE  #только в режиме разработки
         - DJANGO_SUPERUSER_USERNAME=admin
         - DJANGO_SUPERUSER_PASSWORD=admin
@@ -35,8 +35,8 @@ services:
      #   - pgdb
       #env_file: .env
       environment:
-        - VIRTUAL_HOST=profile
-        - VIRTUAL_PATH=/profile
+       # - VIRTUAL_HOST=profile
+       # - VIRTUAL_PATH=/profile
         - DEBUG=TRUE  #только в режиме разработки
         - DJANGO_SUPERUSER_USERNAME=admin
         - DJANGO_SUPERUSER_PASSWORD=admin
@@ -70,9 +70,9 @@ services:
 #      - db_network
 
   nginx:
-    #image: {{ env.NGINX_IMAGE }}
+    image: {{ env.NGINX_IMAGE }}
     #container_name: nginx
-    image: nginxproxy/nginx-proxy:latest
+    #image: nginxproxy/nginx-proxy:latest
     volumes:
       - /var/run/docker.sock:/tmp/docker.sock:ro
     ports:
