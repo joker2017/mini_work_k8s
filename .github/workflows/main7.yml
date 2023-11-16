@@ -110,7 +110,8 @@ jobs:
             #TAG=${{ env.TAG1 }} docker-compose up -d --no-deps --no-recreate $service_name1 $service_name2
             echo "444"
             
-            TAG=3af887d0095d9cae571d89af921b47c497305633 docker rollout -f docker-compose.yml coi-account-1
+            #TAG=3af887d0095d9cae571d89af921b47c497305633 docker rollout -f docker-compose.yml coi-account-1
+            TAG=3af887d0095d9cae571d89af921b47c497305633 docker rollout -f docker-compose.yml account
             docker exec nginx /usr/sbin/nginx -s reload
             echo "555"
             docker stop $old_profile_id

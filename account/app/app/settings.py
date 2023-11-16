@@ -88,14 +88,26 @@ WSGI_APPLICATION = 'app.wsgi.application'
 
 
 # For PosgreSQL
+# DATABASES = {
+#     'default': {
+#         'ENGINE': os.getenv('DB_ENGINE', 'django.db.backends.postgresql_psycopg2'),
+#         'NAME': os.getenv('DB_NAME', 'postgres'),
+#         'USER': os.getenv('DB_USER', 'postgres'),
+#         'PASSWORD': os.getenv('DB_USER_PASSWORD', 'postgres'),
+#         'HOST': os.getenv('DB_HOST', 'pgdb'),
+#         'PORT': os.getenv('DB_PORT', '5432'),
+#     }
+# }
+
+
 DATABASES = {
     'default': {
         'ENGINE': os.getenv('DB_ENGINE', 'django.db.backends.postgresql_psycopg2'),
-        'NAME': os.getenv('DB_NAME', 'postgres'),
-        'USER': os.getenv('DB_USER', 'postgres'),
-        'PASSWORD': os.getenv('DB_USER_PASSWORD', 'postgres'),
-        'HOST': os.getenv('DB_HOST', 'pgdb'),
-        'PORT': os.getenv('DB_PORT', '5432'),
+        'NAME': os.getenv('DB_NAME', 'db1'),
+        'USER': os.getenv('DB_USER', 'postgres1'),
+        'PASSWORD': os.getenv('DB_USER_PASSWORD', 'postgres1'),
+        'HOST': os.getenv('DB_HOST', 'c9qi313a1cucdrbehco4.rw.mdb.yandexcloud.net'),
+        'PORT': os.getenv('DB_PORT', '6432'),
     }
 }
 
