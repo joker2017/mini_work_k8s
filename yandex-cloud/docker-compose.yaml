@@ -6,7 +6,7 @@ services:
       #container_name: account
       networks:
        - nginx_network
-       - db_network
+       #- db_network
       volumes:
          - static_volume:/vol/web/static
       command: gunicorn app.wsgi:application --bind 0.0.0.0 #:8001 --workers 3 -t 0
@@ -26,7 +26,7 @@ services:
       #container_name: profile
       networks:
        - nginx_network
-       - db_network
+       #- db_network
       volumes:
          - static_volume:/vol/web/static
       command: gunicorn app.wsgi:application --bind 0.0.0.0 #:8002 --workers 3 -t 0
