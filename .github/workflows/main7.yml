@@ -1,14 +1,15 @@
 name: Deploy BG
 on:
-  push:
-    branches: [ "main" ]
-  workflow_dispatch:
-    inputs:
-      reason:
-        description: 'why'
-        required: false
-        default: 'just for fun'
+#  push:
+#    branches: [ "main" ]
+#  workflow_dispatch:
+#    inputs:
+#      reason:
+#        description: 'why'
+#        required: false
+#        default: 'just for fun'
 
+  workflow_dispatch:
 env:
   #TAG1: ${{ github.sha }}
   PROFILE_IMAGE: ${{ secrets.DOCKER_HUB_USERNAME }}/profile:${{ github.sha }}
