@@ -74,7 +74,8 @@ services:
     #container_name: nginx
     #image: nginxproxy/nginx-proxy:latest
     volumes:
-      - /var/run/docker.sock:/tmp/docker.sock:ro
+    #  - /var/run/docker.sock:/tmp/docker.sock:ro
+       - static_volume:/vol/web/static
     ports:
       #- 8002:80
       #- 8001:80
