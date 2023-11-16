@@ -89,7 +89,7 @@ jobs:
 
   update-yc:
     runs-on: ubuntu-latest
-    needs: [ build-account, build-profile, build-nginx ]
+    needs: [ build-account, build-profile]    #, build-nginx ]
     steps:
       - name: Looooooocccccaaaattttiiiioooonnnn
         run: ls
