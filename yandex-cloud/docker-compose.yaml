@@ -10,8 +10,8 @@ services:
       volumes:
          - static_volume:/vol/web/static
       command: gunicorn app.wsgi:application --bind 0.0.0.0 #:8001 --workers 3 -t 0
-      depends_on:
-        - pgdb
+     # depends_on:
+     #   - pgdb
       #env_file: .env
       environment:
         - VIRTUAL_HOST=account
@@ -30,8 +30,8 @@ services:
       volumes:
          - static_volume:/vol/web/static
       command: gunicorn app.wsgi:application --bind 0.0.0.0 #:8002 --workers 3 -t 0
-      depends_on:
-        - pgdb
+     # depends_on:
+     #   - pgdb
       #env_file: .env
       environment:
         - VIRTUAL_HOST=profile
@@ -92,8 +92,8 @@ services:
 networks:
   nginx_network:
     driver: bridge
-  db_network:
-    driver: bridge
+ # db_network:
+ #   driver: bridge
 
 volumes:
   static_volume:
