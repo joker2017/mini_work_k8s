@@ -106,7 +106,7 @@ DATABASES = {
         'NAME': os.getenv('DB_NAME', 'db1'),
         'USER': os.getenv('DB_USER', 'postgres1'),
         'PASSWORD': os.getenv('DB_USER_PASSWORD', 'postgres1'),
-        'HOST': os.getenv('DB_HOST', 'c9qi313a1cucdrbehco4.rw.mdb.yandexcloud.net'),
+        'HOST': os.getenv('DB_HOST', 'c-c9qi313a1cucdrbehco4.rw.mdb.yandexcloud.net'),
         'PORT': os.getenv('DB_PORT', '6432'),
     }
 }
