@@ -123,6 +123,7 @@ jobs:
     # Декодирование ключа сервисного аккаунта Yandex Cloud для использования в kubectl
     - name: Decode Yandex Cloud service account key
       run: |
+          mkdir -p $HOME/.yandex-cloud
           echo ${{ secrets.SERVICE_ACCOUNT_KEY_JSON }} | base64 -d > $HOME/.yandex-cloud/service-account-key.json
           yc config profile create github-actions
           yc config set service-account-key $HOME/.yandex-cloud/service-account-key.json
