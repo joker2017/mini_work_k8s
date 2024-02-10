@@ -1,4 +1,4 @@
-# Установка базового образа Python
+# Использование базового образа Python
 FROM python:3.11.0 as builder
 
 # Установка переменных окружения для Python
@@ -7,9 +7,9 @@ ENV PYTHONDONTWRITEBYTECODE=1 \
 
 WORKDIR /app
 
-# Установка системных зависимостей и зависимостей Python для сборки
+# Установка системных зависимостей
 RUN apt-get update && \
-    apt-get install -y postgresql-client gcc libc-dev linux-headers postgresql-dev libpq-dev && \
+    apt-get install -y postgresql-client gcc libc-dev libpq-dev && \
     rm -rf /var/lib/apt/lists/*
 
 # Установка зависимостей Python
