@@ -19,7 +19,7 @@ COPY . .
 RUN pip install --no-cache-dir -r requirements.txt
 
 # Копируем конфигурационный файл NGINX Unit для автоматической настройки
-COPY config.json /docker-entrypoint.d/config.json
+COPY unit.config.json /docker-entrypoint.d/config.json
 
 # Определяем порт, который будет прослушивать приложение
 EXPOSE 80
