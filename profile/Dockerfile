@@ -1,5 +1,5 @@
 # Установка базового образа Python с Alpine для сборки
-FROM python:3.11 as builder
+FROM python:3.10.0-alpine as builder
 
 # Установка переменных окружения для Python
 ENV PYTHONDONTWRITEBYTECODE=1 \
@@ -25,7 +25,7 @@ RUN pip install --upgrade pip --no-cache-dir && \
 # COPY . .
 
 # Второй этап сборки для создания минимального образа
-FROM python:3.11-slim
+FROM python:3.10.0-alpine
 
 # Создание рабочей директории
 WORKDIR /app
