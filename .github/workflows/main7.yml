@@ -21,7 +21,7 @@ jobs:
         run: |
           mkdir -p $HOME/.kube
           echo "${{ secrets.CA_PEM }}" > $HOME/.kube/ca.pem
-        #echo "${{ secrets.KUBECONFIG }}" > $HOME/.kube/config
+          echo "${{ secrets.KUBECONFIG }}" > $HOME/.kube/config
 
       - name: Check Kubernetes Cluster Connection
         run: |
