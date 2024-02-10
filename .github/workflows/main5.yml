@@ -1,12 +1,6 @@
 name: Deploy
 on:
-
   workflow_dispatch:
-    inputs:
-      reason:
-        description: 'why'
-        required: false
-        default: 'just for fun'
 
 env:
   PROFILE_IMAGE: ${{ secrets.DOCKER_HUB_USERNAME }}/profile:${{ github.sha }}
