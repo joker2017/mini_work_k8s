@@ -1,5 +1,5 @@
 # Установка базового образа Python с Alpine для сборки
-FROM python:3.10.0-alpine as builder
+FROM python:3.11.0 as builder
 
 # Установка переменных окружения для Python
 ENV PYTHONDONTWRITEBYTECODE=1 \
@@ -11,10 +11,11 @@ RUN pip install --upgrade pip --no-cache-dir
 # Копирование зависимостей Python
 COPY ./requirements.txt requirements.txt
 RUN pip install --no-cache-dir -r requirements.txt
-RUN apk add --update --no-cache postgresql-client jpeg-dev
+RUN apk add --update --no-cache postgresql-client
 RUN apk add --update --no-cache --virtual .tmp-build-deps \
-  gcc libc-dev linux-headers postgresql-dev musl-dev zlib zlib-dev
-
+  gcc libc-dev linux-headers
+RUN apk add --update --no-cache --virtual .tmp-build-deps \
+  postgresql-dev musl-dev zlib zlib-dev
 # Создание рабочей директории
 #WORKDIR /app
 
@@ -22,9 +23,10 @@ RUN apk add --update --no-cache --virtual .tmp-build-deps \
 
 # Копирование остальных файлов проекта
 # COPY . .
-
+# Очищаем временные зависимости
+RUN apk del .tmp-build-deps
 # Второй этап сборки для создания минимального образа
-FROM python:3.10.0-alpine
+FROM python:3.11.0-slim
 
 # Создание рабочей директории
 WORKDIR /app
