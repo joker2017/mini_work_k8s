@@ -114,9 +114,9 @@ jobs:
     # Шаг 2: Установка kubectl
     - name: Install kubectl
       uses: azure/setup-kubectl@v3
-      with:
-        version: 'v1.26' # default is latest stable
       id: install
+      with:
+          version: 'v1.28.2
 
     # Шаг 3: Авторизация в Kubernetes кластере
     - name: Setup Kubernetes context
