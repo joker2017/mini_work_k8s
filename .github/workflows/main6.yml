@@ -121,7 +121,7 @@ jobs:
 
     # Шаг 3: Авторизация в Kubernetes кластере
     - name: Setup Kubernetes context
-      uses: azure/k8s-set-context@v3
+      uses: azure/k8s-set-context@v1
       with:
         method: kubeconfig
         kubeconfig: ${{ secrets.KUBECONFIG }}
