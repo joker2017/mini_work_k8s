@@ -1,43 +1,33 @@
-# Установка базового образа Python с Alpine для сборки
+# Установка базового образа Python
 FROM python:3.11.0 as builder
 
 # Установка переменных окружения для Python
 ENV PYTHONDONTWRITEBYTECODE=1 \
     PYTHONUNBUFFERED=1
+
 WORKDIR /app
+
 # Установка системных зависимостей и зависимостей Python для сборки
-#COPY ./requirements.txt requirements.txt
+RUN apt-get update && \
+    apt-get install -y postgresql-client gcc libc-dev linux-headers postgresql-dev libpq-dev && \
+    rm -rf /var/lib/apt/lists/*
+
+# Установка зависимостей Python
 RUN pip install --upgrade pip --no-cache-dir
-# Копирование зависимостей Python
 COPY ./requirements.txt requirements.txt
 RUN pip install --no-cache-dir -r requirements.txt
-RUN apk add --update --no-cache postgresql-client
-RUN apk add --update --no-cache --virtual .tmp-build-deps \
-  gcc libc-dev linux-headers
-RUN apk add --update --no-cache --virtual .tmp-build-deps \
-  postgresql-dev musl-dev zlib zlib-dev
-# Создание рабочей директории
-#WORKDIR /app
 
-
-
-# Копирование остальных файлов проекта
-# COPY . .
-# Очищаем временные зависимости
-RUN apk del .tmp-build-deps
 # Второй этап сборки для создания минимального образа
 FROM python:3.11.0-slim
 
-# Создание рабочей директории
 WORKDIR /app
 
 # Копирование файлов из предыдущего этапа сборки
 COPY --from=builder /app /app
 
 # Установка NGINX Unit и модуля Python
-RUN apt-get update && apt-get install -y --no-install-recommends \
-    nginx-unit \
-    nginx-unit-python && \
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends nginx-unit nginx-unit-python && \
     rm -rf /var/lib/apt/lists/*
 
 # Создание пользователя для запуска приложения
@@ -47,5 +37,4 @@ USER user
 # Копирование конфигурационного файла NGINX Unit
 COPY unit.config.json /docker-entrypoint.d/
 
-# Настройка точки входа для запуска NGINX Unit с нашей конфигурацией
 CMD ["unitd", "--no-daemon", "--control", "unix:/var/run/control.unit.sock"]
