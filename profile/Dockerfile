@@ -8,9 +8,17 @@ ENV PYTHONDONTWRITEBYTECODE=1 \
 WORKDIR /app
 
 # Установка зависимостей Python и системных зависимостей для сборки
-RUN apk update && apk add --no-cache postgresql-client jpeg-dev nginx-unit nginx-unit-python && \
-    apk add --no-cache --virtual .tmp-build-deps \
-    gcc libc-dev linux-headers postgresql-dev musl-dev zlib zlib-dev
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    postgresql-client \
+    libjpeg-dev \
+    nginx-unit \
+    nginx-unit-python \
+    gcc \
+    libc-dev \
+    linux-headers \
+    libpq-dev \
+    zlib1g-dev && \
+    rm -rf /var/lib/apt/lists/*
 
 COPY ./requirements.txt .
 RUN pip install --upgrade pip --no-cache-dir && \
@@ -19,20 +27,20 @@ RUN pip install --upgrade pip --no-cache-dir && \
 # Копирование оставшихся файлов проекта
 COPY . .
 
-# Очищаем временные зависимости
-RUN apk del .tmp-build-deps
-
 # Второй этап сборки для создания минимального образа
-FROM python:3.10.0-alpine
+FROM python:3.10.0-slim
 
 WORKDIR /app
 COPY --from=builder /app /app
 
 # Установка NGINX Unit и модуля Python
-RUN apk add --no-cache nginx-unit nginx-unit-python
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    nginx-unit \
+    nginx-unit-python && \
+    rm -rf /var/lib/apt/lists/*
 
 # Создание пользователя для запуска приложения
-RUN adduser -D user && chown -R user:user /app
+RUN adduser --disabled-password --gecos '' user && chown -R user:user /app
 USER user
 
 # Копируем конфигурацию NGINX Unit
