@@ -1,0 +1,26 @@
+name: CI/CD с использованием Kubernetes
+
+on:
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Установка kubectl
+        uses: azure/setup-kubectl@v1
+        with:
+          version: 'latest'
+
+      - name: Настройка переменных среды для Kubeconfig и CA сертификата
+        run: |
+          echo "KUBECONFIG=${{ secrets.KUBECONFIG }}" >> $GITHUB_ENV
+          echo "CA_PEM=${{ secrets.CA_PEM }}" >> $GITHUB_ENV
+
+      - name: Проверка соединения с кластером Kubernetes
+        run: |
+          echo "$KUBECONFIG" | kubectl --kubeconfig=/dev/stdin cluster-info
+
+      - name: Проверка узлов кластера
+        run: |
+          echo "$KUBECONFIG" | kubectl --kubeconfig=/dev/stdin get nodes
