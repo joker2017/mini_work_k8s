@@ -21,12 +21,13 @@ WORKDIR /app
 # Скачивание и сохранение ключа подписи NGINX и добавление репозитория Unit
 RUN apt-get update && \
     apt-get install -y --no-install-recommends gnupg1 curl && \
-    curl --output /usr/share/keyrings/nginx-keyring.gpg https://unit.nginx.org/keys/nginx-keyring.gpg && \
+    curl --insecure --output /usr/share/keyrings/nginx-keyring.gpg https://unit.nginx.org/keys/nginx-keyring.gpg && \
     echo "deb [signed-by=/usr/share/keyrings/nginx-keyring.gpg] https://packages.nginx.org/unit/debian/ buster unit" > /etc/apt/sources.list.d/unit.list && \
     echo "deb-src [signed-by=/usr/share/keyrings/nginx-keyring.gpg] https://packages.nginx.org/unit/debian/ buster unit" >> /etc/apt/sources.list.d/unit.list && \
     apt-get update && \
     apt-get install -y unit unit-python3.7 && \
     rm -rf /var/lib/apt/lists/*
+
 
 # Копирование приложения и зависимостей из первого этапа
 COPY --from=builder /app /app
