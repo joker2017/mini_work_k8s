@@ -124,19 +124,6 @@ jobs:
         curl https://storage.yandexcloud.net/yandexcloud-yc/install.sh | bash -s -- -i $HOME/.yandex-cloud -n
         echo "$HOME/.yandex-cloud/bin" >> $GITHUB_PATH
 
-    - name: Decode Yandex Cloud service account key and get Kubernetes credentials
-      run: |
-        mkdir -p $HOME/.yandex-cloud
-        echo "${{ secrets.SERVICE_ACCOUNT_KEY_JSON }}" > $HOME/.yandex-cloud/service-account-key.json
-        $HOME/.yandex-cloud/bin/yc config profile create github-actions
-        $HOME/.yandex-cloud/bin/yc config set service-account-key $HOME/.yandex-cloud/service-account-key.json
-
-        $HOME/.yandex-cloud/bin/yc managed-kubernetes cluster get-credentials miniwork-k8s --external --force --folder-id ${{ secrets.YANDEX_FOLDER_ID }}
-        $HOME/.yandex-cloud/bin/yc managed-kubernetes cluster list
-      #env:
-      #  FOLDER_ID: ${{ secrets.YANDEX_FOLDER_ID }}
-
-      #$HOME/.yandex-cloud/bin/yc managed-kubernetes cluster get-credentials ${{ secrets.YANDEX_CLUSTER_NAME }} --external --force
 
     - name: Setup Kubernetes context
       run: |
