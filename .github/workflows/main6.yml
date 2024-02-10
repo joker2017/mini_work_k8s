@@ -119,30 +119,25 @@ jobs:
       with:
         version: 'v1.28.2'
 
-    - name: Install Yandex Cloud CLI
+    - name: Install Yandex Cloud CLI non-interactively
       run: |
-        curl -sSL https://storage.yandexcloud.net/yandexcloud-yc/install.sh | bash
+        curl https://storage.yandexcloud.net/yandexcloud-yc/install.sh | bash -s -- -i $HOME/.yandex-cloud -n
         echo "$HOME/.yandex-cloud/bin" >> $GITHUB_PATH
 
-    - name: Verify yc installation
+    - name: Decode Yandex Cloud service account key and get Kubernetes credentials
       run: |
-         $HOME/.yandex-cloud/bin/yc --version
-    # Декодирование ключа сервисного аккаунта Yandex Cloud для использования в kubectl
-    - name: Decode Yandex Cloud service account key
-      run: |
-          mkdir -p $HOME/.yandex-cloud
-          echo ${{ secrets.SERVICE_ACCOUNT_KEY_JSON }} | base64 -d > $HOME/.yandex-cloud/service-account-key.json
-          yc config profile create github-actions
-          yc config set service-account-key $HOME/.yandex-cloud/service-account-key.json
-          yc managed-kubernetes cluster get-credentials ${{ secrets.YANDEX_CLUSTER_NAME }} --external
+        mkdir -p $HOME/.yandex-cloud
+        echo ${{ secrets.SERVICE_ACCOUNT_KEY_JSON }} | base64 -d > $HOME/.yandex-cloud/service-account-key.json
+        $HOME/.yandex-cloud/bin/yc config profile create github-actions
+        $HOME/.yandex-cloud/bin/yc config set service-account-key $HOME/.yandex-cloud/service-account-key.json
+        $HOME/.yandex-cloud/bin/yc managed-kubernetes cluster get-credentials ${{ secrets.YANDEX_CLUSTER_NAME }} --external
 
-    # Настройка контекста Kubernetes с использованием полученных credentials
     - name: Setup Kubernetes context
       run: |
-          kubectl config set-cluster my-cluster --server=${{ secrets.K8S_CLUSTER_ENDPOINT }} --certificate-authority=$HOME/.yandex-cloud/ca.crt
-          kubectl config set-credentials github-actions --token=$(yc iam create-token)
-          kubectl config set-context my-context --cluster=my-cluster --user=github-actions
-          kubectl config use-context my-context
+        kubectl config set-cluster my-cluster --server=${{ secrets.K8S_CLUSTER_ENDPOINT }} --certificate-authority=$HOME/.yandex-cloud/ca.crt
+        kubectl config set-credentials github-actions --token=$($HOME/.yandex-cloud/bin/yc iam create-token)
+        kubectl config set-context my-context --cluster=my-cluster --user=github-actions
+        kubectl config use-context my-context
 
 
     # Шаг 4: Сборка и публикация Docker образов
