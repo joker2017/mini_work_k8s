@@ -19,6 +19,7 @@ jobs:
 
       - name: Configure Kubeconfig
         run: |
+          echo "${{ secrets.CA_PEM }}" > $HOME/home/runner/.kube/ca.pem
           mkdir -p $HOME/.kube
           echo "${{ secrets.KUBECONFIG }}" > $HOME/.kube/config
 
