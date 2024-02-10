@@ -123,11 +123,10 @@ jobs:
       run: |
         curl -sSL https://storage.yandexcloud.net/yandexcloud-yc/install.sh | bash
         echo "$HOME/.yandex-cloud/bin" >> $GITHUB_PATH
-    - name: Install Yandex Cloud CLI
-      run: |
-         curl -sSL https://storage.yandexcloud.net/yandexcloud-yc/install.sh | bash
-         echo "$HOME/.yandex-cloud/bin" >> $GITHUB_PATH
 
+    - name: Verify yc installation
+      run: |
+         $HOME/.yandex-cloud/bin/yc --version
     # Декодирование ключа сервисного аккаунта Yandex Cloud для использования в kubectl
     - name: Decode Yandex Cloud service account key
       run: |
