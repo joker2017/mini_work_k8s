@@ -17,23 +17,14 @@ jobs:
         with:
           version: 'latest'
 
-      - name: Configure Kubeconfig
-        run: |
-          mkdir -p $HOME/.kube
-       
-       
-       
-          echo "${{ secrets.KUBECONFIG }}" > $HOME/.kube/config
-
       - name: Check Kubernetes Cluster Connection
         run: |
-          kubectl cluster-info
-          
+          echo "${{ secrets.KUBECONFIG }}" | kubectl --kubeconfig=/dev/stdin cluster-info
 
       - name: Get Nodes
         run: |
-          kubectl get nodes
+          echo "${{ secrets.KUBECONFIG }}" | kubectl --kubeconfig=/dev/stdin get nodes
 
       - name: Get namespace
         run: |
-          kubectl get namespace
+          echo "${{ secrets.KUBECONFIG }}" | kubectl --kubeconfig=/dev/stdin get namespace
