@@ -6,16 +6,17 @@ ENV PYTHONDONTWRITEBYTECODE=1 \
     PYTHONUNBUFFERED=1
 
 # Установка системных зависимостей и зависимостей Python для сборки
-RUN apk update && apk add --no-cache \
+
+RUN sudo apk update && sudo apk add --no-cache \
     postgresql-client \
-    jpeg-dev \
     gcc \
     libc-dev \
     linux-headers \
     musl-dev \
     zlib-dev \
     nginx-unit \
-    nginx-unit-python
+    nginx-unit-python \
+  && sudo rm -rf /var/lib/apt/lists/*
 
 # Создание рабочей директории
 WORKDIR /app
