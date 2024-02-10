@@ -1,0 +1,36 @@
+name: Kubernetes Connection Test
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  check-k8s-connection:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Setup Kubectl
+        uses: azure/setup-kubectl@v1
+        with:
+          version: 'latest'
+
+      - name: Configure Kubeconfig
+        run: |
+          mkdir -p $HOME/.kube
+          echo "${{ secrets.KUBECONFIG }}" > $HOME/.kube/config
+
+      - name: Check Kubernetes Cluster Connection
+        run: |
+          kubectl cluster-info
+          
+
+      - name: Get Nodes
+        run: |
+          kubectl get nodes
+
+      - name: Get namespace
+        run: |
+          kubectl get namespace

@@ -140,7 +140,14 @@ jobs:
 
     - name: Setup Kubernetes context
       run: |
-        kubectl config set-cluster my-cluster --server=${{ secrets.K8S_CLUSTER_ENDPOINT }} --certificate-authority=$HOME/.yandex-cloud/ca.crt
+      # mkdir -p $HOME/.yandex-cloud
+      #echo "${{ secrets.CA_PEM }}" > $HOME/.yandex-cloud/ca.pem
+      #kubectl config use-context default --kubeconfig=test.kubeconfig
+        kubectl config set-cluster ${{ secrets.YANDEX_CLUSTER_NAME }} `
+               --certificate-authority = ${{ secrets.CA_PEM }} `
+               --server = ${{ secrets.K8S_CLUSTER_ENDPOINT }}
+               --kubeconfig = ${{ secrets.KUBECONFIG }}
+        #kubectl config set-cluster ${{ secrets.YANDEX_CLUSTER_NAME }} --server=${{ secrets.K8S_CLUSTER_ENDPOINT }} --certificate-authority= ${{ secrets.CA_PEM }}
         kubectl config set-credentials github-actions --token=$($HOME/.yandex-cloud/bin/yc iam create-token)
         kubectl config set-context my-context --cluster=my-cluster --user=github-actions
         kubectl config use-context my-context
@@ -151,7 +158,7 @@ jobs:
     #  run: |
     #    echo "${{ secrets.DOCKER_PASSWORD }}" | docker login -u "${{ secrets.DOCKER_USERNAME }}" --password-stdin
     #    docker build -t ${{ secrets.DOCKER_USERNAME }}/app:${{ github.sha }} ./app
-    #    docker push ${{ secrets.DOCKER_USERNAME }}/app:${{ github.sha }}
+    #    docker push ${{ secrets.YANDEX_CLUSTER_NAME }}/app:${{ github.sha }}
 
 
     # Шаг 5: Определение текущей и следующей версий
