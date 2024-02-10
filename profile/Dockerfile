@@ -4,22 +4,21 @@ FROM python:3.10.0-alpine as builder
 # Установка переменных окружения для Python
 ENV PYTHONDONTWRITEBYTECODE=1 \
     PYTHONUNBUFFERED=1
-
+WORKDIR /app
 # Установка системных зависимостей и зависимостей Python для сборки
-
+#COPY ./requirements.txt requirements.txt
 RUN pip install --upgrade pip --no-cache-dir
-RUN pip install -r /app/requirements.txt --no-cache-dir
+# Копирование зависимостей Python
+COPY ./requirements.txt requirements.txt
+RUN pip install --no-cache-dir -r requirements.txt
 RUN apk add --update --no-cache postgresql-client jpeg-dev
 RUN apk add --update --no-cache --virtual .tmp-build-deps \
   gcc libc-dev linux-headers postgresql-dev musl-dev zlib zlib-dev
 
 # Создание рабочей директории
-WORKDIR /app
+#WORKDIR /app
 
-# Копирование зависимостей Python
-COPY ./requirements.txt requirements.txt
-RUN pip install --upgrade pip --no-cache-dir && \
-    pip install --no-cache-dir -r requirements.txt
+
 
 # Копирование остальных файлов проекта
 # COPY . .
