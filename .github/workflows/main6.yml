@@ -116,7 +116,7 @@ jobs:
       uses: azure/setup-kubectl@v3
       id: install
       with:
-          version: 'v1.28.2
+        version: 'v1.28.2'
 
     # Шаг 3: Авторизация в Kubernetes кластере
     - name: Setup Kubernetes context
