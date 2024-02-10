@@ -127,13 +127,12 @@ jobs:
     - name: Decode Yandex Cloud service account key and get Kubernetes credentials
       run: |
         mkdir -p $HOME/.yandex-cloud
-        echo "${{ secrets.SERVICE_ACCOUNT_KEY_JSON }}" | base64 -d > $HOME/.yandex-cloud/service-account-key.json
+        echo "${{ secrets.SERVICE_ACCOUNT_KEY_JSON }}" > $HOME/.yandex-cloud/service-account-key.json
         $HOME/.yandex-cloud/bin/yc config profile create github-actions
         $HOME/.yandex-cloud/bin/yc config set service-account-key $HOME/.yandex-cloud/service-account-key.json
 
         $HOME/.yandex-cloud/bin/yc managed-kubernetes cluster get-credentials miniwork-k8s --external --force --folder-id ${{ secrets.YANDEX_FOLDER_ID }}
         $HOME/.yandex-cloud/bin/yc managed-kubernetes cluster list
-
       #env:
       #  FOLDER_ID: ${{ secrets.YANDEX_FOLDER_ID }}
 
