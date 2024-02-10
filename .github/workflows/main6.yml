@@ -130,9 +130,9 @@ jobs:
         echo ${{ secrets.SERVICE_ACCOUNT_KEY_JSON }} | base64 -d > $HOME/.yandex-cloud/service-account-key.json
         $HOME/.yandex-cloud/bin/yc config profile create github-actions
         $HOME/.yandex-cloud/bin/yc config set service-account-key $HOME/.yandex-cloud/service-account-key.json
-        $HOME/.yandex-cloud/bin/yc managed-kubernetes cluster list
+     #$HOME/.yandex-cloud/bin/yc managed-kubernetes cluster list
          
-      # $HOME/.yandex-cloud/bin/yc managed-kubernetes cluster get-credentials miniwork-k8s --external --force --folder-id $FOLDER_ID
+        $HOME/.yandex-cloud/bin/yc managed-kubernetes cluster get-credentials miniwork-k8s --external --force --folder-id $FOLDER_ID
       #env:
       #  FOLDER_ID: ${{ secrets.YANDEX_FOLDER_ID }}
 
