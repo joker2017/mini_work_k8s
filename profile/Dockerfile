@@ -1,5 +1,5 @@
 # Используем базовый образ Python с Alpine для сборки
-FROM python:3.10.0-alpine as builder
+FROM python:3.10.0 as builder
 
 # Установка переменных окружения для Python
 ENV PYTHONDONTWRITEBYTECODE=1 \
