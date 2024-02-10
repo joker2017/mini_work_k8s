@@ -1,0 +1,31 @@
+{
+  "listeners": {
+    "*:8300": {
+      "pass": "routes"
+    }
+  },
+  "routes": [
+    {
+      "match": {
+        "uri": "/static/*"
+      },
+      "action": {
+        "share": "/app/static/"
+      }
+    },
+    {
+      "action": {
+        "pass": "applications/django_project"
+      }
+    }
+  ],
+  "applications": {
+    "django_project": {
+      "type": "python",
+      "path": "/app/",
+      "home": "/path/to/virtual-env/if/used/",
+      "module": "project.wsgi",
+      "user": "user"
+    }
+  }
+}

@@ -1,0 +1,17 @@
+# service.yaml
+
+# Для приложения Account
+spec:
+  ports:
+  - port: {{ .Values.account.service.port }}
+    targetPort: http
+    protocol: TCP
+  ...
+
+# Для приложения Profile
+spec:
+  ports:
+  - port: {{ .Values.profile.service.port }}
+    targetPort: http
+    protocol: TCP
+  ...

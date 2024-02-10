@@ -1,0 +1,43 @@
+# ingress.yaml
+
+# Для приложения Account
+spec:
+  rules:
+  - host: "{{ .Values.account.ingress.host }}"
+    http:
+      paths:
+      - path: "/blue(/|$)(.*)"
+        pathType: Prefix
+        backend:
+          service:
+            name: "account-blue"
+            port:
+              number: {{ .Values.account.service.port }}
+      - path: "/green(/|$)(.*)"
+        pathType: Prefix
+        backend:
+          service:
+            name: "account-green"
+            port:
+              number: {{ .Values.account.service.port }}
+
+# Для приложения Profile
+spec:
+  rules:
+  - host: "{{ .Values.profile.ingress.host }}"
+    http:
+      paths:
+      - path: "/blue(/|$)(.*)"
+        pathType: Prefix
+        backend:
+          service:
+            name: "profile-blue"
+            port:
+              number: {{ .Values.profile.service.port }}
+      - path: "/green(/|$)(.*)"
+        pathType: Prefix
+        backend:
+          service:
+            name: "profile-green"
+            port:
+              number: {{ .Values.profile.service.port }}

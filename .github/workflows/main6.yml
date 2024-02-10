@@ -1,22 +1,209 @@
-name: SSH
+name: CI/CD with Blue-Green Deployment
 
 on:
   workflow_dispatch:
+
+env:
+  PROFILE_IMAGE: ${{ secrets.DOCKER_HUB_USERNAME }}/profile:${{ github.sha }}
+  ACCOUNT_IMAGE: ${{ secrets.DOCKER_HUB_USERNAME }}/account:${{ github.sha }}
+
 jobs:
-      run_example_job:
-        runs-on: ubuntu-latest
-        timeout-minutes: 5
-        steps:
-          - name: print out example job
-            uses: appleboy/ssh-action@v1.0.0
-            with:
-              host: 158.160.127.41
-              username: ${{ secrets.USERNAME }}
-              key: ${{ secrets.KEY }}
-              port: ${{ secrets.PORT }}
-              passphrase: ${{ secrets.PASSPHRASE }}
-              command_timeout: 30m
-              script_stop: true
-              script: |
-                old_container_id=$(docker ps -f name=profile -q | tail -n1)
-                echo "$old_container_id"
+
+  lint-test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+
+      - name: Set up Helm
+        uses: azure/setup-helm@v3
+        with:
+          version: v3.12.1
+
+      - uses: actions/setup-python@v4
+        with:
+          python-version: '3.10'
+          check-latest: true
+
+      - name: Set up chart-testing
+        uses: helm/chart-testing-action@v2.6.0
+
+      - name: Run chart-testing (list-changed)
+        id: list-changed
+        run: |
+          changed=$(ct list-changed --target-branch ${{ github.event.repository.default_branch }})
+          if [[ -n "$changed" ]]; then
+            echo "changed=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Run chart-testing (lint)
+        if: steps.list-changed.outputs.changed == 'true'
+        run: ct lint --target-branch ${{ github.event.repository.default_branch }}
+
+      - name: Create kind cluster
+        if: steps.list-changed.outputs.changed == 'true'
+        uses: helm/kind-action@v1.8.0
+
+      - name: Run chart-testing (install)
+        if: steps.list-changed.outputs.changed == 'true'
+        run: ct install --target-branch ${{ github.event.repository.default_branch }}
+
+  build-account:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Login to Dockerhub
+        uses: docker/login-action@v2
+        with:
+          username: ${{ secrets.DOCKER_HUB_USERNAME }}
+          password: ${{ secrets.DOCKER_HUB_ACCESS_TOKEN }}
+
+      - name: Setup Buildx
+        uses: docker/setup-buildx-action@v2
+
+      - name: Build Account
+        uses: docker/build-push-action@v3
+        with:
+          context: ./account
+          file: ./account/Dockerfile
+          push: true
+          tags: ${{ env.ACCOUNT_IMAGE }}
+
+  build-profile:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Login to Dockerhub
+        uses: docker/login-action@v2
+        with:
+          username: ${{ secrets.DOCKER_HUB_USERNAME }}
+          password: ${{ secrets.DOCKER_HUB_ACCESS_TOKEN }}
+
+
+      - name: Setup Buildx
+        uses: docker/setup-buildx-action@v2
+
+      - name: Build Profile
+        uses: docker/build-push-action@v3
+        with:
+          context: ./profile
+          file: ./profile/Dockerfile
+          push: true
+          build-args: SERVER_URL=${{ secrets.API_SERVER_URL }}
+          tags: ${{ env.PROFILE_IMAGE }}
+
+
+  deploy-in-k8s:
+    runs-on: ubuntu-latest
+    steps:
+    # Шаг 1: Извлечение кода из репозитория
+    - name: Checkout code
+      uses: actions/checkout@v3
+
+    # Шаг 2: Установка Helm
+    - name: Install Helm
+      uses: azure/setup-helm@v3
+      with:
+        version: v3.6.2
+    # Шаг 2: Установка kubectl
+    - name: Install kubectl
+      uses: azure/setup-kubectl@v3
+      with:
+        version: 'v1.26' # default is latest stable
+      id: install
+
+    # Шаг 3: Авторизация в Kubernetes кластере
+    - name: Setup Kubernetes context
+      uses: azure/k8s-set-context@v3
+      with:
+        method: kubeconfig
+        kubeconfig: ${{ secrets.KUBECONFIG }}
+
+    # Шаг 4: Сборка и публикация Docker образов
+    #- name: Build and push Docker images
+    #  run: |
+    #    echo "${{ secrets.DOCKER_PASSWORD }}" | docker login -u "${{ secrets.DOCKER_USERNAME }}" --password-stdin
+    #    docker build -t ${{ secrets.DOCKER_USERNAME }}/app:${{ github.sha }} ./app
+    #    docker push ${{ secrets.DOCKER_USERNAME }}/app:${{ github.sha }}
+
+
+    # Шаг 5: Определение текущей и следующей версий
+          # Определение текущей и следующей версий
+    - name: Determine current and next versions
+      run: |
+        CURRENT_VERSION=$(kubectl get configmap app-version -o=jsonpath='{.data.CURRENT_VERSION}' || echo "")
+        if [[ "$CURRENT_VERSION" == "" ]]; then
+          echo "This is a fresh install."
+          NEXT_VERSION="green" # Пример начального значения
+        elif [[ "$CURRENT_VERSION" == "blue" ]]; then
+          NEXT_VERSION="green"
+        else
+          NEXT_VERSION="blue"
+        fi
+        echo "NEXT_VERSION=$NEXT_VERSION" >> $GITHUB_ENV
+        echo "CURRENT_VERSION=$CURRENT_VERSION" >> $GITHUB_ENV
+
+    # Развертывание приложений с Helm
+    - name: Deploy applications with Helm
+      run: |
+        # Развертывание приложения Account
+        helm upgrade --install account-${NEXT_VERSION} ./helm-chart-account \
+          --set image=${{ env.ACCOUNT_IMAGE }} \
+          --set deploymentColor=${NEXT_VERSION}
+              
+        # Развертывание приложения Profile
+        helm upgrade --install profile-${NEXT_VERSION} ./helm-chart-profile \
+          --set image=${{ env.PROFILE_IMAGE }} \
+          --set deploymentColor=${NEXT_VERSION}
+              
+        # Условная логика для установки Ingress, если это чистая установка
+        if [[ "$CURRENT_VERSION" == "" ]]; then
+          kubectl apply -f ./k8s/ingress-${NEXT_VERSION}.yaml
+        fi
+
+    # Обновление информации о текущей версии после успешного развертывания
+    - name: Update current version info
+      run: |
+        kubectl create configmap app-version --from-literal=CURRENT_VERSION=${NEXT_VERSION} --dry-run=client -o yaml | kubectl apply -f -
+
+      # Шаг 7: Проверка здоровья новой версии приложений
+    - name: Health check for the new version
+      run: |
+        echo "Проверка здоровья новых версий приложений..."
+        # Проверка здоровья для приложения Account
+        ACCOUNT_NEW_VERSION_POD=$(kubectl get pods -l app=account,version=${{ env.NEXT_VERSION }} -n default -o jsonpath="{.items[0].metadata.name}")
+        kubectl wait --for=condition=ready pod $ACCOUNT_NEW_VERSION_POD --timeout=60s -n default
+        # Проверка здоровья для приложения Profile
+        PROFILE_NEW_VERSION_POD=$(kubectl get pods -l app=profile,version=${{ env.NEXT_VERSION }} -n default -o jsonpath="{.items[0].metadata.name}")
+        kubectl wait --for=condition=ready pod $PROFILE_NEW_VERSION_POD --timeout=60s -n default
+
+      
+
+    # Шаг 8: Переключение трафика
+    - name: Switch traffic to the new version
+      run: |
+        # Обновление Ingress для перенаправления трафика на новую версию обоих приложений
+        kubectl patch ingress my-app-ingress -n default -p "{\"spec\":{\"rules\":[{\"http\":{\"paths\":[{\"path\":\"/account\",\"backend\":{\"service\":{\"name\":\"account-${{ env.NEXT_VERSION }}\",\"port\":{\"number\":80}}}}, {\"path\":\"/profile\",\"backend\":{\"service\":{\"name\":\"profile-${{ env.NEXT_VERSION }}\",\"port\":{\"number\":80}}}}]}}]}}"
+
+    
+
+    # Шаг 9: Очистка старых ресурсов
+    - name: Cleanup old version resources
+      run: |
+        echo "Очистка ресурсов старой версии приложений..."
+        PREVIOUS_VERSION=${{ env.CURRENT_VERSION }}
+        if [[ "$PREVIOUS_VERSION" != "" ]]; then
+          # Удаление старой версии приложения Account
+          helm uninstall account-${PREVIOUS_VERSION} --namespace default
+          # Удаление старой версии приложения Profile
+          helm uninstall profile-${PREVIOUS_VERSION} --namespace default
+          echo "Ресурсы старой версии приложений account и profile были успешно удалены."
+        else
+          echo "Чистая установка, не требуется очистка старых ресурсов."
+

@@ -1,0 +1,20 @@
+global:
+  imagePullSecrets: []
+
+app:
+  name: "your-application" # Имя приложения (можно переопределить для каждого приложения)
+  port: 8080 # Порт, на котором работает приложение
+
+image:
+  repository: "depsemt2009" # Репозиторий Docker образа
+  tag: "{{ .Values.github.sha }}" # Тег Docker образа
+
+service:
+  type: ClusterIP # Тип Kubernetes сервиса
+
+ingress:
+  host: "51.250.87.116"
+
+environment: "blue" # Среда развертывания (blue или green)
+
+replicaCount: 1 # Количество реплик пода
