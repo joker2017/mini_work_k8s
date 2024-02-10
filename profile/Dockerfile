@@ -1,42 +1,29 @@
-# Первый этап: Сборка и установка зависимостей Python
-FROM python:3.11.0 as builder
+# Используем официальный образ NGINX Unit для Python
+FROM nginx/unit:1.31.1-python3.11
 
-ENV PYTHONDONTWRITEBYTECODE=1 \
-    PYTHONUNBUFFERED=1
-
-WORKDIR /app
-
-COPY ./requirements.txt requirements.txt
-
-RUN pip install --upgrade pip && \
-    pip install --no-cache-dir -r requirements.txt
-
- #COPY . .
-
-# Второй этап: Создание конечного образа с NGINX Unit
-FROM debian:buster-slim
-
-WORKDIR /app
-
-# Скачивание и сохранение ключа подписи NGINX и добавление репозитория Unit
+# Обновляем список пакетов и устанавливаем необходимые зависимости
+# Например, gcc для компиляции некоторых Python пакетов
 RUN apt-get update && \
-    apt-get install -y --no-install-recommends gnupg1 curl && \
-    curl --insecure --output /usr/share/keyrings/nginx-keyring.gpg https://unit.nginx.org/keys/nginx-keyring.gpg && \
-    echo "deb [signed-by=/usr/share/keyrings/nginx-keyring.gpg] https://packages.nginx.org/unit/debian/ buster unit" > /etc/apt/sources.list.d/unit.list && \
-    echo "deb-src [signed-by=/usr/share/keyrings/nginx-keyring.gpg] https://packages.nginx.org/unit/debian/ buster unit" >> /etc/apt/sources.list.d/unit.list && \
-    apt-get update && \
-    apt-get install -y unit unit-python3.7 && \
+    apt-get install -y gcc && \
+    # Очищаем кэш apt для уменьшения размера образа
+    apt-get clean && \
     rm -rf /var/lib/apt/lists/*
 
+# Создаем рабочую директорию для приложения
+WORKDIR /www/app
 
-# Копирование приложения и зависимостей из первого этапа
-COPY --from=builder /app /app
+# Копируем файлы приложения в контейнер
+COPY . .
 
-# Создание пользователя для запуска приложения
-RUN useradd --create-home appuser
-USER appuser
+# Устанавливаем зависимости Python из файла requirements.txt
+RUN pip install --no-cache-dir -r requirements.txt
 
-# Копирование конфигурационного файла NGINX Unit (если он необходим)
-COPY --from=builder /app/unit.config.json /docker-entrypoint.d/unit.config.json
+# Копируем конфигурационный файл NGINX Unit для автоматической настройки
+COPY config.json /docker-entrypoint.d/config.json
 
-CMD ["unitd", "--no-daemon", "--control", "unix:/var/run/control.unit.sock"]
+# Определяем порт, который будет прослушивать приложение
+EXPOSE 80
+
+# Команда запуска NGINX Unit уже определена в базовом образе,
+# поэтому здесь не требуется указывать CMD или ENTRYPOINT.
+
