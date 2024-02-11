@@ -131,6 +131,12 @@ jobs:
           echo "NEXT_VERSION=$NEXT_VERSION" >> $GITHUB_ENV
           echo "CURRENT_VERSION=$CURRENT_VERSION" >> $GITHUB_ENV
 
+      - name: Delete old service
+        run: |
+          kubectl --kubeconfig=kubeconfig.yml delete service account-blue -n default || true
+        continue-on-error: true
+
+
       - name: Deploy applications using Helm
         run: |
           helm upgrade --install account-${{ env.NEXT_VERSION }} ./charts --set image=${{ secrets.DOCKER_HUB_USERNAME }}/account:${{ github.sha }},deploymentColor=${{ env.NEXT_VERSION }} --namespace default --create-namespace --kubeconfig=kubeconfig.yml
