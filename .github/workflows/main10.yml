@@ -24,6 +24,6 @@ jobs:
 
       - name: Deploy Helm chart
         run: |
-          echo "${{ secrets.KUBECONFIG }}" | helm upgrade --install my-release ./path/to/your/chart --namespace default --create-namespace --kubeconfig=/dev/stdin
+          echo "${{ secrets.KUBECONFIG }}" | helm upgrade --install my-release .\chart2 --namespace default --create-namespace --kubeconfig=/dev/stdin
 
       # Дополнительные шаги, такие как проверка статуса развертывания, могут быть добавлены здесь.
