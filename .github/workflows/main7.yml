@@ -33,7 +33,22 @@ jobs:
       - name: Check Helm Version
         run: |
           helm version
+      - name: Create Pod
+        run: |
+            echo "apiVersion: v1
+            kind: Pod
+            metadata:
+            name: test-pod
+            spec:
+            containers:
+            - name: nginx
+             image: nginx" | kubectl apply -f -
 
+            - name: Wait 30 Seconds
+              run: sleep 30
+
+      - name: Delete Pod
+        run: kubectl delete pod test-pod
       #- name: Check Helm Release
       #  run: |
        #   helm list --all-namespaces
