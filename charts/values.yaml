@@ -1,6 +1,6 @@
 global:
   imagePullSecrets: []
-  deploymentColor: blue # Добавляем переменную deploymentColor и устанавливаем ее значение по умолчанию
+  deploymentColor: green # Добавляем переменную deploymentColor и устанавливаем ее значение по умолчанию
 
 
 app:
@@ -13,8 +13,8 @@ service:
 ingress:
   enabled: true
   host: "example.com"
-
-environment: "blue"
+  type: ClusterIP
+#environment: "green"
 
 replicaCount: 1
 
