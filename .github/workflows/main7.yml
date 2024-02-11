@@ -38,11 +38,11 @@ jobs:
           apiVersion: v1
           kind: Pod
           metadata:
-            name: test-pod
+             name: test-pod
           spec:
-            containers:
-            - name: nginx
-              image: nginx
+             containers:
+             - name: nginx
+               image: nginx
           EOF
 
       - name: Wait for Pod to be Ready
