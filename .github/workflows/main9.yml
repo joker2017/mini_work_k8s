@@ -117,10 +117,6 @@ jobs:
           echo "${{ secrets.KUBECONFIG }}" > kubeconfig.yml
           chmod 600 kubeconfig.yml
 
-      - name: Delete old service
-        run: |
-          kubectl --kubeconfig=kubeconfig.yml delete service account-blue -n default || true
-        continue-on-error: true
 
       - name: Determine current and next versions
         run: |
