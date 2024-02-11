@@ -2,9 +2,11 @@ replicaCount: 1
 
 image:
   repository: nginx
-  pullPolicy: IfNotPresent
   tag: "latest"
 
 service:
   type: ClusterIP
   port: 80
+
+nameOverride: ""
+fullnameOverride: ""
