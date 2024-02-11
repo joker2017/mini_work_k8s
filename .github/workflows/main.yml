@@ -1,83 +1,38 @@
-name: Unit_Test
+name: Проверка кластера Kubernetes
 
 on:
-  workflow_dispatch
- # push:
-  #  branches:
-  #  - dev
-  #pull_request:
-  #  branches:
-  #  - dev
+  workflow_dispatch:
+
 jobs:
-  test_account:
-
-    runs-on: ubuntu-latest
-
-    steps:
-    - uses: actions/checkout@v4
-    - run: |
-        git fetch --prune --unshallow
-        ls
-        echo "CCCCCCCCCCCCCCCCCCCCC"
-    - name: Set up Python 3.8
-      uses: actions/setup-python@v4
-      with:
-        python-version: 3.8
-    - name: Install dependencies
-      run: |
-        python -m pip install --upgrade pip
-        pip install -r account/requirements.txt
-
-    - name: Test with pytest
-      run: |
-        cd account
-        python app/manage.py test account
-
-    - name: Python Django Coverage GitHub Action
-      uses: dc740/django-coveragepy-github-action@0.9
-
-
-
-
-
-
-
-
-
-
-
-
-
-  test_profile:
+  check-k8s-connection:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - run: |
-          git fetch --prune --unshallow
-      - name: Set up Python 3.8
-        uses: actions/setup-python@v4
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Setup Kubectl
+        uses: azure/setup-kubectl@v1
         with:
-          python-version: 3.8
-      - name: Install dependencies
-        run: |
-          python -m pip install --upgrade pip
-          pip install -r profile/requirements.txt
-      #- name: Lint with flake8
-      #  run: |
-      #    pip install flake8
-          # stop the build if there are Python syntax errors or undefined names
-      #    flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics
-          # exit-zero treats all errors as warnings. The GitHub editor is 127 chars wide
-      #    flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
-      - name: Test with pytest
-        run: |
-          python profile/app/manage.py test profile
-      - name: Python Django Coverage GitHub Action
-        uses: dc740/django-coveragepy-github-action@0.9
-       
-          
-          
-          
-          
-          
+          version: 'latest'
 
+      - name: Применить тестовый Pod
+        run: |
+          echo 'apiVersion: v1
+kind: Pod
+metadata:
+  name: test-pod
+spec:
+  containers:
+  - name: nginx
+    image: nginx' | kubectl apply -f -
+          
+      - name: Подождать 30 секунд
+        run: sleep 30
+
+      - name: Проверить кластер Kubernetes
+        run: |
+          echo "${{ secrets.KUBECONFIG }}" | kubectl --kubeconfig=/dev/stdin get nodes
+
+      - name: Удалить тестовый Pod
+        run: |
+          kubectl delete pod test-pod
