@@ -36,18 +36,24 @@ jobs:
         run: |
           echo "${{ secrets.KUBECONFIG }}" | kubectl --kubeconfig=/dev/stdin apply -f .github/workflows/your-pod-definition.yaml
 
-      - name: Wait for Pod to be Ready
+      - name: Wait for Pod to be Ready in Loop
         run: |
-          echo "${{ secrets.KUBECONFIG }}" | kubectl --kubeconfig=/dev/stdin wait --for=condition=ready pod -l app=test-app --timeout=60s
-
-      - name: Verify Pod is Ready
-        id: verify-pod
-        run: |
-          pod_status=$(echo "${{ secrets.KUBECONFIG }}" | kubectl --kubeconfig=/dev/stdin get pod -l app=test-app -o jsonpath='{.items[0].status.phase}')
-          echo "::set-output name=podStatus::$pod_status"
+          end=$((SECONDS+360)) # 120 seconds from now
+          while [ $SECONDS -lt $end ]; do
+            status=$(echo "${{ secrets.KUBECONFIG }}" | kubectl --kubeconfig=/dev/stdin get pod -l app=test-app -o jsonpath='{.items[*].status.phase}')
+            if [[ $status == "Running" ]]; then
+              echo "Pod is ready"
+              break
+            fi
+            echo "Waiting for pod to be ready... Current status: $status"
+            sleep 5
+          done
+          if [[ $status != "Running" ]]; then
+            echo "Pod did not become ready in time"
+            exit 1
+          fi
         shell: /usr/bin/bash -e {0}
 
       - name: Delete Test Pod
-        if: steps.verify-pod.outputs.podStatus == 'Running'
         run: |
           echo "${{ secrets.KUBECONFIG }}" | kubectl --kubeconfig=/dev/stdin delete -f .github/workflows/your-pod-definition.yaml
