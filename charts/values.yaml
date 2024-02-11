@@ -1,20 +1,45 @@
 global:
   imagePullSecrets: []
 
+# Общие параметры приложения
 app:
-  name: "your-application" # Имя приложения (можно переопределить для каждого приложения)
-  port: 8080 # Порт, на котором работает приложение
+  name: "your-application"
+  port: 8080
 
+# Параметры образа
 image:
-  repository: "depsemt2009" # Репозиторий Docker образа
-  tag: "{{ .Values.github.sha }}" # Тег Docker образа
+  repository: "depsemt2009"
+  tag: "latest"
 
+# Параметры сервиса
 service:
-  type: ClusterIP # Тип Kubernetes сервиса
+  type: ClusterIP
 
+# Настройки Ingress
 ingress:
-  host: "51.250.87.116"
+  enabled: true
+  host: "example.com"
 
-environment: "blue" # Среда развертывания (blue или green)
+# Среда (может быть переключена на blue или green)
+environment: "blue"
 
-replicaCount: 1 # Количество реплик пода
+# Количество реплик
+replicaCount: 1
+
+# Параметры профиля
+profile:
+  app:
+    name: "your-profile-application"
+    port: 8081
+  image:
+    repository: "depsemt2009-profile"
+    tag: "latest"
+
+# Параметры аккаунта
+account:
+  app:
+    name: "your-account-application"
+    port: 8082
+  image:
+    repository: "depsemt2009-account"
+    tag: "latest"

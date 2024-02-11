@@ -1,43 +1,23 @@
-# ingress.yaml
-
-# Для приложения Account
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: "{{ .Values.app.name }}-ingress-{{ .Values.environment }}"
 spec:
   rules:
-  - host: "{{ .Values.account.ingress.host }}"
-    http:
-      paths:
-      - path: "/blue(/|$)(.*)"
-        pathType: Prefix
-        backend:
-          service:
-            name: "account-blue"
-            port:
-              number: {{ .Values.account.service.port }}
-      - path: "/green(/|$)(.*)"
-        pathType: Prefix
-        backend:
-          service:
-            name: "account-green"
-            port:
-              number: {{ .Values.account.service.port }}
-
-# Для приложения Profile
-spec:
-  rules:
-  - host: "{{ .Values.profile.ingress.host }}"
-    http:
-      paths:
-      - path: "/blue(/|$)(.*)"
-        pathType: Prefix
-        backend:
-          service:
-            name: "profile-blue"
-            port:
-              number: {{ .Values.profile.service.port }}
-      - path: "/green(/|$)(.*)"
-        pathType: Prefix
-        backend:
-          service:
-            name: "profile-green"
-            port:
-              number: {{ .Values.profile.service.port }}
+    - host: "{{ .Values.ingress.host }}"
+      http:
+        paths:
+          - path: "/account"
+            pathType: Prefix
+            backend:
+              service:
+                name: "{{ .Values.account.app.name }}-{{ .Values.environment }}"
+                port:
+                  number: {{ .Values.account.app.port }}
+          - path: "/profile"
+            pathType: Prefix
+            backend:
+              service:
+                name: "{{ .Values.profile.app.name }}-{{ .Values.environment }}"
+                port:
+                  number: {{ .Values.profile.app.port }}

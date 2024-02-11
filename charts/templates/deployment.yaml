@@ -15,35 +15,35 @@ spec:
         environment: {{ .Values.environment }}
     spec:
       containers:
-      - name: {{ .Values.app.name }}
-        image: "{{ .Values.image.repository }}/account:{{ .Values.image.tag }}"
-        ports:
-        - containerPort: {{ .Values.app.port }}
-        livenessProbe:
-          httpGet:
-            path: /health
-            port: {{ .Values.app.port }}
-          initialDelaySeconds: 10
-          periodSeconds: 5
-        readinessProbe:
-          httpGet:
-            path: /ready
-            port: {{ .Values.app.port }}
-          initialDelaySeconds: 5
-          periodSeconds: 5
-      - name: profile # Второе приложение
-        image: "{{ .Values.profile.image.repository }}/profile:{{ .Values.profile.image.tag }}"
-        ports:
-        - containerPort: {{ .Values.profile.app.port }}
-        livenessProbe:
-          httpGet:
-            path: /health
-            port: {{ .Values.profile.app.port }}
-          initialDelaySeconds: 10
-          periodSeconds: 5
-        readinessProbe:
-          httpGet:
-            path: /ready
-            port: {{ .Values.profile.app.port }}
-          initialDelaySeconds: 5
-          periodSeconds: 5
+        - name: {{ .Values.app.name }}
+          image: "{{ .Values.image.repository }}/account:{{ .Values.image.tag }}"
+          ports:
+            - containerPort: {{ .Values.app.port }}
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: {{ .Values.app.port }}
+            initialDelaySeconds: 10
+            periodSeconds: 5
+          readinessProbe:
+            httpGet:
+              path: /ready
+              port: {{ .Values.app.port }}
+            initialDelaySeconds: 5
+            periodSeconds: 5
+        - name: {{ .Values.profile.app.name }}
+          image: "{{ .Values.profile.image.repository }}/profile:{{ .Values.profile.image.tag }}"
+          ports:
+            - containerPort: {{ .Values.profile.app.port }}
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: {{ .Values.profile.app.port }}
+            initialDelaySeconds: 10
+            periodSeconds: 5
+          readinessProbe:
+            httpGet:
+              path: /ready
+              port: {{ .Values.profile.app.port }}
+            initialDelaySeconds: 5
+            periodSeconds: 5
