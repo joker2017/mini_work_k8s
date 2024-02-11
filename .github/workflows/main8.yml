@@ -24,3 +24,23 @@ jobs:
       - name: Проверка узлов кластера
         run: |
           echo "$KUBECONFIG" | kubectl --kubeconfig=/dev/stdin get nodes
+
+
+. (Root directory of your repository)
+├── .github
+│   └── workflows
+│       └── ci-cd.yaml (Ваш скрипт GitHub Actions)
+├── chart
+│   ├── Chart.yaml (Описание чарта Helm для приложения account и profile)
+│   ├── values.yaml (Стандартные значения для чарта account и profile)
+│   └── templates
+│       ├── deployment.yaml (Описание deployment для приложения account и profile)
+│       ├── service.yaml (Описание service для приложения account и profile)
+│       └── ingress.yaml (Описание Ingress для синей зеленой версии для для приложения account и profile)
+│   
+├── account
+│   ├── Dockerfile (Dockerfile для сборки образа приложения account)
+│   └── ... (Исходный код и ресурсы приложения account)
+└── profile
+    ├── Dockerfile (Dockerfile для сборки образа приложения profile)
+    └── ... (Исходный код и ресурсы приложения profile)
