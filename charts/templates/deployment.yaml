@@ -1,18 +1,18 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: "{{ .Values.app.name }}-{{ .Values.environment }}"
+  name: "{{ .Values.app.name }}-{{ .Values.global.deploymentColor }}"
 spec:
   replicas: {{ .Values.replicaCount }}
   selector:
     matchLabels:
       app: {{ .Values.app.name }}
-      environment: {{ .Values.environment }}
+      environment: {{ .Values.global.environment }}
   template:
     metadata:
       labels:
         app: {{ .Values.app.name }}
-        environment: {{ .Values.environment }}
+        environment: {{ .Values.global.deploymentColor }}
     spec:
       containers:
         - name: {{ .Values.account.name }}

@@ -9,7 +9,7 @@ spec:
       targetPort: {{ .Values.account.port }}
   selector:
     app: {{ .Values.account.name }}
-    environment: {{ .Values.environment }}
+    environment: {{ .Values.global.deploymentColor }}
 ---
 apiVersion: v1
 kind: Service
@@ -22,4 +22,4 @@ spec:
       targetPort: {{ .Values.profile.port }}
   selector:
     app: {{ .Values.profile.name }}
-    environment: {{ .Values.environment }}
+    environment: {{ .Values.global.deploymentColor }}
