@@ -27,3 +27,6 @@ jobs:
       - name: Get namespace
         run: |
           echo "${{ secrets.KUBECONFIG }}" | kubectl --kubeconfig=/dev/stdin get namespace
+      - name: Check Kubernetes Client and Server Versions
+        run: |
+          echo "${{ secrets.KUBECONFIG }}" | kubectl --kubeconfig=/dev/stdin version
