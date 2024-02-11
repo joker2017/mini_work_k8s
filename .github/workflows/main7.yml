@@ -18,24 +18,25 @@ jobs:
 
       - name: Check Kubernetes Cluster Connection
         run: |
-          echo "${{ secrets.KUBECONFIG }}" | kubectl --kubeconfig=/dev/stdin cluster-info
+          export KUBECONFIG=${{ secrets.KUBECONFIG }}
+          kubectl --kubeconfig=$KUBECONFIG cluster-info
 
       - name: Get Nodes
         run: |
-          echo "${{ secrets.KUBECONFIG }}" | kubectl --kubeconfig=/dev/stdin get nodes
+          kubectl --kubeconfig=$KUBECONFIG get nodes
 
       - name: Get namespaces
         run: |
-          echo "${{ secrets.KUBECONFIG }}" | kubectl --kubeconfig=/dev/stdin get namespaces
+          kubectl --kubeconfig=$KUBECONFIG get namespaces
 
       - name: Check Permissions to Create Pods
         run: |
-          kubectl create pods --namespace default --kubeconfig=${{ secrets.KUBECONFIG }}
+          kubectl create pods --namespace default --kubeconfig=$KUBECONFIG
 
       - name: Create Test Pod
         run: |
-          export KUBECONFIG=${{ secrets.KUBECONFIG }}
-          kubectl apply -f --kubeconfig=$KUBECONFIG <<EOF
+          
+          kubectl --kubeconfig=$KUBECONFIG apply -f <<EOF
           apiVersion: v1
           kind: Pod
           metadata:
