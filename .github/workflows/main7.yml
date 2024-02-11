@@ -38,21 +38,30 @@ jobs:
 
       - name: Wait for Pod to be Ready in Loop
         run: |
-          end=$((SECONDS+360)) # 120 seconds from now
-          while [ $SECONDS -lt $end ]; do
-            status=$(echo "${{ secrets.KUBECONFIG }}" | kubectl --kubeconfig=/dev/stdin get pod -l app=test-app -o jsonpath='{.items[*].status.phase}')
-            if [[ $status == "Running" ]]; then
-              echo "Pod is ready"
+          end=$(date +%s) # current time
+          timeout=$((end + 360)) # 6 minutes from now
+          while [ $(date +%s) -lt $timeout ]; do
+            statuses=$(echo "${{ secrets.KUBECONFIG }}" | kubectl --kubeconfig=/dev/stdin get pods -l app=test-app -o jsonpath='{.items[*].status.phase}')
+            ready=true
+            for status in $statuses; do
+              if [[ "$status" != "Running" ]]; then
+                ready=false
+                break
+              fi
+            done
+            if [ "$ready" = true ]; then
+              echo "All pods are ready"
               break
             fi
-            echo "Waiting for pod to be ready... Current status: $status"
+            echo "Waiting for all pods to be ready... Current statuses: $statuses"
             sleep 5
           done
-          if [[ $status != "Running" ]]; then
-            echo "Pod did not become ready in time"
+          if [ "$ready" != true ]; then
+            echo "Not all pods became ready in time"
             exit 1
           fi
         shell: /usr/bin/bash -e {0}
+  }
 
       - name: Delete Test Pod
         run: |
