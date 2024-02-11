@@ -65,5 +65,3 @@ jobs:
             helm uninstall account-${{ env.CURRENT_VERSION }} --namespace default --kubeconfig=kubeconfig.yml
             helm uninstall profile-${{ env.CURRENT_VERSION }} --namespace default --kubeconfig=kubeconfig.yml
           fi
-
-# Продолжение задач по мере необходимости...
