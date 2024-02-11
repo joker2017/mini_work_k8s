@@ -119,7 +119,8 @@ jobs:
           curl https://storage.yandexcloud.net/yandexcloud-yc/install.sh | bash -s -- -i $HOME/.yandex-cloud -n
           echo "$HOME/.yandex-cloud/bin" >> $GITHUB_PATH
 
-      - name: Определение текущей и следующей версий
+      # Determining current and next application versions
+      - name: Determine current and next versions
         run: |
           CURRENT_VERSION=$(echo "${{ secrets.KUBECONFIG }}" | kubectl --kubeconfig=/dev/stdin get configmap app-version -o=jsonpath='{.data.CURRENT_VERSION}' || echo "")
           if [[ "$CURRENT_VERSION" == "" ]]; then
@@ -133,38 +134,49 @@ jobs:
           echo "NEXT_VERSION=$NEXT_VERSION" >> $GITHUB_ENV
           echo "CURRENT_VERSION=$CURRENT_VERSION" >> $GITHUB_ENV
 
-      - name: Развертывание приложений с Helm
+      # Deploying applications using Helm
+      - name: Deploy applications using Helm
         run: |
-          helm --kubeconfig=/dev/stdin upgrade --install account-${{ env.NEXT_VERSION }} ./chart --set image=${{ env.ACCOUNT_IMAGE }},deploymentColor=${{ env.NEXT_VERSION }}
-          helm --kubeconfig=/dev/stdin upgrade --install profile-${{ env.NEXT_VERSION }} ./chart --set image=${{ env.PROFILE_IMAGE }},deploymentColor=${{ env.NEXT_VERSION }}
+          # Deploying Account application
+          echo "..." | helm --kubeconfig=/dev/stdin upgrade --install account-green ./chart --set image=${{ env.ACCOUNT_IMAGE }},deploymentColor=green
+          # Deploying Profile application
+          echo "..." | helm --kubeconfig=/dev/stdin upgrade --install profile-green ./chart --set image=${{ env.PROFILE_IMAGE }},deploymentColor=green
+          # Applying Ingress, if it's a fresh installation
+          if [[ "$CURRENT_VERSION" == "" ]]; then
+             echo "..." | kubectl --kubeconfig=/dev/stdin apply -f ./chart/templates/ingress.yaml
+          fi
 
-      - name: Применение Ingress, если это первичная установка
-        if: steps.Определение текущей и следующей версий.outputs.CURRENT_VERSION == ''
+      # Updating application version information
+      - name: Update current version information
         run: |
-          kubectl --kubeconfig=/dev/stdin apply -f ./k8s/ingress-${{ env.NEXT_VERSION }}.yaml
+          echo "${{ secrets.KUBECONFIG }}" | kubectl --kubeconfig=/dev/stdin cr eate configmap app-version --from-literal=CURRENT_VERSION=${{ env.NEXT_VERSION }} --dry-run=client -o yaml | kubectl --kubeconfig=/dev/stdin apply -f -
 
-      - name: Обновление информации о текущей версии
+      # Checking health of new application versions
+      - name: Check health of new application versions
         run: |
-          echo "${{ secrets.KUBECONFIG }}" | kubectl --kubeconfig=/dev/stdin create configmap app-version --from-literal=CURRENT_VERSION=${{ env.NEXT_VERSION }} --dry-run=client -o yaml | kubectl --kubeconfig=/dev/stdin apply -f -
-
-      - name: Проверка здоровья новых версий приложений
-        run: |
+          # Checking health for Account application
           ACCOUNT_NEW_VERSION_POD=$(echo "${{ secrets.KUBECONFIG }}" | kubectl --kubeconfig=/dev/stdin get pods -l app=account,version=${{ env.NEXT_VERSION }} -n default -o jsonpath="{.items[0].metadata.name}")
-          kubectl --kubeconfig=/dev/stdin wait --for=condition=ready pod $ACCOUNT_NEW_VERSION_POD --timeout=60s -n default
+          echo "${{ secrets.KUBECONFIG }}" | kubectl --kubeconfig=/dev/stdin wait --for=condition=ready pod $ACCOUNT_NEW_VERSION_POD --timeout=60s -n default
+          # Checking health for Profile application
           PROFILE_NEW_VERSION_POD=$(echo "${{ secrets.KUBECONFIG }}" | kubectl --kubeconfig=/dev/stdin get pods -l app=profile,version=${{ env.NEXT_VERSION }} -n default -o jsonpath="{.items[0].metadata.name}")
-          kubectl --kubeconfig=/dev/stdin wait --for=condition=ready pod $PROFILE_NEW_VERSION_POD --timeout=60s -n default
+          echo "${{ secrets.KUBECONFIG }}" | kubectl --kubeconfig=/dev/stdin wait --for=condition=ready pod $PROFILE_NEW_VERSION_POD --timeout=60s -n default
 
-      - name: Переключение трафика на новую версию
+      # Switching traffic to the new version
+      - name: Switch traffic to the new version
         run: |
-          kubectl --kubeconfig=/dev/stdin patch ingress my-app-ingress -n default -p "{\"spec\":{\"rules\":[{\"http\":{\"paths\":[{\"path\":\"/account\",\"backend\":{\"service\":{\"name\":\"account-${{ env.NEXT_VERSION }}\",\"port\":{\"number\":80}}}}, {\"path\":\"/profile\",\"backend\":{\"service\":{\"name\":\"profile-${{ env.NEXT_VERSION }}\",\"port\":{\"number\":80}}}}]}}]}"
+          echo "${{ secrets.KUBECONFIG }}" | kubectl --kubeconfig=/dev/stdin patch ingress my-app-ingress -n default -p "{\"spec\":{\"rules\":[{\"http\":{\"paths\":[{\"path\":\"/account\",\"backend\":{\"service\":{\"name\":\"account-${{ env.NEXT_VERSION }}\",\"port\":{\"number\":80}}}}, {\"path\":\"/profile\",\"backend\":{\"service\":{\"name\":\"profile-${{ env.NEXT_VERSION }}\",\"port\":{\"number\":80}}}}]}}]}"
 
-      - name: Очистка старых ресурсов
+      # Step 9: Cleaning up old resources
+      - name: Cleaning up old resources
         run: |
-          echo "Очистка ресурсов старой версии приложений..."
+          echo "Cleaning up resources of the old application version..."
           PREVIOUS_VERSION=${{ env.CURRENT_VERSION }}
           if [[ "$PREVIOUS_VERSION" != "" ]]; then
-            helm --kubeconfig=/dev/stdin uninstall account-${PREVIOUS_VERSION} --namespace default
-            helm --kubeconfig=/dev/stdin uninstall profile-${PREVIOUS_VERSION} --namespace default
-            echo "Ресурсы старой версии приложений account и profile были успешно удалены."
+            # Deleting old version of Account application
+            echo "${{ secrets.KUBECONFIG }}" | helm --kubeconfig=/dev/stdin uninstall account-${PREVIOUS_VERSION} --namespace default
+            # Deleting old version of Profile application
+            echo "${{ secrets.KUBECONFIG }}" | helm --kubeconfig=/dev/stdin uninstall profile-${PREVIOUS_VERSION} --namespace default
+            echo "Resources of the old application version account and profile have been successfully deleted."
           else
-            echo "Чистая установка, не требуется очистка старых ресурсов."
+            echo "Fresh installation, no need to clean up old resources."
+          fi

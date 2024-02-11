@@ -188,17 +188,16 @@ jobs:
     
 
     # Шаг 9: Очистка старых ресурсов
-    - name: Очистка старых ресурсов
+    - name: Cleanup old version resources
       run: |
         echo "Очистка ресурсов старой версии приложений..."
         PREVIOUS_VERSION=${{ env.CURRENT_VERSION }}
         if [[ "$PREVIOUS_VERSION" != "" ]]; then
           # Удаление старой версии приложения Account
-          echo "${{ secrets.KUBECONFIG }}" | helm --kubeconfig=/dev/stdin uninstall account-${PREVIOUS_VERSION} --namespace default
+          helm uninstall account-${PREVIOUS_VERSION} --namespace default
           # Удаление старой версии приложения Profile
-          echo "${{ secrets.KUBECONFIG }}" | helm --kubeconfig=/dev/stdin uninstall profile-${PREVIOUS_VERSION} --namespace default
+          helm uninstall profile-${PREVIOUS_VERSION} --namespace default
           echo "Ресурсы старой версии приложений account и profile были успешно удалены."
         else
           echo "Чистая установка, не требуется очистка старых ресурсов."
-
 
