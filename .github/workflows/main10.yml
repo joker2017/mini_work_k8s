@@ -1,4 +1,4 @@
-name: Deploy to Kubernetes with Helm
+name: Deploy Application with Helm
 
 on:
   workflow_dispatch:
@@ -18,12 +18,13 @@ jobs:
 
       - name: Install Helm
         run: |
-          curl -fsSL -o get_helm.sh https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3
-          chmod 700 get_helm.sh
-          ./get_helm.sh
+          curl https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 | bash
+
+      - name: Configure Kubeconfig
+        run: |
+          echo "${{ secrets.KUBECONFIG }}" > kubeconfig.yml
 
       - name: Deploy Helm chart
         run: |
-          echo "${{ secrets.KUBECONFIG }}" | helm upgrade --install my-release /chart2 --namespace default --create-namespace --kubeconfig=/dev/stdin
-
-      # Дополнительные шаги, такие как проверка статуса развертывания, могут быть добавлены здесь.
+          helm upgrade --install my-release ./chart2 --namespace default --create-namespace --kubeconfig=kubeconfig.yml
+        shell: /usr/bin/bash -e {0}
