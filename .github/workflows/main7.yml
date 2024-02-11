@@ -39,8 +39,15 @@ jobs:
       - name: Wait for Pod to be Ready
         run: |
           echo "${{ secrets.KUBECONFIG }}" | kubectl --kubeconfig=/dev/stdin wait --for=condition=ready pod -l app=test-app --timeout=60s
-        # Здесь предполагается, что в вашем файле your-pod-definition.yaml используется label app=test-app для пода.
+
+      - name: Verify Pod is Ready
+        id: verify-pod
+        run: |
+          pod_status=$(echo "${{ secrets.KUBECONFIG }}" | kubectl --kubeconfig=/dev/stdin get pod -l app=test-app -o jsonpath='{.items[0].status.phase}')
+          echo "::set-output name=podStatus::$pod_status"
+        shell: /usr/bin/bash -e {0}
 
       - name: Delete Test Pod
+        if: steps.verify-pod.outputs.podStatus == 'Running'
         run: |
           echo "${{ secrets.KUBECONFIG }}" | kubectl --kubeconfig=/dev/stdin delete -f .github/workflows/your-pod-definition.yaml
