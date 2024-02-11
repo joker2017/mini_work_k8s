@@ -133,49 +133,38 @@ jobs:
           echo "NEXT_VERSION=$NEXT_VERSION" >> $GITHUB_ENV
           echo "CURRENT_VERSION=$CURRENT_VERSION" >> $GITHUB_ENV
 
-      # Развертывание приложений с использованием Helm
-      - name: Deploy applications with Helm
+      - name: Развертывание приложений с Helm
         run: |
-          # Развертывание приложения Account
-          echo "${{ secrets.KUBECONFIG }}" | helm --kubeconfig=/dev/stdin upgrade --install account-${{ env.NEXT_VERSION }} ./helm-chart-account --set image=${{ env.ACCOUNT_IMAGE }},deploymentColor=${{ env.NEXT_VERSION }}
-          # Развертывание приложения Profile
-          echo "${{ secrets.KUBECONFIG }}" | helm --kubeconfig=/dev/stdin upgrade --install profile-${{ env.NEXT_VERSION }} ./helm-chart-profile --set image=${{ env.PROFILE_IMAGE }},deploymentColor=${{ env.NEXT_VERSION }}
-          # Применение Ingress, если это первичная установка
-          if [[ "$CURRENT_VERSION" == "" ]]; then
-            echo "${{ secrets.KUBECONFIG }}" | kubectl --kubeconfig=/dev/stdin apply -f ./k8s/ingress-${{ env.NEXT_VERSION }}.yaml
-          fi
+          helm --kubeconfig=/dev/stdin upgrade --install account-${{ env.NEXT_VERSION }} ./chart --set image=${{ env.ACCOUNT_IMAGE }},deploymentColor=${{ env.NEXT_VERSION }}
+          helm --kubeconfig=/dev/stdin upgrade --install profile-${{ env.NEXT_VERSION }} ./chart --set image=${{ env.PROFILE_IMAGE }},deploymentColor=${{ env.NEXT_VERSION }}
 
-      # Обновление информации о версии приложения
-      - name: Update application version information
+      - name: Применение Ingress, если это первичная установка
+        if: steps.Определение текущей и следующей версий.outputs.CURRENT_VERSION == ''
+        run: |
+          kubectl --kubeconfig=/dev/stdin apply -f ./k8s/ingress-${{ env.NEXT_VERSION }}.yaml
+
+      - name: Обновление информации о текущей версии
         run: |
           echo "${{ secrets.KUBECONFIG }}" | kubectl --kubeconfig=/dev/stdin create configmap app-version --from-literal=CURRENT_VERSION=${{ env.NEXT_VERSION }} --dry-run=client -o yaml | kubectl --kubeconfig=/dev/stdin apply -f -
 
-      # Проверка здоровья новых версий приложений
-      - name: Check health of new application versions
+      - name: Проверка здоровья новых версий приложений
         run: |
-          # Проверка здоровья для приложения Account
           ACCOUNT_NEW_VERSION_POD=$(echo "${{ secrets.KUBECONFIG }}" | kubectl --kubeconfig=/dev/stdin get pods -l app=account,version=${{ env.NEXT_VERSION }} -n default -o jsonpath="{.items[0].metadata.name}")
-          echo "${{ secrets.KUBECONFIG }}" | kubectl --kubeconfig=/dev/stdin wait --for=condition=ready pod $ACCOUNT_NEW_VERSION_POD --timeout=60s -n default
-          # Проверка здоровья для приложения Profile
+          kubectl --kubeconfig=/dev/stdin wait --for=condition=ready pod $ACCOUNT_NEW_VERSION_POD --timeout=60s -n default
           PROFILE_NEW_VERSION_POD=$(echo "${{ secrets.KUBECONFIG }}" | kubectl --kubeconfig=/dev/stdin get pods -l app=profile,version=${{ env.NEXT_VERSION }} -n default -o jsonpath="{.items[0].metadata.name}")
-          echo "${{ secrets.KUBECONFIG }}" | kubectl --kubeconfig=/dev/stdin wait --for=condition=ready pod $PROFILE_NEW_VERSION_POD --timeout=60s -n default
+          kubectl --kubeconfig=/dev/stdin wait --for=condition=ready pod $PROFILE_NEW_VERSION_POD --timeout=60s -n default
 
-      # Переключение трафика на новую версию
-      - name: Switch traffic to the new version
+      - name: Переключение трафика на новую версию
         run: |
-          echo "${{ secrets.KUBECONFIG }}" | kubectl --kubeconfig=/dev/stdin patch ingress my-app-ingress -n default -p "{\"spec\":{\"rules\":[{\"http\":{\"paths\":[{\"path\":\"/account\",\"backend\":{\"service\":{\"name\":\"account-${{ env.NEXT_VERSION }}\",\"port\":{\"number\":80}}}}, {\"path\":\"/profile\",\"backend\":{\"service\":{\"name\":\"profile-${{ env.NEXT_VERSION }}\",\"port\":{\"number\":80}}}}]}}]}"
+          kubectl --kubeconfig=/dev/stdin patch ingress my-app-ingress -n default -p "{\"spec\":{\"rules\":[{\"http\":{\"paths\":[{\"path\":\"/account\",\"backend\":{\"service\":{\"name\":\"account-${{ env.NEXT_VERSION }}\",\"port\":{\"number\":80}}}}, {\"path\":\"/profile\",\"backend\":{\"service\":{\"name\":\"profile-${{ env.NEXT_VERSION }}\",\"port\":{\"number\":80}}}}]}}]}"
 
-      # Очистка старых ресурсов
-      - name: Clean up old resources
+      - name: Очистка старых ресурсов
         run: |
-          echo "Cleaning up resources of the old version..."
+          echo "Очистка ресурсов старой версии приложений..."
           PREVIOUS_VERSION=${{ env.CURRENT_VERSION }}
           if [[ "$PREVIOUS_VERSION" != "" ]]; then
-            # Удаление старой версии приложения Account
-            echo "${{ secrets.KUBECONFIG }}" | helm --kubeconfig=/dev/stdin uninstall account-${PREVIOUS_VERSION} --namespace default
-            # Удаление старой версии приложения Profile
-            echo "${{ secrets.KUBECONFIG }}" | helm --kubeconfig=/dev/stdin uninstall profile-${PREVIOUS_VERSION} --namespace default
-            echo "Resources of the old version of account and profile applications have been successfully removed."
+            helm --kubeconfig=/dev/stdin uninstall account-${PREVIOUS_VERSION} --namespace default
+            helm --kubeconfig=/dev/stdin uninstall profile-${PREVIOUS_VERSION} --namespace default
+            echo "Ресурсы старой версии приложений account и profile были успешно удалены."
           else
-            echo "Fresh install, no need to clean up old resources."
-          fi
+            echo "Чистая установка, не требуется очистка старых ресурсов."
