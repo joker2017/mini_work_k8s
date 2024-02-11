@@ -54,49 +54,38 @@ jobs:
   build-account:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout
-        uses: actions/checkout@v3
-
-      - name: Login to Dockerhub
-        uses: docker/login-action@v2
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v3
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+      - name: Login to Docker Hub
+        uses: docker/login-action@v3
         with:
           username: ${{ secrets.DOCKER_HUB_USERNAME }}
           password: ${{ secrets.DOCKER_HUB_ACCESS_TOKEN }}
-
-      - name: Setup Buildx
-        uses: docker/setup-buildx-action@v2
-
-      - name: Build Account
-        uses: docker/build-push-action@v3
+      - name: Build and push
+        uses: docker/build-push-action@v5
         with:
-          context: ./account
-          file: ./account/Dockerfile
           push: true
-          tags: ${{ env.ACCOUNT_IMAGE }}
+          tags: ${{ secrets.DOCKER_HUB_USERNAME }}/account:${{ github.sha }}
 
   build-profile:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout
-        uses: actions/checkout@v3
-
-      - name: Login to Dockerhub
-        uses: docker/login-action@v2
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v3
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+      - name: Login to Docker Hub
+        uses: docker/login-action@v3
         with:
           username: ${{ secrets.DOCKER_HUB_USERNAME }}
           password: ${{ secrets.DOCKER_HUB_ACCESS_TOKEN }}
-
-      - name: Setup Buildx
-        uses: docker/setup-buildx-action@v2
-
-      - name: Build Profile
-        uses: docker/build-push-action@v3
+      - name: Build and push
+        uses: docker/build-push-action@v5
         with:
-          context: ./profile
-          file: ./profile/Dockerfile
           push: true
-          build-args: SERVER_URL=${{ secrets.API_SERVER_URL }}
-          tags: ${{ env.PROFILE_IMAGE }}
+          tags: ${{ secrets.DOCKER_HUB_USERNAME }}/profile:${{ github.sha }}
 
   deploy-in-k8s:
     runs-on: ubuntu-latest
@@ -139,8 +128,8 @@ jobs:
 
       - name: Deploy applications using Helm
         run: |
-          helm upgrade --install account-${{ env.NEXT_VERSION }} ./charts --set image=${{ env.ACCOUNT_IMAGE }},deploymentColor=${{ env.NEXT_VERSION }} --namespace default --create-namespace --kubeconfig=kubeconfig.yml
-          helm upgrade --install profile-${{ env.NEXT_VERSION }} ./charts --set image=${{ env.PROFILE_IMAGE }},deploymentColor=${{ env.NEXT_VERSION }} --namespace default --create-namespace --kubeconfig=kubeconfig.yml
+          helm upgrade --install account-${{ env.NEXT_VERSION }} ./charts --set image=${{ secrets.DOCKER_HUB_USERNAME }}/account:${{ github.sha }},deploymentColor=${{ env.NEXT_VERSION }} --namespace default --create-namespace --kubeconfig=kubeconfig.yml
+          helm upgrade --install profile-${{ env.NEXT_VERSION }} ./charts --set image=${{ secrets.DOCKER_HUB_USERNAME }}/profile:${{ github.sha }},deploymentColor=${{ env.NEXT_VERSION }} --namespace default --create-namespace --kubeconfig=kubeconfig.yml
           if [[ "$CURRENT_VERSION" == "" ]]; then
              kubectl --kubeconfig=kubeconfig.yml apply -f ./charts/templates/ingress.yaml
           fi
