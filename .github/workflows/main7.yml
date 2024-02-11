@@ -34,7 +34,8 @@ jobs:
 
       - name: Create Test Pod
         run: |
-          kubectl apply -f --kubeconfig=${{ secrets.KUBECONFIG }} <<EOF
+          export KUBECONFIG=${{ secrets.KUBECONFIG }}
+          kubectl apply -f --kubeconfig=$KUBECONFIG <<EOF
           apiVersion: v1
           kind: Pod
           metadata:
@@ -47,8 +48,8 @@ jobs:
 
       - name: Wait for Pod to be Ready
         run: |
-          kubectl wait --for=condition=ready pod/test-pod --timeout=60s --kubeconfig=${{ secrets.KUBECONFIG }}
+          kubectl wait --for=condition=ready pod/test-pod --timeout=60s --kubeconfig=$KUBECONFIG
 
       - name: Delete Test Pod
         run: |
-          kubectl delete pod test-pod --kubeconfig=${{ secrets.KUBECONFIG }}
+          kubectl delete pod test-pod --kubeconfig=$KUBECONFIG
