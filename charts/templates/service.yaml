@@ -1,25 +1,25 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: {{ .Values.account.name }}-{{ .Values.global.deploymentColor }}
+  name: "{{ .Values.account.name }}-{{ .Values.global.deploymentColor }}"
 spec:
-  type: {{ .Values.service.type }}
+  type: "{{ .Values.service.type }}"
   ports:
     - port: {{ .Values.account.service.port }}
       targetPort: {{ .Values.account.port }}
   selector:
-    app: {{ .Values.account.name }}
-    environment: {{ .Values.global.deploymentColor }}
+    app: "{{ .Values.account.name }}"
+    environment: "{{ .Values.global.deploymentColor }}"
 ---
 apiVersion: v1
 kind: Service
 metadata:
-  name: {{ .Values.profile.name }}-{{ .Values.global.deploymentColor }}
+  name: "{{ .Values.profile.name }}-{{ .Values.global.deploymentColor }}"
 spec:
-  type: {{ .Values.service.type }}
+  type: "{{ .Values.service.type }}"
   ports:
     - port: {{ .Values.profile.service.port }}
       targetPort: {{ .Values.profile.port }}
   selector:
-    app: {{ .Values.profile.name }}
-    environment: {{ .Values.global.deploymentColor }}
+    app: "{{ .Values.profile.name }}"
+    environment: "{{ .Values.global.deploymentColor }}"
