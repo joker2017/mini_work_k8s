@@ -139,10 +139,10 @@ jobs:
 
       - name: Deploy applications using Helm
         run: |
-          helm upgrade --install account-${{ env.NEXT_VERSION }} ./chart --set image=${{ env.ACCOUNT_IMAGE }},deploymentColor=${{ env.NEXT_VERSION }} --namespace default --create-namespace --kubeconfig=kubeconfig.yml
-          helm upgrade --install profile-${{ env.NEXT_VERSION }} ./chart --set image=${{ env.PROFILE_IMAGE }},deploymentColor=${{ env.NEXT_VERSION }} --namespace default --create-namespace --kubeconfig=kubeconfig.yml
+          helm upgrade --install account-${{ env.NEXT_VERSION }} ./charts --set image=${{ env.ACCOUNT_IMAGE }},deploymentColor=${{ env.NEXT_VERSION }} --namespace default --create-namespace --kubeconfig=kubeconfig.yml
+          helm upgrade --install profile-${{ env.NEXT_VERSION }} ./charts --set image=${{ env.PROFILE_IMAGE }},deploymentColor=${{ env.NEXT_VERSION }} --namespace default --create-namespace --kubeconfig=kubeconfig.yml
           if [[ "$CURRENT_VERSION" == "" ]]; then
-             kubectl --kubeconfig=kubeconfig.yml apply -f ./chart/templates/ingress.yaml
+             kubectl --kubeconfig=kubeconfig.yml apply -f ./charts/templates/ingress.yaml
           fi
 
       - name: Update current version information
