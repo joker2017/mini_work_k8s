@@ -30,7 +30,7 @@ jobs:
 
       - name: Check Permissions to Create Pods
         run: |
-          echo "${{ secrets.KUBECONFIG }}" | kubectl --kubeconfig=/dev/stdin auth can-i create pods --namespace default
+          kubectl create pods --namespace default --kubeconfig=${{ secrets.KUBECONFIG }}
 
       - name: Create Test Pod
         run: |
