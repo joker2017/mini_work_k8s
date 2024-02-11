@@ -1,17 +1,25 @@
-# service.yaml
-
-# Для приложения Account
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ .Values.account.app.name }}-{{ .Values.environment }}
 spec:
+  type: {{ .Values.service.type }}
   ports:
-  - port: {{ .Values.account.service.port }}
-    targetPort: http
-    protocol: TCP
-  ...
-
-# Для приложения Profile
+    - port: {{ .Values.account.service.port }}
+      targetPort: {{ .Values.account.app.port }}
+  selector:
+    app: {{ .Values.account.app.name }}
+    environment: {{ .Values.environment }}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ .Values.profile.app.name }}-{{ .Values.environment }}
 spec:
+  type: {{ .Values.service.type }}
   ports:
-  - port: {{ .Values.profile.service.port }}
-    targetPort: http
-    protocol: TCP
-  ...
+    - port: {{ .Values.profile.service.port }}
+      targetPort: {{ .Values.profile.app.port }}
+  selector:
+    app: {{ .Values.profile.app.name }}
+    environment: {{ .Values.environment }}

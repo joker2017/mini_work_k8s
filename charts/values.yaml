@@ -1,45 +1,35 @@
 global:
   imagePullSecrets: []
 
-# Общие параметры приложения
 app:
   name: "your-application"
   port: 8080
 
-# Параметры образа
-image:
-  repository: "depsemt2009"
-  tag: "latest"
-
-# Параметры сервиса
 service:
   type: ClusterIP
 
-# Настройки Ingress
 ingress:
   enabled: true
   host: "example.com"
 
-# Среда (может быть переключена на blue или green)
 environment: "blue"
 
-# Количество реплик
 replicaCount: 1
 
-# Параметры профиля
-profile:
-  app:
-    name: "your-profile-application"
-    port: 8081
-  image:
-    repository: "depsemt2009-profile"
-    tag: "latest"
-
-# Параметры аккаунта
 account:
   app:
-    name: "your-account-application"
     port: 8082
   image:
-    repository: "depsemt2009-account"
-    tag: "latest"
+    repository: "depsemt2009/account"
+    tag: "latest" # Или конкретный тег, как в вашем примере
+  service:
+    port: 80
+
+profile:
+  app:
+    port: 8081
+  image:
+    repository: "depsemt2009/profile"
+    tag: "latest" # Или конкретный тег, как в вашем примере
+  service:
+    port: 80
