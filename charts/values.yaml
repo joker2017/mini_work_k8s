@@ -17,19 +17,17 @@ environment: "blue"
 replicaCount: 1
 
 account:
-  app:
-    port: 8082
+  port: 8082
   image:
-    repository: "depsemt2009/account"
-    tag: "latest" # Или конкретный тег, как в вашем примере
+    repository: "{{ secrets.DOCKER_HUB_USERNAME }}"
+    tag: "{{ github.sha }}"
   service:
     port: 80
 
 profile:
-  app:
-    port: 8081
+  port: 8081
   image:
-    repository: "depsemt2009/profile"
-    tag: "latest" # Или конкретный тег, как в вашем примере
+    repository: "{{ secrets.DOCKER_HUB_USERNAME }}"
+    tag: "{{ github.sha }}"
   service:
     port: 80
