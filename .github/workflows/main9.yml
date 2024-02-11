@@ -9,7 +9,7 @@ env:
   FOLDER_ID: ${{ secrets.YANDEX_FOLDER_ID }}
 
 jobs:
-  # Существующие задачи сохраняются без изменений...
+
 
   deploy-in-k8s:
     runs-on: ubuntu-latest
