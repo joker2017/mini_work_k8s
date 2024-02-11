@@ -34,7 +34,7 @@ jobs:
 
       - name: Create Test Pod
         run: |
-          echo "${{ secrets.KUBECONFIG }}" | kubectl --kubeconfig=/dev/stdin apply -f .\.github\workflows\your-pod-definition.yaml
+          echo "${{ secrets.KUBECONFIG }}" | kubectl --kubeconfig=/dev/stdin apply -f .github/workflows/your-pod-definition.yaml
 
       - name: Wait for Pod to be Ready
         run: |
@@ -43,4 +43,4 @@ jobs:
 
       - name: Delete Test Pod
         run: |
-          echo "${{ secrets.KUBECONFIG }}" | kubectl --kubeconfig=/dev/stdin delete -f your-pod-definition.yaml
+          echo "${{ secrets.KUBECONFIG }}" | kubectl --kubeconfig=/dev/stdin delete -f .github/workflows/your-pod-definition.yaml
