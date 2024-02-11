@@ -1,10 +1,9 @@
 name: Kubernetes Connection Test
 
 on:
-  push:
-    branches:
-      - main
- #echo "${{ secrets.CA_PEM }}" > $HOME/.kube/ca.pem
+  workflow_dispatch:
+
+
 jobs:
   check-k8s-connection:
     runs-on: ubuntu-latest
