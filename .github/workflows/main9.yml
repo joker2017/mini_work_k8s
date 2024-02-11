@@ -10,10 +10,97 @@ env:
 
 jobs:
 
+  lint-test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+
+      - name: Set up Helm
+        uses: azure/setup-helm@v3
+        with:
+          version: v3.12.1
+
+      - uses: actions/setup-python@v4
+        with:
+          python-version: '3.10'
+          check-latest: true
+
+      - name: Set up chart-testing
+        uses: helm/chart-testing-action@v2.6.0
+
+      - name: Run chart-testing (list-changed)
+        id: list-changed
+        run: |
+          changed=$(ct list-changed --target-branch ${{ github.event.repository.default_branch }})
+          if [[ -n "$changed" ]]; then
+            echo "changed=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Run chart-testing (lint)
+        if: steps.list-changed.outputs.changed == 'true'
+        run: ct lint --target-branch ${{ github.event.repository.default_branch }}
+
+      - name: Create kind cluster
+        if: steps.list-changed.outputs.changed == 'true'
+        uses: helm/kind-action@v1.8.0
+
+      - name: Run chart-testing (install)
+        if: steps.list-changed.outputs.changed == 'true'
+        run: ct install --target-branch ${{ github.event.repository.default_branch }}
+
+  build-account:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Login to Dockerhub
+        uses: docker/login-action@v2
+        with:
+          username: ${{ secrets.DOCKER_HUB_USERNAME }}
+          password: ${{ secrets.DOCKER_HUB_ACCESS_TOKEN }}
+
+      - name: Setup Buildx
+        uses: docker/setup-buildx-action@v2
+
+      - name: Build Account
+        uses: docker/build-push-action@v3
+        with:
+          context: ./account
+          file: ./account/Dockerfile
+          push: true
+          tags: ${{ env.ACCOUNT_IMAGE }}
+
+  build-profile:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Login to Dockerhub
+        uses: docker/login-action@v2
+        with:
+          username: ${{ secrets.DOCKER_HUB_USERNAME }}
+          password: ${{ secrets.DOCKER_HUB_ACCESS_TOKEN }}
+
+      - name: Setup Buildx
+        uses: docker/setup-buildx-action@v2
+
+      - name: Build Profile
+        uses: docker/build-push-action@v3
+        with:
+          context: ./profile
+          file: ./profile/Dockerfile
+          push: true
+          build-args: SERVER_URL=${{ secrets.API_SERVER_URL }}
+          tags: ${{ env.PROFILE_IMAGE }}
 
   deploy-in-k8s:
     runs-on: ubuntu-latest
-    needs: [build-profile, build-account, lint-test]
+    needs: [ build-profile, build-account, lint-test ]
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
@@ -36,32 +123,48 @@ jobs:
           echo "${{ secrets.KUBECONFIG }}" > kubeconfig.yml
           chmod 600 kubeconfig.yml
 
-      # Обновите использование Kubeconfig в последующих шагах:
+      - name: Determine current and next versions
+        run: |
+          CURRENT_VERSION=$(kubectl --kubeconfig=kubeconfig.yml get configmap app-version -o=jsonpath='{.data.CURRENT_VERSION}' || echo "")
+          if [[ "$CURRENT_VERSION" == "" ]]; then
+            echo "This is a fresh install."
+            NEXT_VERSION="green"
+          elif [[ "$CURRENT_VERSION" == "blue" ]]; then
+            NEXT_VERSION="green"
+          else
+            NEXT_VERSION="blue"
+          fi
+          echo "NEXT_VERSION=$NEXT_VERSION" >> $GITHUB_ENV
+          echo "CURRENT_VERSION=$CURRENT_VERSION" >> $GITHUB_ENV
+
       - name: Deploy applications using Helm
         run: |
-          # Deploying Account application
           helm upgrade --install account-${{ env.NEXT_VERSION }} ./chart --set image=${{ env.ACCOUNT_IMAGE }},deploymentColor=${{ env.NEXT_VERSION }} --namespace default --create-namespace --kubeconfig=kubeconfig.yml
-          # Deploying Profile application
           helm upgrade --install profile-${{ env.NEXT_VERSION }} ./chart --set image=${{ env.PROFILE_IMAGE }},deploymentColor=${{ env.NEXT_VERSION }} --namespace default --create-namespace --kubeconfig=kubeconfig.yml
+          if [[ "$CURRENT_VERSION" == "" ]]; then
+             kubectl --kubeconfig=kubeconfig.yml apply -f ./chart/templates/ingress.yaml
+          fi
 
-      # Обновите все последующие команды kubectl для использования kubeconfig.yml
       - name: Update current version information
         run: |
-          kubectl create configmap app-version --from-literal=CURRENT_VERSION=${{ env.NEXT_VERSION }} --dry-run=client -o yaml | kubectl apply -f - --kubeconfig=kubeconfig.yml
+          kubectl --kubeconfig=kubeconfig.yml create configmap app-version --from-literal=CURRENT_VERSION=${{ env.NEXT_VERSION }} --dry-run=client -o yaml | kubectl --kubeconfig=kubeconfig.yml apply -f -
 
       - name: Check health of new application versions
         run: |
-          # Пример проверки готовности для Account и Profile
-          kubectl wait --for=condition=ready pod -l app=account,version=${{ env.NEXT_VERSION }} --timeout=60s --namespace default --kubeconfig=kubeconfig.yml
-          kubectl wait --for=condition=ready pod -l app=profile,version=${{ env.NEXT_VERSION }} --timeout=60s --namespace default --kubeconfig=kubeconfig.yml
+          ACCOUNT_NEW_VERSION_POD=$(kubectl --kubeconfig=kubeconfig.yml get pods -l app=account,version=${{ env.NEXT_VERSION }} -n default -o jsonpath="{.items[0].metadata.name}")
+          kubectl --kubeconfig=kubeconfig.yml wait --for=condition=ready pod $ACCOUNT_NEW_VERSION_POD --timeout=60s -n default
+          PROFILE_NEW_VERSION_POD=$(kubectl --kubeconfig=kubeconfig.yml get pods -l app=profile,version=${{ env.NEXT_VERSION }} -n default -o jsonpath="{.items[0].metadata.name}")
+          kubectl --kubeconfig=kubeconfig.yml wait --for=condition=ready pod $PROFILE_NEW_VERSION_POD --timeout=60s -n default
 
       - name: Switch traffic to the new version
         run: |
-          kubectl patch ingress my-app-ingress -n default -p "{\"spec\":{\"rules\":[{\"http\":{\"paths\":[{\"path\":\"/account\",\"backend\":{\"service\":{\"name\":\"account-${{ env.NEXT_VERSION }}\",\"port\":{\"number\":80}}}}, {\"path\":\"/profile\",\"backend\":{\"service\":{\"name\":\"profile-${{ env.NEXT_VERSION }}\",\"port\":{\"number\":80}}}}]}}]}" --kubeconfig=kubeconfig.yml
+          kubectl --kubeconfig=kubeconfig.yml patch ingress my-app-ingress -n default -p "{\"spec\":{\"rules\":[{\"http\":{\"paths\":[{\"path\":\"/account\",\"backend\":{\"service\":{\"name\":\"account-${{ env.NEXT_VERSION }}\",\"port\":{\"number\":80}}}}, {\"path\":\"/profile\",\"backend\":{\"service\":{\"name\":\"profile-${{ env.NEXT_VERSION }}\",\"port\":{\"number\":80}}}}]}}]}"
 
       - name: Cleaning up old resources
         run: |
           if [[ "${{ env.CURRENT_VERSION }}" != "" ]]; then
-            helm uninstall account-${{ env.CURRENT_VERSION }} --namespace default --kubeconfig=kubeconfig.yml
-            helm uninstall profile-${{ env.CURRENT_VERSION }} --namespace default --kubeconfig=kubeconfig.yml
-          fi
+            helm --kubeconfig=kubeconfig.yml uninstall account-${{ env.CURRENT_VERSION }} --namespace default
+            helm --kubeconfig=kubeconfig.yml uninstall profile-${{ env.CURRENT_VERSION }} --namespace default
+            echo "Resources of the old application version account and profile have been successfully deleted."
+          else
+            echo "Fresh installation, no need to clean up old resources."
