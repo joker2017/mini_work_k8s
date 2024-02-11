@@ -2,7 +2,7 @@ global:
   imagePullSecrets: []
 
 app:
-  name: "your-application"
+  name: "minibank"
   port: 8080
 
 service:

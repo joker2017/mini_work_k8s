@@ -11,13 +11,13 @@ spec:
             pathType: Prefix
             backend:
               service:
-                name: "{{ .Values.account.app.name }}-{{ .Values.environment }}"
+                name: "{{ .Values.account.name }}-{{ .Values.environment }}"
                 port:
-                  number: {{ .Values.account.app.port }}
+                  number: {{ .Values.account.port }}
           - path: "/profile"
             pathType: Prefix
             backend:
               service:
-                name: "{{ .Values.profile.app.name }}-{{ .Values.environment }}"
+                name: "{{ .Values.profile.name }}-{{ .Values.environment }}"
                 port:
-                  number: {{ .Values.profile.app.port }}
+                  number: {{ .Values.profile.port }}
