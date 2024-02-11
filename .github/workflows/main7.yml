@@ -61,7 +61,7 @@ jobs:
             exit 1
           fi
         shell: /usr/bin/bash -e {0}
-  }
+
 
       - name: Delete Test Pod
         run: |
