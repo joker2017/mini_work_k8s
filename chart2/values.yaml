@@ -4,6 +4,8 @@ image:
   repository: nginx
   tag: "latest"
 
+containerPort: 80
+
 service:
   type: ClusterIP
   port: 80
