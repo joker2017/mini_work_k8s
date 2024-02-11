@@ -17,7 +17,7 @@ jobs:
       - name: Set up Helm
         uses: azure/setup-helm@v3
         with:
-           version: ${{ github.event.inputs.helm_version || 'latest' }}
+          version: ${{ github.event.inputs.helm_version || 'latest' }}
       - name: Check Kubernetes Cluster Connection
         run: |
           echo "${{ secrets.KUBECONFIG }}" | kubectl --kubeconfig=/dev/stdin cluster-info
@@ -31,12 +31,11 @@ jobs:
           echo "${{ secrets.KUBECONFIG }}" | kubectl --kubeconfig=/dev/stdin get namespaces
 
       - name: Check Helm Version
-        run: |
-          helm version
+        run: helm version
 
       - name: Create Pod
         run: |
-          echo '
+          echo "${{ secrets.KUBECONFIG }}" | kubectl --kubeconfig=/dev/stdin apply -f - <<EOF
           apiVersion: v1
           kind: Pod
           metadata:
@@ -45,10 +44,11 @@ jobs:
             containers:
             - name: nginx
               image: nginx
-          ' | kubectl apply -f -
+          EOF
 
       - name: Wait 30 seconds
         run: sleep 30
 
       - name: Delete Pod
-        run: kubectl delete pod test-pod
+        run: |
+          echo "${{ secrets.KUBECONFIG }}" | kubectl --kubeconfig=/dev/stdin delete pod test-pod
