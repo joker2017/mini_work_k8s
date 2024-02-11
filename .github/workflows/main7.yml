@@ -18,39 +18,29 @@ jobs:
 
       - name: Check Kubernetes Cluster Connection
         run: |
-          export KUBECONFIG=${{ secrets.KUBECONFIG }}
-          kubectl --kubeconfig=$KUBECONFIG cluster-info
+          echo "${{ secrets.KUBECONFIG }}" | kubectl --kubeconfig=/dev/stdin cluster-info
 
       - name: Get Nodes
         run: |
-          kubectl --kubeconfig=$KUBECONFIG get nodes
+          echo "${{ secrets.KUBECONFIG }}" | kubectl --kubeconfig=/dev/stdin get nodes
 
       - name: Get namespaces
         run: |
-          kubectl --kubeconfig=$KUBECONFIG get namespaces
+          echo "${{ secrets.KUBECONFIG }}" | kubectl --kubeconfig=/dev/stdin get namespaces
 
       - name: Check Permissions to Create Pods
         run: |
-          kubectl create pods --namespace default --kubeconfig=$KUBECONFIG
+          echo "${{ secrets.KUBECONFIG }}" | kubectl --kubeconfig=/dev/stdin auth can-i create pods --namespace default
 
       - name: Create Test Pod
         run: |
-          
-          kubectl --kubeconfig=$KUBECONFIG apply -f <<EOF
-          apiVersion: v1
-          kind: Pod
-          metadata:
-             name: test-pod
-          spec:
-             containers:
-             - name: nginx
-               image: nginx
-          EOF
+          echo "${{ secrets.KUBECONFIG }}" | kubectl --kubeconfig=/dev/stdin apply -f \.github\workflows\your-pod-definition.yaml
 
       - name: Wait for Pod to be Ready
         run: |
-          kubectl wait --for=condition=ready pod/test-pod --timeout=60s --kubeconfig=$KUBECONFIG
+          echo "${{ secrets.KUBECONFIG }}" | kubectl --kubeconfig=/dev/stdin wait --for=condition=ready pod -l app=test-app --timeout=60s
+        # Здесь предполагается, что в вашем файле your-pod-definition.yaml используется label app=test-app для пода.
 
       - name: Delete Test Pod
         run: |
-          kubectl delete pod test-pod --kubeconfig=$KUBECONFIG
+          echo "${{ secrets.KUBECONFIG }}" | kubectl --kubeconfig=/dev/stdin delete -f your-pod-definition.yaml
