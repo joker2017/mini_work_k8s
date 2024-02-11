@@ -10,10 +10,12 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Setup Kubectl
-        uses: azure/setup-kubectl@v1
-        with:
-          version: 'latest'
+      - name: Install kubectl
+        run: |
+          curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl"
+          chmod +x ./kubectl
+          sudo mv ./kubectl /usr/local/bin/kubectl
+      
 
       - name: Set up Helm
         uses: azure/setup-helm@v3
