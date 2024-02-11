@@ -23,6 +23,7 @@ jobs:
       - name: Configure Kubeconfig
         run: |
           echo "${{ secrets.KUBECONFIG }}" > kubeconfig.yml
+          chmod 600 kubeconfig.yml
 
       - name: Deploy Helm chart
         run: |
