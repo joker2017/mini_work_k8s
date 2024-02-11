@@ -35,6 +35,14 @@ jobs:
       - name: Create Test Pod
         run: |
           echo "${{ secrets.KUBECONFIG }}" | kubectl --kubeconfig=/dev/stdin apply -f .github/workflows/your-pod-definition.yaml
+      - name: проверка команды
+            - name: Create Test Pod
+        run: |
+          echo
+            kubectl --kubeconfig=kubeconfig.yml get configmap app-version -o=jsonpath='{.data.CURRENT_VERSION}' || echo ""
+          
+          
+          
 
       - name: Wait for Pod to be Ready in Loop
         run: |
