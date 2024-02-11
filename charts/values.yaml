@@ -17,6 +17,7 @@ environment: "blue"
 replicaCount: 1
 
 account:
+  name: account
   port: 8082
   image:
     repository: "{{ secrets.DOCKER_HUB_USERNAME }}"
@@ -25,9 +26,11 @@ account:
     port: 80
 
 profile:
+  name: profile
   port: 8081
   image:
     repository: "{{ secrets.DOCKER_HUB_USERNAME }}"
     tag: "{{ github.sha }}"
   service:
     port: 80
+
