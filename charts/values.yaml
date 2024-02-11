@@ -1,5 +1,7 @@
 global:
   imagePullSecrets: []
+  deploymentColor: blue # Добавляем переменную deploymentColor и устанавливаем ее значение по умолчанию
+
 
 app:
   name: "minibank"
