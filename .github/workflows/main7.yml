@@ -3,7 +3,6 @@ name: Kubernetes Connection Test
 on:
   workflow_dispatch:
 
-
 jobs:
   check-k8s-connection:
     runs-on: ubuntu-latest
@@ -24,9 +23,14 @@ jobs:
         run: |
           echo "${{ secrets.KUBECONFIG }}" | kubectl --kubeconfig=/dev/stdin get nodes
 
-      - name: Get namespace
+      - name: Get namespaces
         run: |
-          echo "${{ secrets.KUBECONFIG }}" | kubectl --kubeconfig=/dev/stdin get namespace
-      - name: Check Kubernetes Client and Server Versions
+          echo "${{ secrets.KUBECONFIG }}" | kubectl --kubeconfig=/dev/stdin get namespaces
+
+      - name: Check Helm Version
         run: |
-          echo "${{ secrets.KUBECONFIG }}" | kubectl --kubeconfig=/dev/stdin version
+          helm version
+
+      - name: Check Helm Release
+        run: |
+          helm list --all-namespaces
