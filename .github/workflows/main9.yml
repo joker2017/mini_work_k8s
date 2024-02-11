@@ -1,4 +1,4 @@
-name: CI/CD with Blue-Green Deployment
+name: CI/CD with Blue-Green Deployment NEW
 
 on:
   workflow_dispatch:
