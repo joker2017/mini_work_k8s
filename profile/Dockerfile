@@ -11,7 +11,7 @@ RUN apt-get update && \
 WORKDIR /app
 
 # Копируем файлы приложения в контейнер
-COPY ./app ./
+COPY ./app .
 
 # Установка tree для просмотра структуры директорий, если необходимо
 RUN apt-get update && apt-get install -y tree && apt-get clean
