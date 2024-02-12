@@ -16,7 +16,7 @@
       },
       {
         "action": {
-          "pass": "applications/profile"
+          "pass": "applications/account"
         }
       }
     ]
