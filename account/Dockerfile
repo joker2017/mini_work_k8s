@@ -11,15 +11,10 @@ RUN apt-get update && \
 WORKDIR /app
 
 # Копируем файлы приложения в контейнер
-COPY ./app .
 
+COPY ./app ./
+COPY ./requirements.txt ./
 
-# Установка tree для просмотра структуры директорий, если необходимо
-RUN apt-get update && apt-get install -y tree && apt-get clean
-# Вывод структуры директорий
-RUN ls -lah
-# Или используйте tree для более детального представления
-RUN tree
 
 # Установка tree для просмотра структуры директорий, если необходимо
 RUN apt-get update && apt-get install -y tree && apt-get clean
@@ -32,7 +27,7 @@ RUN tree
 RUN pip install --no-cache-dir -r requirements.txt
 
 # Копируем конфигурационный файл NGINX Unit для автоматической настройки
-COPY unit.config.json /docker-entrypoint.d/config.json
+COPY ./unit.config.json /docker-entrypoint.d/config.json
 
 # Указываем пути для статических файлов и медиа
 VOLUME ["/vol/web"]
