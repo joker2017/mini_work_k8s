@@ -2,7 +2,7 @@ apiVersion: v1
 kind: Service
 metadata:
   #name: "service-{{ .Values.app.name }}-{{ .Values.component }}-{{ .Values.global.deploymentColor }}"
-  name: "{{ .Values.app.name }}-account-service-{{ .Values.global.deploymentColor }}"
+  name: "account-service-{{ .Values.global.deploymentColor }}"
 spec:
   type: "{{ .Values.service.type }}"
   ports:
@@ -17,7 +17,7 @@ apiVersion: v1
 kind: Service
 metadata:
   #name: "service-{{ .Values.app.name }}-{{ .Values.component }}-{{ .Values.global.deploymentColor }}"
-  name: "{{ .Values.app.name }}-profile-service-{{ .Values.global.deploymentColor }}"
+  name: "profile-service-{{ .Values.global.deploymentColor }}"
 spec:
   type: "{{ .Values.service.type }}"
   ports:

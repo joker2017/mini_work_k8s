@@ -134,46 +134,67 @@ jobs:
 
       - name: Deploy applications using Helm
         run: |
-          helm template my-release ./charts --set app.name=myapp,global.deploymentColor=green,service.type=ClusterIP,service.port=80,account.name=account,account.image.repository=myrepo/account,account.image.tag=latest,account.port=8080,profile.name=profile,profile.image.repository=myrepo/profile,profile.image.tag=latest,profile.port=8081
+           helm upgrade --install app-${{ env.NEXT_VERSION }} \
+                ./.k8s/charts \
+                --set global.deploymentColor=${{ env.NEXT_VERSION }}, \
+                account.image.tag=${{ github.sha }}, \
+                profile.image.tag=${{ github.sha }} \
+                --namespace default \
+                --create-namespace \
+                --kubeconfig=kubeconfig.yml
 
-
-      #- name: Deploy applications using Helm
-      #  run: |
-      #    helm upgrade --install account-${{ env.NEXT_VERSION }} ./charts --set component=account,account.image.tag=${{ github.sha }},deploymentColor=${{ env.NEXT_VERSION }},ingress.manage=true --namespace default --create-namespace --kubeconfig=kubeconfig.yml
-      #    helm upgrade --install profile-${{ env.NEXT_VERSION }} ./charts --set component=profile,profile.image.tag=${{ github.sha }},deploymentColor=${{ env.NEXT_VERSION }},ingress.manage=false --namespace default --create-namespace --kubeconfig=kubeconfig.yml
-
-      - name: Deploy applications using Helm
-        run: |
-          helm upgrade --install minibank-${{ env.CURRENT_VERSION }} ./charts \
-            --set account.image.tag=${{ github.sha }} \
-            --set profile.image.tag=${{ github.sha }} \
-            --set global.deploymentColor=${{ env.NEXT_VERSION }} \
-            --set ingress.manage=true \
-            --namespace default \
-            --create-namespace \
-            --kubeconfig=kubeconfig.yml
 
 
       - name: Check health of new application versions
         run: |
-          # Получаем список всех подов для account и profile соответствующих NEXT_VERSION
-          NEW_VERSION_PODS=$(kubectl --kubeconfig=kubeconfig.yml get pods -l "app=minibank-{{ env.NEXT_VERSION }},environment=${{ env.NEXT_VERSION }}" -n default -o jsonpath="{.items[*].metadata.name}")
-          # Если список не пустой, проверяем каждый под на готовность
-          if [ -n "$NEW_VERSION_PODS" ]; then
-            for pod in $NEW_VERSION_PODS; do
-              echo "Checking readiness of pod $pod with version ${{ env.NEXT_VERSION }}"
-              kubectl --kubeconfig=kubeconfig.yml wait --for=condition=ready pod $pod --timeout=60s -n default
+            # Получаем время начала выполнения задания
+            start_time=$(date +%s)
+            
+            # Переменная для хранения текущего времени
+            current_time=$(date +%s)
+            
+            # Определение максимального времени ожидания в секундах
+            max_wait=360
+            
+            # Цикл ожидания в течение максимального времени
+            while [ $((current_time - start_time)) -lt $max_wait ]; do
+                # Проверка готовности подов
+                kubectl --kubeconfig=kubeconfig.yml wait --for=condition=ready pod -l "app=minibank-account-${{ env.NEXT_VERSION }}" --timeout=60s -n default >/dev/null 2>&1 &&
+                kubectl --kubeconfig=kubeconfig.yml wait --for=condition=ready pod -l "app=minibank-profile-${{ env.NEXT_VERSION }}" --timeout=60s -n default >/dev/null 2>&1
+            
+                # Проверка готовности сервисов
+                account_service_ready=$(kubectl --kubeconfig=kubeconfig.yml get svc -l "app=account-service-${{ env.NEXT_VERSION }}" -n default --no-headers | awk '{print $4}')
+                profile_service_ready=$(kubectl --kubeconfig=kubeconfig.yml get svc -l "app=profile-service-${{ env.NEXT_VERSION }}" -n default --no-headers | awk '{print $4}')
+            
+                if [ "$account_service_ready" != "" ] && [ "$profile_service_ready" != "" ]; then
+                    # Если все компоненты готовы, выводим сообщение о готовности и выходим
+                    echo "All pods and services are ready"
+                    exit 0
+                else
+                    # Если не все компоненты готовы, ждем некоторое время и увеличиваем текущее время
+                    sleep 10
+                    current_time=$(date +%s)
+                fi
             done
-          else
-            echo "No pods found for version ${{ env.NEXT_VERSION }}"
-          fi
+
           
           
       
 
       - name: Switch traffic to the new version
         run: |
-          helm upgrade minibank-${{ env.CURRENT_VERSION }} ./chart --namespace default --set global.activeVersion={{ env.NEXT_VERSION }}
+          if ! helm get ingress ingress-${{ env.CURRENT_VERSION }} >/dev/null 2>&1; then
+             # Ингресс не установлен, установка нового
+             helm install ingress-${{ env.NEXT_VERSION }} ./.k8s/ingress \
+               --namespace default \
+               --create-namespace \
+               --kubeconfig=kubeconfig.yml
+          else 
+            # Ингресс уже установлен, обновление на новую версию приложений
+            helm upgrade --install ingress-${{ env.NEXT_VERSION }} ./.k8s/ingress \
+              --namespace default \
+              --kubeconfig=kubeconfig.yml
+          fi
       
       
 

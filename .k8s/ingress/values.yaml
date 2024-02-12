@@ -1,0 +1,5 @@
+activeVersion: blue
+
+ingress:
+  enabled: true
+  hostname: example.com

@@ -1,0 +1,23 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: "minibank-ingress-{{ .Values.global.activeVersion }}"
+spec:
+  rules:
+    - host: "{{ .Values.ingress.host }}"
+      http:
+        paths:
+          - path: "/account"
+            pathType: Prefix
+            backend:
+              service:
+                name: "account-service-{{ .Values.global.activeVersion }}"
+                port:
+                  number: 80
+          - path: "/profile"
+            pathType: Prefix
+            backend:
+              service:
+                name: "profile-service-{{ .Values.global.activeVersion }}"
+                port:
+                  number: 80
