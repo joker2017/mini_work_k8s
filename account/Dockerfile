@@ -13,6 +13,14 @@ WORKDIR /app
 # Копируем файлы приложения в контейнер
 COPY . .
 
+
+# Установка tree для просмотра структуры директорий, если необходимо
+RUN apt-get update && apt-get install -y tree && apt-get clean
+# Вывод структуры директорий
+RUN ls -lah
+# Или используйте tree для более детального представления
+RUN tree
+
 # Устанавливаем зависимости Python из файла requirements.txt
 RUN pip install --no-cache-dir -r requirements.txt
 
