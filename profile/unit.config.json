@@ -10,7 +10,7 @@
         "uri": "/static/*"
       },
       "action": {
-        "share": "/app/vol/web$uri"
+        "share": "/vol/web/static"
       }
     },
     {
@@ -21,10 +21,9 @@
   ],
   "applications": {
     "app": {
-      "type": "python 3", // Укажите явно тип приложения и версию Python, если это необходимо
-      "path": "/app", // Убедитесь, что путь абсолютный и соответствует местоположению вашего приложения в контейнере
-      "module": "app.wsgi", // Указывает на модуль, где находится ваш WSGI-объект
-      "callable": "application" // Имя переменной в вашем WSGI-модуле, которая ссылается на WSGI-приложение
+      "type": "python 3",
+      "path": "/app",
+      "module": "app.app.wsgi"
     }
   }
 }

@@ -1,42 +1,29 @@
 # Используем официальный образ NGINX Unit для Python
-FROM unit:1.31.1-python3.11
+FROM python3.11 as build-python
 #FROM unit:1.31.1-minimal
 # Обновляем список пакетов и устанавливаем необходимые зависимости
 RUN apt-get update && \
     apt-get install -y gcc && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/*
+# Установка tree для просмотра структуры директорий, если необходимо
+RUN apt-get update && apt-get install -y tree && apt-get clean
+# Вывод структуры директорий
+RUN ls -lah
+# Или используйте tree для более детального представления
+RUN tree
 
-# Создаем рабочую директорию для приложения
+#COPY requirements.txt /app/
 WORKDIR /app
+RUN pip install -r requirements.txt
+COPY . /app
 
-# Копируем файлы приложения в контейнер
-COPY . .
-RUN mkdir -p /vol/web/static
-
-# Установка tree для просмотра структуры директорий, если необходимо
-RUN apt-get update && apt-get install -y tree && apt-get clean
-# Вывод структуры директорий
-RUN ls -lah
-# Или используйте tree для более детального представления
+### Final image
+FROM unit:1.31.1-minimal
+COPY --from=build-python /app /app
 RUN tree
-
-# Установка tree для просмотра структуры директорий, если необходимо
-RUN apt-get update && apt-get install -y tree && apt-get clean
-# Вывод структуры директорий
-RUN ls -lah
-# Или используйте tree для более детального представления
-RUN tree
-
-# Устанавливаем зависимости Python из файла requirements.txt
-RUN pip install --no-cache-dir -r requirements.txt
-RUN chown -R unit:unit /app
-# Копируем конфигурационный файл NGINX Unit для автоматической настройки
+WORKDIR /app
+ENV PYTHONUNBUFFERED 1
 COPY unit.config.json /docker-entrypoint.d/config.json
 
-# Указываем пути для статических файлов и медиа
-#VOLUME ["/vol/web/static"]
-
-# Определяем порт, который будет прослушивать приложение
-EXPOSE 8300
 
