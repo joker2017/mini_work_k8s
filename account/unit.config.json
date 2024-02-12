@@ -20,8 +20,7 @@
     }
   ],
   "applications": {
-    "account": {
-      "type": "python",
+    "profile": {
       "path": "app",
       "module": "app.wsgi",
       "callable": "application"
