@@ -23,7 +23,8 @@
     "account": {
       "type": "python",
       "path": "/app",
-      "module": "app.app.wsgi"
+      "module": "app.app.wsgi",
+      "callable": "application"
     }
   }
 }

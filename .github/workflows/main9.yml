@@ -194,7 +194,7 @@ jobs:
         run: |
           if [[ "${{ env.CURRENT_VERSION }}" != "" ]]; then
             echo "Uninstalling old Helm release for the version: ${{ env.CURRENT_VERSION }}"
-            helm --kubeconfig=kubeconfig.yml uninstall app-${{ env.CURRENT_VERSION }} --namespace default
+            helm --kubeconfig=kubeconfig.yml uninstall app-${{ env.CURRENT_VERSION }} --namespace default || true
             echo "Resources of the old application version ${{ env.CURRENT_VERSION }} have been successfully deleted."
           else
             echo "Fresh installation, no need to clean up old resources."
