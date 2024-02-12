@@ -16,13 +16,13 @@
       },
       {
         "action": {
-          "pass": "applications/profile"
+          "pass": "applications/user_profile"
         }
       }
     ]
   },
   "applications": {
-    "profile": {
+    "user_profile": {
       "path": "app",
       "module": "app.wsgi",
       "callable": "application"
