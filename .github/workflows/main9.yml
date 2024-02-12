@@ -194,10 +194,10 @@ jobs:
         run: |
           if [[ "${CURRENT_VERSION}" != "" ]]; then
             # Проверяем, существует ли релиз
-            if helm --kubeconfig=kubeconfig.yml list --namespace default --filter "^app-${CURRENT_VERSION}$" | grep -q "app-${CURRENT_VERSION}"; then
-              echo "Uninstalling old Helm release for the version: ${CURRENT_VERSION}"
-              helm --kubeconfig=kubeconfig.yml uninstall app-${CURRENT_VERSION} --namespace default
-              echo "Resources of the old application version ${CURRENT_VERSION} have been successfully deleted."
+            if helm --kubeconfig=kubeconfig.yml list --namespace default --filter "^app-${env.CURRENT_VERSION}$" | grep -q "app-${env.CURRENT_VERSION}"; then
+              echo "Uninstalling old Helm release for the version: ${env.CURRENT_VERSION}"
+              helm --kubeconfig=kubeconfig.yml uninstall app-${env.CURRENT_VERSION} --namespace default
+              echo "Resources of the old application version ${env.CURRENT_VERSION} have been successfully deleted."
             else
               echo "Release app-${CURRENT_VERSION} does not exist. Moving on to the next step."
             fi

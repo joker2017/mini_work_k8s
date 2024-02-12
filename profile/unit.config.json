@@ -1,29 +1,35 @@
 {
   "listeners": {
     "*:8300": {
-      "pass": "routes"
+      "pass": "routes/main"
     }
   },
-  "routes": [
-    {
-      "match": {
-        "uri": "/static/*"
+  "routes": {
+    "main": [
+      {
+        "match": {
+          "uri": "/static/*"
+        },
+        "action": {
+          "share": "/app/static"
+        }
       },
-      "action": {
-        "share": "/vol/web/static"
+      {
+        "action": {
+          "pass": "applications/profile"
+        }
       }
-    },
-    {
-      "action": {
-        "pass": "applications/profile"
-      }
-    }
-  ],
+    ]
+  },
   "applications": {
     "profile": {
       "type": "python",
       "path": "/app",
-      "module": "app.wsgi"
+      "module": "app.wsgi",
+      "callable": "application",
+      "environment": {
+        "DJANGO_SETTINGS_MODULE": "app.settings"
+      }
     }
   }
 }
