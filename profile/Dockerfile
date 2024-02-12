@@ -30,7 +30,7 @@ RUN tree
 
 # Устанавливаем зависимости Python из файла requirements.txt
 RUN pip install --no-cache-dir -r requirements.txt
-chown -R unit:unit /app
+RUN chown -R unit:unit /app
 # Копируем конфигурационный файл NGINX Unit для автоматической настройки
 COPY unit.config.json /docker-entrypoint.d/config.json
 
