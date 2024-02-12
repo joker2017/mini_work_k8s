@@ -35,7 +35,7 @@ RUN pip install --no-cache-dir -r requirements.txt
 COPY unit.config.json /docker-entrypoint.d/config.json
 
 # Указываем пути для статических файлов и медиа
-VOLUME ["/vol/web"]
+#VOLUME ["/vol/web"]
 
 # Определяем порт, который будет прослушивать приложение
 EXPOSE 8300
