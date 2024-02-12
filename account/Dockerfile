@@ -1,3 +1,6 @@
+# Используем официальный образ NGINX Unit для Python
+FROM unit:1.31.1-python3.11
+#FROM unit:1.31.1-minimal
 # Обновляем список пакетов и устанавливаем необходимые зависимости
 RUN apt-get update && \
     apt-get install -y gcc && \
@@ -36,4 +39,3 @@ VOLUME ["/vol/web"]
 
 # Определяем порт, который будет прослушивать приложение
 EXPOSE 8300
-
