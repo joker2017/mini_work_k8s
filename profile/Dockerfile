@@ -12,7 +12,7 @@ WORKDIR /app
 
 # Копируем файлы приложения в контейнер
 COPY . .
-
+RUN mkdir -p /vol/web/static
 
 # Установка tree для просмотра структуры директорий, если необходимо
 RUN apt-get update && apt-get install -y tree && apt-get clean
@@ -35,7 +35,7 @@ RUN pip install --no-cache-dir -r requirements.txt
 COPY unit.config.json /docker-entrypoint.d/config.json
 
 # Указываем пути для статических файлов и медиа
-VOLUME ["/vol/web"]
+VOLUME ["/vol/web/static"]
 
 # Определяем порт, который будет прослушивать приложение
 EXPOSE 8300

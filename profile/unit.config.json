@@ -1,7 +1,7 @@
 {
   "listeners": {
     "*:8300": {
-      "pass": "routes/main"
+      "pass": "routes"
     }
   },
   "routes": [
@@ -10,7 +10,7 @@
         "uri": "/static/*"
       },
       "action": {
-        "share": "/app/static"
+        "share": 'app/vol/web/static'
       }
     },
     {
