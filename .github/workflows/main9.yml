@@ -157,7 +157,7 @@ jobs:
       - name: Check health of new application versions
         run: |
           # Получаем список всех подов для account и profile соответствующих NEXT_VERSION
-          NEW_VERSION_PODS=$(kubectl --kubeconfig=kubeconfig.yml get pods -l "app=minibank-${{ env.CURRENT_VERSION }},environment=${{ env.NEXT_VERSION }}" -n default -o jsonpath="{.items[*].metadata.name}")
+          NEW_VERSION_PODS=$(kubectl --kubeconfig=kubeconfig.yml get pods -l "app=minibank-{{ env.NEXT_VERSION }},environment=${{ env.NEXT_VERSION }}" -n default -o jsonpath="{.items[*].metadata.name}")
           # Если список не пустой, проверяем каждый под на готовность
           if [ -n "$NEW_VERSION_PODS" ]; then
             for pod in $NEW_VERSION_PODS; do
@@ -173,18 +173,7 @@ jobs:
 
       - name: Switch traffic to the new version
         run: |
-          # Проверяем, не пуста ли переменная CURRENT_VERSION
-          if [ -n "${{ env.CURRENT_VERSION }}" ]; then
-            # Если CURRENT_VERSION не пуста, проверяем дополнительные условия
-            if [ "${{ env.CURRENT_VERSION }}" == "blue" ] || [ "${{ env.NEXT_VERSION }}" == "green" ]; then
-              echo "Switching ingress to ${{ env.NEXT_VERSION }} version."
-              kubectl --kubeconfig=kubeconfig.yml patch ingress "{{ .Values.app.name }}-ingress-{{ .Values.global.deploymentColor }}" -n default -p "{\"spec\":{\"rules\":[{\"http\":{\"paths\":[{\"path\":\"/account\",\"backend\":{\"service\":{\"name\":\"${{ .Values.app.name }}-account-${{ env.NEXT_VERSION }}\",\"port\":{\"number\":${{ .Values.account.service.port }}}}}, {\"path\":\"/profile\",\"backend\":{\"service\":{\"name\":\"${{ .Values.app.name }}-profile-${{ env.NEXT_VERSION }}\",\"port\":{\"number\":${{ .Values.profile.service.port }}}}}]}}]}"
-            else
-              echo "The conditions for switching ingress are not met."
-            fi
-          else
-            echo "CURRENT_VERSION is empty, assuming a fresh installation. No need to switch ingress."
-          fi
+          helm upgrade minibank-${{ env.CURRENT_VERSION }} ./chart --namespace default --set global.activeVersion={{ env.NEXT_VERSION }}
       
       
 

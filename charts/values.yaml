@@ -1,6 +1,7 @@
 global:
   imagePullSecrets: []
   deploymentColor: green # Добавляем переменную deploymentColor и устанавливаем ее значение по умолчанию
+  activeVersion:
 
 
 app:
