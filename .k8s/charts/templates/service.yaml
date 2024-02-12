@@ -4,7 +4,7 @@ metadata:
   #name: "service-{{ .Values.app.name }}-{{ .Values.component }}-{{ .Values.global.deploymentColor }}"
   name: "account-service-{{ .Values.global.deploymentColor }}"
 spec:
-  type: TCP
+  type: ClusterIP
   ports:
     - port: 8300
       targetPort: 8300
@@ -19,7 +19,7 @@ metadata:
   #name: "service-{{ .Values.app.name }}-{{ .Values.component }}-{{ .Values.global.deploymentColor }}"
   name: "profile-service-{{ .Values.global.deploymentColor }}"
 spec:
-  type: TCP
+  type: ClusterIP
   ports:
     - port: 8300
       targetPort: 8300
