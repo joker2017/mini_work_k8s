@@ -1,7 +1,7 @@
 {
   "listeners": {
     "*:8300": {
-      "pass": "routes/main"
+      "pass": "routes"
     }
   },
   "routes": {
@@ -24,12 +24,9 @@
   "applications": {
     "profile": {
       "type": "python",
-      "path": "/app",
+      "path": "./app",
       "module": "app.wsgi",
-      "callable": "application",
-      "environment": {
-        "DJANGO_SETTINGS_MODULE": "app.settings"
-      }
+      "callable": "application"
     }
   }
 }
