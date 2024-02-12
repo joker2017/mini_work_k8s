@@ -21,7 +21,7 @@ spec:
         - name: account
           image: "{{ .Values.account.image.repository }}/account:{{ .Values.account.image.tag }}"
           ports:
-            - containerPort: {{ .Values.account.port }}
+            - containerPort: 8300
           livenessProbe:
             httpGet:
               path: /health
@@ -57,7 +57,7 @@ spec:
       - name: profile
         image: "{{ .Values.profile.image.repository }}/profile:{{ .Values.profile.image.tag }}"
         ports:
-        - containerPort: {{ .Values.profile.port }}
+        - containerPort: 8300
         livenessProbe:
           httpGet:
             path: /health

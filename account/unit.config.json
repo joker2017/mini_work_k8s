@@ -10,22 +10,20 @@
         "uri": "/static/*"
       },
       "action": {
-        "share": "/app/static/"
+        "share": "/vol/web/static"
       }
     },
     {
       "action": {
-        "pass": "applications/django_project"
+        "pass": "applications/account"
       }
     }
   ],
   "applications": {
-    "django_project": {
+    "account": {
       "type": "python",
       "path": "/app/",
-      "home": "/path/to/virtual-env/if/used/",
-      "module": "project.wsgi",
-      "user": "user"
+      "module": "project.wsgi"
     }
   }
 }

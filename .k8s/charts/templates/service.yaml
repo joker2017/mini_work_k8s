@@ -4,10 +4,10 @@ metadata:
   #name: "service-{{ .Values.app.name }}-{{ .Values.component }}-{{ .Values.global.deploymentColor }}"
   name: "account-service-{{ .Values.global.deploymentColor }}"
 spec:
-  type: "{{ .Values.service.type }}"
+  type: TCP
   ports:
-    - port: {{ .Values.account.service.port }}
-      targetPort: {{ .Values.account.port }}
+    - port: 8300
+      targetPort: 8300
   selector:
     #app: "{{ .Values.app.name }}-{{ .Values.component }}-{{ .Values.global.deploymentColor }}"
     app: "{{ .Values.app.name }}-account"
@@ -19,10 +19,10 @@ metadata:
   #name: "service-{{ .Values.app.name }}-{{ .Values.component }}-{{ .Values.global.deploymentColor }}"
   name: "profile-service-{{ .Values.global.deploymentColor }}"
 spec:
-  type: "{{ .Values.service.type }}"
+  type: TCP
   ports:
-    - port: {{ .Values.profile.service.port }}
-      targetPort: {{ .Values.profile.port }}
+    - port: 8300
+      targetPort: 8300
   selector:
     #app: "{{ .Values.app.name }}-{{ .Values.component }}-{{ .Values.global.deploymentColor }}"
     app: "{{ .Values.app.name }}-profile"
