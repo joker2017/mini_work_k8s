@@ -22,8 +22,8 @@
   "applications": {
     "account": {
       "type": "python",
-      "path": "/app",
-      "module": "app.app.wsgi",
+      "path": "app",
+      "module": "app.wsgi",
       "callable": "application"
     }
   }
