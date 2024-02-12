@@ -14,7 +14,7 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: "{{ .Values.app.name }}-{{ .Values.component }}-{{ .Values.global.deploymentColor }}"
+  name: "service-{{ .Values.app.name }}-{{ .Values.component }}-{{ .Values.global.deploymentColor }}"
 spec:
   type: "{{ .Values.service.type }}"
   ports:
