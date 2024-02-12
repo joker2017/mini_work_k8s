@@ -15,12 +15,12 @@
     },
     {
       "action": {
-        "pass": "applications/user_profile"
+        "pass": "applications/app"
       }
     }
   ],
   "applications": {
-    "user_profile": {
+    "app": {
       "type": "python 3", // Укажите явно тип приложения и версию Python, если это необходимо
       "path": "/app", // Убедитесь, что путь абсолютный и соответствует местоположению вашего приложения в контейнере
       "module": "app.wsgi", // Указывает на модуль, где находится ваш WSGI-объект
