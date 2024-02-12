@@ -4,8 +4,8 @@
       "pass": "routes"
     }
   },
-  "routes": {
-    "main": [
+  "routes": [
+
       {
         "match": {
           "uri": "/static/*"
@@ -19,11 +19,11 @@
           "pass": "applications/account"
         }
       }
-    ]
-  },
+    ],
   "applications": {
     "account": {
-      "path": "app",
+      "type": "python",
+      "path": "/app",
       "module": "app.wsgi",
       "callable": "application"
     }
