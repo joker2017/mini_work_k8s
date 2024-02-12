@@ -139,8 +139,8 @@ jobs:
 
       - name: Deploy applications using Helm
         run: |
-          helm upgrade --install account-${{ env.NEXT_VERSION }} ./charts --set component=account,image.tag=${{ github.sha }},deploymentColor=${{ env.NEXT_VERSION }},ingress.manage=true --namespace default --create-namespace --kubeconfig=kubeconfig.yml
-          helm upgrade --install profile-${{ env.NEXT_VERSION }} ./charts --set component=profile,image.tag=${{ github.sha }},deploymentColor=${{ env.NEXT_VERSION }},ingress.manage=false --namespace default --create-namespace --kubeconfig=kubeconfig.yml
+          helm upgrade --install account-${{ env.NEXT_VERSION }} ./charts --set component=account,account.image.tag=${{ github.sha }},deploymentColor=${{ env.NEXT_VERSION }},ingress.manage=true --namespace default --create-namespace --kubeconfig=kubeconfig.yml
+          helm upgrade --install profile-${{ env.NEXT_VERSION }} ./charts --set component=profile,profile.image.tag=${{ github.sha }},deploymentColor=${{ env.NEXT_VERSION }},ingress.manage=false --namespace default --create-namespace --kubeconfig=kubeconfig.yml
           #if [[ "$CURRENT_VERSION" == "" ]]; then
           #   kubectl --kubeconfig=kubeconfig.yml apply -f ./charts/templates/ingress.yaml
           #fi
