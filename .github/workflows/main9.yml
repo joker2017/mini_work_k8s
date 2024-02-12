@@ -151,10 +151,29 @@ jobs:
 
       - name: Check health of new application versions
         run: |
-          ACCOUNT_NEW_VERSION_POD=$(kubectl --kubeconfig=kubeconfig.yml get pods -l app=account,version=${{ env.NEXT_VERSION }} -n default -o jsonpath="{.items[0].metadata.name}")
-          kubectl --kubeconfig=kubeconfig.yml wait --for=condition=ready pod $ACCOUNT_NEW_VERSION_POD --timeout=60s -n default
-          PROFILE_NEW_VERSION_POD=$(kubectl --kubeconfig=kubeconfig.yml get pods -l app=profile,version=${{ env.NEXT_VERSION }} -n default -o jsonpath="{.items[0].metadata.name}")
-          kubectl --kubeconfig=kubeconfig.yml wait --for=condition=ready pod $PROFILE_NEW_VERSION_POD --timeout=60s -n default
+          # Получаем список всех подов для account соответствующих NEXT_VERSION
+          ACCOUNT_NEW_VERSION_PODS=$(kubectl --kubeconfig=kubeconfig.yml get pods -l "app=minibank-account,environment=${{ env.NEXT_VERSION }}" -n default -o jsonpath="{.items[*].metadata.name}")
+          # Если список не пустой, проверяем каждый под на готовность
+          if [ -n "$ACCOUNT_NEW_VERSION_PODS" ]; then
+            for pod in $ACCOUNT_NEW_VERSION_PODS; do
+              echo "Checking readiness of pod $pod for account with version ${{ env.NEXT_VERSION }}"
+              kubectl --kubeconfig=kubeconfig.yml wait --for=condition=ready pod $pod --timeout=60s -n default
+            done
+          else
+            echo "No pods found for account with version ${{ env.NEXT_VERSION }}"
+          fi
+
+          # Повторяем для profile с той же логикой
+          PROFILE_NEW_VERSION_PODS=$(kubectl --kubeconfig=kubeconfig.yml get pods -l "app=minibank-profile,environment=${{ env.NEXT_VERSION }}" -n default -o jsonpath="{.items[*].metadata.name}")
+          if [ -n "$PROFILE_NEW_VERSION_PODS" ]; then
+            for pod in $PROFILE_NEW_VERSION_PODS; do
+              echo "Checking readiness of pod $pod for profile with version ${{ env.NEXT_VERSION }}"
+              kubectl --kubeconfig=kubeconfig.yml wait --for=condition=ready pod $pod --timeout=60s -n default
+            done
+          else
+            echo "No pods found for profile with version ${{ env.NEXT_VERSION }}"
+          fi
+      
 
       - name: Switch traffic to the new version
         run: |
