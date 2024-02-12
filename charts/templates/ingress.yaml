@@ -1,3 +1,5 @@
+{{- if .Values.ingress.manage }}
+
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
@@ -21,3 +23,4 @@ spec:
                 name: "{{ .Values.app.name }}-profile-{{ .Values.global.deploymentColor }}"
                 port:
                   number: {{ .Values.profile.service.port }}
+{{- end }}

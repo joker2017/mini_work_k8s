@@ -16,6 +16,7 @@ ingress:
   enabled: true
   host: "example.com"
   type: ClusterIP
+  manage: false
 #environment: "green"
 
 replicaCount: 1
@@ -24,8 +25,8 @@ account:
   name: account
   port: 8082
   image:
-    repository: "{{ secrets.DOCKER_HUB_USERNAME }}"
-    tag: "{{ github.sha }}"
+    repository: "${{ secrets.DOCKER_HUB_USERNAME }}"
+    tag: ""
   service:
     port: 80
 
@@ -33,8 +34,8 @@ profile:
   name: profile
   port: 8081
   image:
-    repository: "{{ secrets.DOCKER_HUB_USERNAME }}"
-    tag: "{{ github.sha }}"
+    repository: "${{ secrets.DOCKER_HUB_USERNAME }}"
+    tag: ""
   service:
     port: 80
 
