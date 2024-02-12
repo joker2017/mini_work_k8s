@@ -198,13 +198,10 @@ jobs:
             echo "Resources of the old application version ${{ env.CURRENT_VERSION }} have been successfully deleted."
           else
             echo "Fresh installation, no need to clean up old resources."
-      
-          if [[ "${{ env.CURRENT_VERSION }}" != "" ]]; then
-             echo "Удаляем старый релиз Helm для версии: "${{ env.CURRENT_VERSION }}""
-             helm --kubeconfig=kubeconfig.yml uninstall app-"${{ env.CURRENT_VERSION }}" --namespace default
-             echo "Ресурсы старой версии приложения "${{ env.CURRENT_VERSION }}" успешно удалены."
           fi
-
+        
+      
+      
 
       - name: Update current version information
         run: |

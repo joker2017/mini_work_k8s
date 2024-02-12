@@ -22,8 +22,8 @@
   "applications": {
     "profile": {
       "type": "python",
-      "path": "/app/",
-      "module": "app.wsgi.application"
+      "path": "/app",
+      "module": "app.wsgi"
     }
   }
 }
