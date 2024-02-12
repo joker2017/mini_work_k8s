@@ -10,7 +10,7 @@
         "uri": "/static/*"
       },
       "action": {
-        "share": 'app/vol/web/static'
+        "share": '/app/vol/web$uri'
       }
     },
     {
