@@ -5,13 +5,13 @@ metadata:
 spec:
   replicas: {{ .Values.replicaCount }}
   selector:
-    matchLabels:   #!!!!!!!!!!!!!!!!!!!!
-       app: {{ .Values.app.name }}
+    matchLabels:
+       app: "{{ .Values.app.name }}-{{ .Values.component }}-{{ .Values.global.deploymentColor }}"
        environment: {{ .Values.global.deploymentColor }}
   template:
     metadata:
       labels:   #!!!!!!!!!!!!!!!!!!!!!!!!!!
-         app: {{ .Values.app.name }}
+         app: "{{ .Values.app.name }}-{{ .Values.component }}-{{ .Values.global.deploymentColor }}"
          environment: {{ .Values.global.deploymentColor }}
     spec:
       containers:
