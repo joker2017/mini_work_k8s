@@ -1,26 +1,30 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: "service-{{ .Values.app.name }}-{{ .Values.component }}-{{ .Values.global.deploymentColor }}"
+  #name: "service-{{ .Values.app.name }}-{{ .Values.component }}-{{ .Values.global.deploymentColor }}"
+  name: "{{ .Values.app.name }}-account-service-{{ .Values.global.deploymentColor }}"
 spec:
   type: "{{ .Values.service.type }}"
   ports:
     - port: {{ .Values.account.service.port }}
       targetPort: {{ .Values.account.port }}
   selector:
-    app: "{{ .Values.app.name }}-{{ .Values.component }}-{{ .Values.global.deploymentColor }}"
+    #app: "{{ .Values.app.name }}-{{ .Values.component }}-{{ .Values.global.deploymentColor }}"
+    app: "{{ .Values.app.name }}-account"
     environment: "{{ .Values.global.deploymentColor }}"
 ---
 apiVersion: v1
 kind: Service
 metadata:
-  name: "service-{{ .Values.app.name }}-{{ .Values.component }}-{{ .Values.global.deploymentColor }}"
+  #name: "service-{{ .Values.app.name }}-{{ .Values.component }}-{{ .Values.global.deploymentColor }}"
+  name: "{{ .Values.app.name }}-profile-service-{{ .Values.global.deploymentColor }}"
 spec:
   type: "{{ .Values.service.type }}"
   ports:
     - port: {{ .Values.profile.service.port }}
       targetPort: {{ .Values.profile.port }}
   selector:
-    app: "{{ .Values.app.name }}-{{ .Values.component }}-{{ .Values.global.deploymentColor }}"
+    #app: "{{ .Values.app.name }}-{{ .Values.component }}-{{ .Values.global.deploymentColor }}"
+    app: "{{ .Values.app.name }}-profile"
     environment: "{{ .Values.global.deploymentColor }}"
 

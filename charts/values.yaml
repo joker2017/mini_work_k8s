@@ -13,7 +13,7 @@ service:
   type: ClusterIP
 
 ingress:
-  enabled: true
+  #enabled: true
   host: "example.com"
   type: ClusterIP
   manage: false

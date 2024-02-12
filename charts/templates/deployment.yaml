@@ -1,21 +1,24 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: "{{ .Values.app.name }}-{{ .Values.component }}-{{ .Values.global.deploymentColor }}"
+  #name: "{{ .Values.app.name }}-{{ .Values.component }}-{{ .Values.global.deploymentColor }}"
+  name: "{{ .Values.app.name }}-account-{{ .Values.global.deploymentColor }}"
 spec:
   replicas: {{ .Values.replicaCount }}
   selector:
     matchLabels:
-       app: "{{ .Values.app.name }}-{{ .Values.component }}-{{ .Values.global.deploymentColor }}"
+       #app: "{{ .Values.app.name }}-{{ .Values.component }}-{{ .Values.global.deploymentColor }}"
+       app: "{{ .Values.app.name }}-account"
        environment: {{ .Values.global.deploymentColor }}
   template:
     metadata:
       labels:   #!!!!!!!!!!!!!!!!!!!!!!!!!!
-         app: "{{ .Values.app.name }}-{{ .Values.component }}-{{ .Values.global.deploymentColor }}"
+         #app: "{{ .Values.app.name }}-{{ .Values.component }}-{{ .Values.global.deploymentColor }}"
+         app: "{{ .Values.app.name }}-account"
          environment: {{ .Values.global.deploymentColor }}
     spec:
       containers:
-        - name: {{ .Values.account.name }}
+        - name: account
           image: "{{ .Values.account.image.repository }}/account:{{ .Values.account.image.tag }}"
           ports:
             - containerPort: {{ .Values.account.port }}
@@ -31,19 +34,39 @@ spec:
               port: {{ .Values.account.port }}
             initialDelaySeconds: 5
             periodSeconds: 5
-        - name: {{ .Values.profile.name }}
-          image: "{{ .Values.profile.image.repository }}/profile:{{ .Values.profile.image.tag }}"
-          ports:
-            - containerPort: {{ .Values.profile.port }}
-          livenessProbe:
-            httpGet:
-              path: /health
-              port: {{ .Values.profile.port }}
-            initialDelaySeconds: 10
-            periodSeconds: 5
-          readinessProbe:
-            httpGet:
-              path: /ready
-              port: {{ .Values.profile.port }}
-            initialDelaySeconds: 5
-            periodSeconds: 5
+
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: "{{ .Values.app.name }}-profile-{{ .Values.global.deploymentColor }}"
+spec:
+  replicas: {{ .Values.replicaCount }}
+  selector:
+    matchLabels:
+      app: "{{ .Values.app.name }}-profile"
+      environment: "{{ .Values.global.deploymentColor }}"
+  template:
+    metadata:
+      labels:
+        app: "{{ .Values.app.name }}-profile"
+        environment: "{{ .Values.global.deploymentColor }}"
+    spec:
+      containers:
+      - name: profile
+        image: "{{ .Values.profile.image.repository }}/profile:{{ .Values.profile.image.tag }}"
+        ports:
+        - containerPort: {{ .Values.profile.port }}
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: {{ .Values.profile.port }}
+          initialDelaySeconds: 10
+          periodSeconds: 5
+        readinessProbe:
+          httpGet:
+            path: /ready
+            port: {{ .Values.profile.port }}
+          initialDelaySeconds: 5
+          periodSeconds: 5

@@ -137,53 +137,70 @@ jobs:
           helm template my-release ./charts --set app.name=myapp,global.deploymentColor=green,service.type=ClusterIP,service.port=80,account.name=account,account.image.repository=myrepo/account,account.image.tag=latest,account.port=8080,profile.name=profile,profile.image.repository=myrepo/profile,profile.image.tag=latest,profile.port=8081
 
 
+      #- name: Deploy applications using Helm
+      #  run: |
+      #    helm upgrade --install account-${{ env.NEXT_VERSION }} ./charts --set component=account,account.image.tag=${{ github.sha }},deploymentColor=${{ env.NEXT_VERSION }},ingress.manage=true --namespace default --create-namespace --kubeconfig=kubeconfig.yml
+      #    helm upgrade --install profile-${{ env.NEXT_VERSION }} ./charts --set component=profile,profile.image.tag=${{ github.sha }},deploymentColor=${{ env.NEXT_VERSION }},ingress.manage=false --namespace default --create-namespace --kubeconfig=kubeconfig.yml
+
       - name: Deploy applications using Helm
         run: |
-          helm upgrade --install account-${{ env.NEXT_VERSION }} ./charts --set component=account,account.image.tag=${{ github.sha }},deploymentColor=${{ env.NEXT_VERSION }},ingress.manage=true --namespace default --create-namespace --kubeconfig=kubeconfig.yml
-          helm upgrade --install profile-${{ env.NEXT_VERSION }} ./charts --set component=profile,profile.image.tag=${{ github.sha }},deploymentColor=${{ env.NEXT_VERSION }},ingress.manage=false --namespace default --create-namespace --kubeconfig=kubeconfig.yml
-          #if [[ "$CURRENT_VERSION" == "" ]]; then
-          #   kubectl --kubeconfig=kubeconfig.yml apply -f ./charts/templates/ingress.yaml
-          #fi
+          helm upgrade --install minibank-${{ env.CURRENT_VERSION }} ./charts \
+            --set account.image.tag=${{ github.sha }} \
+            --set profile.image.tag=${{ github.sha }} \
+            --set global.deploymentColor=${{ env.NEXT_VERSION }} \
+            --set ingress.manage=true \
+            --namespace default \
+            --create-namespace \
+            --kubeconfig=kubeconfig.yml
 
-      - name: Update current version information
-        run: |
-          kubectl --kubeconfig=kubeconfig.yml create configmap app-version --from-literal=CURRENT_VERSION=${{ env.NEXT_VERSION }} --dry-run=client -o yaml | kubectl --kubeconfig=kubeconfig.yml apply -f -
 
       - name: Check health of new application versions
         run: |
-          # Получаем список всех подов для account соответствующих NEXT_VERSION
-          ACCOUNT_NEW_VERSION_PODS=$(kubectl --kubeconfig=kubeconfig.yml get pods -l "app=minibank-account,environment=${{ env.NEXT_VERSION }}" -n default -o jsonpath="{.items[*].metadata.name}")
+          # Получаем список всех подов для account и profile соответствующих NEXT_VERSION
+          NEW_VERSION_PODS=$(kubectl --kubeconfig=kubeconfig.yml get pods -l "app=minibank-${{ env.CURRENT_VERSION }},environment=${{ env.NEXT_VERSION }}" -n default -o jsonpath="{.items[*].metadata.name}")
           # Если список не пустой, проверяем каждый под на готовность
-          if [ -n "$ACCOUNT_NEW_VERSION_PODS" ]; then
-            for pod in $ACCOUNT_NEW_VERSION_PODS; do
-              echo "Checking readiness of pod $pod for account with version ${{ env.NEXT_VERSION }}"
+          if [ -n "$NEW_VERSION_PODS" ]; then
+            for pod in $NEW_VERSION_PODS; do
+              echo "Checking readiness of pod $pod with version ${{ env.NEXT_VERSION }}"
               kubectl --kubeconfig=kubeconfig.yml wait --for=condition=ready pod $pod --timeout=60s -n default
             done
           else
-            echo "No pods found for account with version ${{ env.NEXT_VERSION }}"
+            echo "No pods found for version ${{ env.NEXT_VERSION }}"
           fi
-
-          # Повторяем для profile с той же логикой
-          PROFILE_NEW_VERSION_PODS=$(kubectl --kubeconfig=kubeconfig.yml get pods -l "app=minibank-profile,environment=${{ env.NEXT_VERSION }}" -n default -o jsonpath="{.items[*].metadata.name}")
-          if [ -n "$PROFILE_NEW_VERSION_PODS" ]; then
-            for pod in $PROFILE_NEW_VERSION_PODS; do
-              echo "Checking readiness of pod $pod for profile with version ${{ env.NEXT_VERSION }}"
-              kubectl --kubeconfig=kubeconfig.yml wait --for=condition=ready pod $pod --timeout=60s -n default
-            done
-          else
-            echo "No pods found for profile with version ${{ env.NEXT_VERSION }}"
-          fi
+          
+          
       
 
       - name: Switch traffic to the new version
         run: |
-          kubectl --kubeconfig=kubeconfig.yml patch ingress my-app-ingress -n default -p "{\"spec\":{\"rules\":[{\"http\":{\"paths\":[{\"path\":\"/account\",\"backend\":{\"service\":{\"name\":\"account-${{ env.NEXT_VERSION }}\",\"port\":{\"number\":80}}}}, {\"path\":\"/profile\",\"backend\":{\"service\":{\"name\":\"profile-${{ env.NEXT_VERSION }}\",\"port\":{\"number\":80}}}}]}}]}"
+          # Проверяем, не пуста ли переменная CURRENT_VERSION
+          if [ -n "${{ env.CURRENT_VERSION }}" ]; then
+            # Если CURRENT_VERSION не пуста, проверяем дополнительные условия
+            if [ "${{ env.CURRENT_VERSION }}" == "blue" ] || [ "${{ env.NEXT_VERSION }}" == "green" ]; then
+              echo "Switching ingress to ${{ env.NEXT_VERSION }} version."
+              kubectl --kubeconfig=kubeconfig.yml patch ingress "{{ .Values.app.name }}-ingress-{{ .Values.global.deploymentColor }}" -n default -p "{\"spec\":{\"rules\":[{\"http\":{\"paths\":[{\"path\":\"/account\",\"backend\":{\"service\":{\"name\":\"${{ .Values.app.name }}-account-${{ env.NEXT_VERSION }}\",\"port\":{\"number\":${{ .Values.account.service.port }}}}}, {\"path\":\"/profile\",\"backend\":{\"service\":{\"name\":\"${{ .Values.app.name }}-profile-${{ env.NEXT_VERSION }}\",\"port\":{\"number\":${{ .Values.profile.service.port }}}}}]}}]}"
+            else
+              echo "The conditions for switching ingress are not met."
+            fi
+          else
+            echo "CURRENT_VERSION is empty, assuming a fresh installation. No need to switch ingress."
+          fi
+      
+      
 
       - name: Cleaning up old resources
         run: |
           if [[ "${{ env.CURRENT_VERSION }}" != "" ]]; then
-            helm --kubeconfig=kubeconfig.yml uninstall account-${{ env.CURRENT_VERSION }} --namespace default
-            helm --kubeconfig=kubeconfig.yml uninstall profile-${{ env.CURRENT_VERSION }} --namespace default
-            echo "Resources of the old application version account and profile have been successfully deleted."
+            echo "Uninstalling old Helm release for the version: ${{ env.CURRENT_VERSION }}"
+            helm --kubeconfig=kubeconfig.yml uninstall minibank-${{ env.CURRENT_VERSION }} --namespace default
+            echo "Resources of the old application version ${{ env.CURRENT_VERSION }} have been successfully deleted."
           else
             echo "Fresh installation, no need to clean up old resources."
+      
+      
+
+      - name: Update current version information
+        run: |
+          kubectl --kubeconfig=kubeconfig.yml create configmap app-version \
+            --from-literal=CURRENT_VERSION=${{ env.NEXT_VERSION }} \
+            --dry-run=client -o yaml | kubectl apply -f - --namespace default
