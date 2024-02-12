@@ -26,7 +26,7 @@ RUN tree
 RUN pip install --no-cache-dir -r requirements.txt
 
 # Копируем конфигурационный файл NGINX Unit для автоматической настройки
-COPY unit.config.json /docker-entrypoint.d/config.json
+COPY ./unit.config.json /docker-entrypoint.d/config.json
 
 # Указываем пути для статических файлов и медиа
 VOLUME ["/vol/web"]
