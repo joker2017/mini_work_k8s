@@ -134,14 +134,8 @@ jobs:
 
       - name: Deploy applications using Helm
         run: |
-           #helm upgrade --install app-${{ env.NEXT_VERSION }} ./.k8s/charts \
-           #     --set global.deploymentColor=${{ env.NEXT_VERSION }}, \
-           #     account.image.tag=${{ github.sha }}, \
-           #     profile.image.tag=${{ github.sha }} \
-           #     --namespace default \
-           #     --create-namespace \
-           #     --kubeconfig=kubeconfig.yml
-           run: helm upgrade --install app-${{ env.NEXT_VERSION }} ./.k8s/charts --set global.deploymentColor=blue,account.image.tag=${{ github.sha }},profile.image.tag=${{ github.sha }} --namespace default --create-namespace --kubeconfig=kubeconfig.yml
+    
+           helm upgrade --install app-${{ env.NEXT_VERSION }} ./.k8s/charts --set global.deploymentColor=blue,account.image.tag=${{ github.sha }},profile.image.tag=${{ github.sha }} --namespace default --create-namespace --kubeconfig=kubeconfig.yml
 
 
       - name: Check health of new application versions
