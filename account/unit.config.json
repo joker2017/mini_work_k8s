@@ -4,23 +4,25 @@
       "pass": "routes"
     }
   },
-  "routes": [
-    {
-      "match": {
-        "uri": "/static/*"
+  "routes": {
+    "main": [
+      {
+        "match": {
+          "uri": "/static/*"
+        },
+        "action": {
+          "share": "/app/static"
+        }
       },
-      "action": {
-        "share": "/vol/web/static"
+      {
+        "action": {
+          "pass": "applications/profile"
+        }
       }
-    },
-    {
-      "action": {
-        "pass": "applications/account"
-      }
-    }
-  ],
+    ]
+  },
   "applications": {
-    "profile": {
+    "account": {
       "path": "app",
       "module": "app.wsgi",
       "callable": "application"
