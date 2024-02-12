@@ -11,13 +11,13 @@ spec:
             pathType: Prefix
             backend:
               service:
-                name: "{{ .Values.account.name }}-{{ .Values.global.deploymentColor }}"
+                name: "{{ .Values.app.name }}-account-{{ .Values.global.deploymentColor }}"
                 port:
-                  number: {{ .Values.account.port }}
+                  number: {{ .Values.account.service.port }}
           - path: "/profile"
             pathType: Prefix
             backend:
               service:
-                name: "{{ .Values.profile.name }}-{{ .Values.global.deploymentColor }}"
+                name: "{{ .Values.app.name }}-profile-{{ .Values.global.deploymentColor }}"
                 port:
-                  number: {{ .Values.profile.port }}
+                  number: {{ .Values.profile.service.port }}
