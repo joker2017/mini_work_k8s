@@ -192,13 +192,19 @@ jobs:
 
       - name: Cleaning up old resources
         run: |
-          if [[ "${{ env.CURRENT_VERSION }}" != "" ]]; then
-            echo "Uninstalling old Helm release for the version: ${{ env.CURRENT_VERSION }}"
-            helm --kubeconfig=kubeconfig.yml uninstall app-${{ env.CURRENT_VERSION }} --namespace default || true
-            echo "Resources of the old application version ${{ env.CURRENT_VERSION }} have been successfully deleted."
+          if [[ "green" != "" ]]; then
+            # Проверяем, существует ли релиз
+            if helm --kubeconfig=kubeconfig.yml list --namespace default --filter "^app-green$" | grep -q "app-green"; then
+              echo "Uninstalling old Helm release for the version: green"
+              helm --kubeconfig=kubeconfig.yml uninstall app-green --namespace default
+              echo "Resources of the old application version green have been successfully deleted."
+            else
+              echo "Release app-green does not exist. Moving on to the next step."
+            fi
           else
             echo "Fresh installation, no need to clean up old resources."
           fi
+
         
       
       
