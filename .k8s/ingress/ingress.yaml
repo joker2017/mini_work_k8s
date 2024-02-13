@@ -3,8 +3,9 @@ kind: Ingress
 metadata:
   name: "minibank-ingress-{{ .Values.global.activeVersion }}"
 spec:
+  ingressClassName: nginx
   rules:
-    - host: "myapp.example.com"
+    - host: "dmini.ru"
       http:
         paths:
           - path: "/account"
