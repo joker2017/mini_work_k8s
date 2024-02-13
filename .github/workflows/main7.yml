@@ -32,7 +32,7 @@ jobs:
         run: |
           echo "${{ secrets.KUBECONFIG }}" | kubectl --kubeconfig=/dev/stdin auth can-i create pods --namespace default
 
-      - name: Create Test Pod
+      - name: Create Test Ingress
         run: |
           echo "${{ secrets.KUBECONFIG }}" | kubectl --kubeconfig=/dev/stdin apply -f .github/workflows/your-pod-definition.yaml
 
