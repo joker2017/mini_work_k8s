@@ -134,44 +134,45 @@ jobs:
 
       - name: Deploy applications using Helm
         run: |
-          helm upgrade --install app-${{ env.NEXT_VERSION }} ./.k8s/charts --set global.deploymentColor=blue,account.image.tag=${{ github.sha }},account.image.repository=${{ secrets.DOCKER_HUB_USERNAME }},profile.image.tag=${{ github.sha }},profile.image.repository=${{ secrets.DOCKER_HUB_USERNAME }} --namespace default --create-namespace --kubeconfig=kubeconfig.yml
+          #helm upgrade --install app-${{ env.NEXT_VERSION }} ./.k8s/charts --set global.deploymentColor=blue,account.image.tag=${{ github.sha }},account.image.repository=${{ secrets.DOCKER_HUB_USERNAME }},profile.image.tag=${{ github.sha }},profile.image.repository=${{ secrets.DOCKER_HUB_USERNAME }} --namespace default --create-namespace --kubeconfig=kubeconfig.yml
+          
+          helm upgrade --install app-${{ env.NEXT_VERSION }} ./.k8s/charts --set global.deploymentColor=blue,account.image.tag=${{ github.sha }},account.image.repository=${{ secrets.DOCKER_HUB_USERNAME }},profile.image.tag=${{ github.sha }},profile.image.repository=${{ secrets.DOCKER_HUB_USERNAME }},account.version=${{ env.NEXT_VERSION }},profile.version=${{ env.NEXT_VERSION }} --namespace default --create-namespace --kubeconfig=kubeconfig.yml
+
 
 
       - name: Check health of new application versions
         run: |
             # Получаем время начала выполнения задания
             start_time=$(date +%s)
-            
+        
             # Переменная для хранения текущего времени
             current_time=$(date +%s)
-            
+        
             # Определение максимального времени ожидания в секундах
             max_wait=360
-            
+        
             # Цикл ожидания в течение максимального времени
             while [ $((current_time - start_time)) -lt $max_wait ]; do
-                # Проверка готовности подов
-                kubectl --kubeconfig=kubeconfig.yml wait --for=condition=ready pod -l "app=minibank-account-${{ env.NEXT_VERSION }}" --timeout=60s -n default >/dev/null 2>&1 &&
-                kubectl --kubeconfig=kubeconfig.yml wait --for=condition=ready pod -l "app=minibank-profile-${{ env.NEXT_VERSION }}" --timeout=60s -n default >/dev/null 2>&1
-            
-                # Проверка готовности сервисов
-                account_service_ready=$(kubectl --kubeconfig=kubeconfig.yml get svc -l "app=account-service-${{ env.NEXT_VERSION }}" -n default --no-headers | awk '{print $4}')
-                profile_service_ready=$(kubectl --kubeconfig=kubeconfig.yml get svc -l "app=profile-service-${{ env.NEXT_VERSION }}" -n default --no-headers | awk '{print $4}')
-            
-                if [ "$account_service_ready" != "" ] && [ "$profile_service_ready" != "" ]; then
-                    # Если все компоненты готовы, выводим сообщение о готовности и выходим
-                    echo "All pods and services are ready"
-                    exit 0
-                else
-                    # Если не все компоненты готовы, ждем некоторое время и увеличиваем текущее время
-                    sleep 10
-                    current_time=$(date +%s)
-                fi
+               # Проверка готовности подов
+               kubectl --kubeconfig=kubeconfig.yml wait --for=condition=ready pod -l "type=account,version=${{ env.NEXT_VERSION }}" --timeout=60s -n default >/dev/null 2>&1 &&
+               kubectl --kubeconfig=kubeconfig.yml wait --for=condition=ready pod -l "type=profile,version=${{ env.NEXT_VERSION }}" --timeout=60s -n default >/dev/null 2>&1
+        
+               # Если поды готовы, выводим сообщение о готовности и выходим
+               if kubectl --kubeconfig=kubeconfig.yml get pod -l "type=account,version=${{ env.NEXT_VERSION }}" -n default | grep 'Running' && \
+                   kubectl --kubeconfig=kubeconfig.yml get pod -l "type=profile,version=${{ env.NEXT_VERSION }}" -n default | grep 'Running'; then
+                     echo "All pods are ready"
+                     exit 0
+               else
+                   # Если не все компоненты готовы, ждем некоторое время и увеличиваем текущее время
+                   sleep 10
+                   current_time=$(date +%s)
+               fi
             done
+            echo "Timeout reached, not all pods are ready."
+            exit 1
 
           
-          
-      
+  
 
       - name: Switch traffic to the new version
         run: |

@@ -3,6 +3,9 @@ kind: Deployment
 metadata:
   #name: "{{ .Values.app.name }}-{{ .Values.component }}-{{ .Values.global.deploymentColor }}"
   name: "{{ .Values.app.name }}-account-{{ .Values.global.deploymentColor }}"
+  labels: # Добавленные лейблы для деплоймента
+    type: "account-service"
+    version: "{{ .Values.account.version }}" # Новый лейбл с версией
 spec:
   replicas: {{ .Values.replicaCount }}
   selector:
@@ -30,6 +33,9 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: "{{ .Values.app.name }}-profile-{{ .Values.global.deploymentColor }}"
+  labels: # Добавленные лейблы для деплоймента
+    type: "profile-service"
+    version: "{{ .Values.profile.version }}" # Новый лейбл с версией
 spec:
   replicas: {{ .Values.replicaCount }}
   selector:

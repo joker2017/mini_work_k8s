@@ -25,15 +25,18 @@ replicaCount: 1
 account:
   name: account
   port: 8082
+  version:
   image:
     repository: "${{ secrets.DOCKER_HUB_USERNAME }}"
     tag:
   service:
     port: 80
 
+
 profile:
   name: profile
   port: 8081
+  version:
   image:
     repository: "${{ secrets.DOCKER_HUB_USERNAME }}"
     tag:

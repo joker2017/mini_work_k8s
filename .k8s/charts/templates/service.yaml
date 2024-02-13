@@ -3,6 +3,9 @@ kind: Service
 metadata:
   #name: "service-{{ .Values.app.name }}-{{ .Values.component }}-{{ .Values.global.deploymentColor }}"
   name: "account-service-{{ .Values.global.deploymentColor }}"
+  labels: # Добавленные лейблы для сервиса
+    type: "account-service"
+    version: "{{ .Values.account.version }}" # Новый лейбл с версией
 spec:
   type: ClusterIP
   ports:
@@ -18,6 +21,9 @@ kind: Service
 metadata:
   #name: "service-{{ .Values.app.name }}-{{ .Values.component }}-{{ .Values.global.deploymentColor }}"
   name: "profile-service-{{ .Values.global.deploymentColor }}"
+  labels: # Добавленные лейблы для сервиса
+    type: "profile-service"
+    version: "{{ .Values.profile.version }}" # Новый лейбл с версие
 spec:
   type: ClusterIP
   ports:
