@@ -22,18 +22,7 @@ spec:
           image: "{{ .Values.account.image.repository }}/account:{{ .Values.account.image.tag }}"
           ports:
             - containerPort: 8300
-          livenessProbe:
-            httpGet:
-              path: /health
-              port: {{ .Values.account.port }}
-            initialDelaySeconds: 10
-            periodSeconds: 5
-          readinessProbe:
-            httpGet:
-              path: /ready
-              port: {{ .Values.account.port }}
-            initialDelaySeconds: 5
-            periodSeconds: 5
+
 
 
 ---
@@ -58,15 +47,3 @@ spec:
         image: "{{ .Values.profile.image.repository }}/profile:{{ .Values.profile.image.tag }}"
         ports:
         - containerPort: 8300
-        livenessProbe:
-          httpGet:
-            path: /health
-            port: {{ .Values.profile.port }}
-          initialDelaySeconds: 10
-          periodSeconds: 5
-        readinessProbe:
-          httpGet:
-            path: /ready
-            port: {{ .Values.profile.port }}
-          initialDelaySeconds: 5
-          periodSeconds: 5
