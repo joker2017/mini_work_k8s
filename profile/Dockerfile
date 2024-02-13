@@ -1,5 +1,5 @@
 # Используем официальный образ NGINX Unit для Python
-FROM python:3.11 as build-python
+FROM python:3.11-alpine as build-python
 
 #FROM unit:1.31.1-minimal
 # Обновляем список пакетов и устанавливаем необходимые зависимости
@@ -17,7 +17,7 @@ RUN tree
 #COPY requirements.txt /app/
 WORKDIR /app
 RUN pip install --upgrade pip --no-cache-dir
-RUN pip install -r requirements.txt --no-cache-dir
+RUN pip install -r requirements.txt --no-cache-dir -v
 COPY . /app
 
 ### Final image
