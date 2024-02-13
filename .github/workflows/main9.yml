@@ -142,37 +142,38 @@ jobs:
 
       - name: Check health of new application versions
         run: |
-            # Получаем время начала выполнения задания
-            start_time=$(date +%s)
-        
-            # Переменная для хранения текущего времени
-            current_time=$(date +%s)
-        
-            # Определение максимального времени ожидания в секундах
-            max_wait=360
-        
-            # Цикл ожидания в течение максимального времени
-            while [ $((current_time - start_time)) -lt $max_wait ]; do
-               # Проверка готовности подов
-               kubectl --kubeconfig=kubeconfig.yml wait --for=condition=ready pod -l "type=account,version=${{ env.NEXT_VERSION }}" --timeout=60s -n default >/dev/null 2>&1 &&
-               kubectl --kubeconfig=kubeconfig.yml wait --for=condition=ready pod -l "type=profile,version=${{ env.NEXT_VERSION }}" --timeout=60s -n default >/dev/null 2>&1
-        
-               # Если поды готовы, выводим сообщение о готовности и выходим
-               if kubectl --kubeconfig=kubeconfig.yml get pod -l "type=account,version=${{ env.NEXT_VERSION }}" -n default | grep 'Running' && \
-                   kubectl --kubeconfig=kubeconfig.yml get pod -l "type=profile,version=${{ env.NEXT_VERSION }}" -n default | grep 'Running'; then
-                     echo "All pods are ready"
-                     exit 0
-               else
-                   # Если не все компоненты готовы, ждем некоторое время и увеличиваем текущее время
-                   sleep 10
-                   current_time=$(date +%s)
-               fi
-            done
-            echo "Timeout reached, not all pods are ready."
-            exit 1
-
+          # Получаем время начала выполнения задания
+           start_time=$(date +%s)
           
-  
+           # Переменная для хранения текущего времени
+           current_time=$(date +%s)
+          
+           # Определение максимального времени ожидания в секундах
+           max_wait=360
+          
+           # Цикл ожидания в течение максимального времени
+           while [ $((current_time - start_time)) -lt $max_wait ]; do
+              # Проверка готовности подов
+              kubectl --kubeconfig=kubeconfig.yml wait --for=condition=ready pod -l "type=account,version=${{ env.NEXT_VERSION }}" --timeout=60s -n default >/dev/null 2>&1 &&
+              kubectl --kubeconfig=kubeconfig.yml wait --for=condition=ready pod -l "type=profile,version=${{ env.NEXT_VERSION }}" --timeout=60s -n default >/dev/null 2>&1
+          
+              # Проверяем, что поды находятся в статусе Running
+              if kubectl --kubeconfig=kubeconfig.yml get pod -l "type=account,version=${{ env.NEXT_VERSION }}" -n default | grep 'Running' >/dev/null && \
+                 kubectl --kubeconfig=kubeconfig.yml get pod -l "type=profile,version=${{ env.NEXT_VERSION }}" -n default | grep 'Running' >/dev/null; then
+                   echo "All pods are ready"
+                   exit 0
+              else
+                  # Если не все компоненты готовы, ждем некоторое время и увеличиваем текущее время
+                  sleep 10
+                  current_time=$(date +%s)
+              fi
+           done
+           echo "Timeout reached, not all pods are ready."
+           exit 1
+     
+      
+      
+      
 
       - name: Switch traffic to the new version
         run: |
