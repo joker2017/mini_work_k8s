@@ -183,18 +183,17 @@ jobs:
           RELEASE_NAME_NEXT="ingress-$NEXT_VERSION"
 
           # Проверяем существование Ingress следующей версии
-          if helm get $RELEASE_NAME_NEXT -n default --kubeconfig=kubeconfig.yml; then
-
-            echo "Ingress $RELEASE_NAME_NEXT already exists, no action required."
+          if helm get manifest $RELEASE_NAME_NEXT -n default --kubeconfig=kubeconfig.yml > /dev/null 2>&1; then
+             echo "Ingress $RELEASE_NAME_NEXT already exists, no action required."
           else
-            # Если Ingress следующей версии не существует, проверяем существование текущей версии
-            if get status $RELEASE_NAME_CURRENT -n default --kubeconfig=kubeconfig.yml; then
-              echo "Upgrading $RELEASE_NAME_CURRENT to $RELEASE_NAME_NEXT..."
-              helm upgrade --install $RELEASE_NAME_NEXT ./.k8s/ingress --namespace default --kubeconfig=kubeconfig.yml --debug
-            else
-              echo "Ingress for current and next versions does not exist. Installing $RELEASE_NAME_NEXT..."
-              helm install $RELEASE_NAME_NEXT ./.k8s/ingress --namespace default --kubeconfig=kubeconfig.yml --debug
-            fi
+             # Если Ingress следующей версии не существует, проверяем существование текущей версии
+             if helm get manifest $RELEASE_NAME_CURRENT -n default --kubeconfig=kubeconfig.yml > /dev/null 2>&1; then
+                 echo "Upgrading $RELEASE_NAME_CURRENT to $RELEASE_NAME_NEXT..."
+                 helm upgrade --install $RELEASE_NAME_NEXT ./.k8s/ingress --namespace default --kubeconfig=kubeconfig.yml --debug
+             else
+               echo "Ingress for current and next versions does not exist. Installing $RELEASE_NAME_NEXT..."
+               helm install $RELEASE_NAME_NEXT ./.k8s/ingress --namespace default --kubeconfig=kubeconfig.yml --debug
+             fi
           fi
 
       
