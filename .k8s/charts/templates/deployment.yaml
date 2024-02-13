@@ -16,7 +16,8 @@ spec:
   template:
     metadata:
       labels:   #!!!!!!!!!!!!!!!!!!!!!!!!!!
-         #app: "{{ .Values.app.name }}-{{ .Values.component }}-{{ .Values.global.deploymentColor }}"
+         type: "account" # Добавьте лейблы сюда
+         version: "{{ .Values.account.version }}" # Добавьте лейблы сюда
          app: "{{ .Values.app.name }}-account"
          environment: {{ .Values.global.deploymentColor }}
     spec:
@@ -45,6 +46,8 @@ spec:
   template:
     metadata:
       labels:
+        type: "profile" # Добавьте лейблы сюда
+        version: "{{ .Values.profile.version }}" # Добавьте лейблы сюда
         app: "{{ .Values.app.name }}-profile"
         environment: "{{ .Values.global.deploymentColor }}"
     spec:
