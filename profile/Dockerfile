@@ -31,10 +31,11 @@ COPY unit.config.json /docker-entrypoint.d/config.json
 # Обратите внимание, что вы должны настроить Django на использование файловой системы для статических файлов
 # Это может потребовать изменения в settings.py вашего приложения Django
 #RUN mkdir -p /vol/web/static
+RUN chown -R unit:unit /vol/
 RUN useradd -m -s /bin/bash user
 RUN mkdir -p /vol/web/static
-RUN adduser user
-RUN chown -R user:user /vol/
+#RUN adduser user
+#RUN chown -R user:user /vol/
 RUN chmod -R 777 /vol/web
 USER user
 RUN python manage.py collectstatic --no-input
