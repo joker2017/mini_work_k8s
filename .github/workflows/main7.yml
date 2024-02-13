@@ -37,9 +37,9 @@ jobs:
           echo "${{ secrets.KUBECONFIG }}" | kubectl --kubeconfig=/dev/stdin auth can-i create pods --namespace default   
       
       # Ingress-контроллера NGINX
-      - name: Create Ingress
-        run: |
-          echo "${{ secrets.KUBECONFIG }}" | kubectl --kubeconfig=/dev/stdin helm repo add ingress-nginx https://kubernetes.github.io/ingress-nginx
+      #- name: Create Ingress
+      #  run: |
+      #    echo "${{ secrets.KUBECONFIG }}" | kubectl --kubeconfig=/dev/stdin helm repo add ingress-nginx https://kubernetes.github.io/ingress-nginx
 
       - name: TEST!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
         run: |
@@ -75,6 +75,6 @@ jobs:
         shell: /usr/bin/bash -e {0}
 
 
-      - name: Delete Test Pod
+      - name: install ingress
         run: |
           echo "${{ secrets.KUBECONFIG }}" | kubectl --kubeconfig=/dev/stdin delete -f .github/workflows/your-pod-definition.yaml
