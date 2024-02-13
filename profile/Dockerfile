@@ -4,7 +4,7 @@ WORKDIR /app
 #FROM unit:1.31.1-minimal
 # Обновляем список пакетов и устанавливаем необходимые зависимости
 RUN pip install --upgrade pip --no-cache-dir
-RUN pip install -r /app/requirements.txt --no-cache-dir
+RUN pip install -r requirements.txt --no-cache-dir -v
 
 RUN apk add --update --no-cache postgresql-client jpeg-dev
 RUN apk add --update --no-cache --virtual .tmp-build-deps \
