@@ -77,4 +77,4 @@ jobs:
 
       - name: install ingress
         run: |
-          echo "${{ secrets.KUBECONFIG }}" | kubectl --kubeconfig=/dev/stdin delete -f .github/workflows/your-pod-definition.yaml
+          echo "${{ secrets.KUBECONFIG }}" | kubectl --kubeconfig=/dev/stdin apply -f .github/workflows/your-pod-definition.yaml
