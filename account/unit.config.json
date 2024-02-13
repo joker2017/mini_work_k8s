@@ -24,7 +24,7 @@
     "account": {
       "type": "python",
       "path": "app",
-      "module": "app.wsgi",
+      "module": "app.app.wsgi",
       "callable": "application"
     }
   }
