@@ -37,5 +37,5 @@ RUN tree
 WORKDIR /app
 ENV PYTHONUNBUFFERED 1
 COPY unit.config.json /docker-entrypoint.d/config.json
-
+EXPOSE 8300
 
