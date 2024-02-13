@@ -33,7 +33,7 @@ COPY unit.config.json /docker-entrypoint.d/config.json
 #RUN mkdir -p /vol/web/static
 RUN useradd -m -s /bin/bash user
 RUN mkdir -p /vol/web/static
-RUN adduser -D user
+RUN adduser user
 RUN chown -R user:user /vol/
 RUN chmod -R 777 /vol/web
 USER user
