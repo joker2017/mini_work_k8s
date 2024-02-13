@@ -4,7 +4,7 @@ metadata:
   name: "minibank-ingress-{{ .Values.global.activeVersion }}"
 spec:
   rules:
-    - host: "{{ .Values.ingress.host }}"
+    - host: "myapp.example.com"
       http:
         paths:
           - path: "/account"

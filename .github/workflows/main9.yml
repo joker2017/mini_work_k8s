@@ -224,6 +224,5 @@ jobs:
 
       - name: Update current version information
         run: |
-          kubectl --kubeconfig=kubeconfig.yml create configmap app-version \
-            --from-literal=CURRENT_VERSION=${{ env.NEXT_VERSION }} \
-            --dry-run=client -o yaml | kubectl apply -f - --namespace default
+          kubectl --kubeconfig=kubeconfig.yml create configmap app-version --from-literal=CURRENT_VERSION=${{ env.NEXT_VERSION }} --dry-run=client -o yaml | kubectl apply -f - --namespace default
+
