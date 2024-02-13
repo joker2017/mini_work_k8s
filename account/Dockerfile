@@ -21,12 +21,7 @@ RUN ls -lah
 # Или используйте tree для более детального представления
 RUN tree
 
-# Установка tree для просмотра структуры директорий, если необходимо
-RUN apt-get update && apt-get install -y tree && apt-get clean
-# Вывод структуры директорий
-RUN ls -lah
-# Или используйте tree для более детального представления
-RUN tree
+
 
 # Устанавливаем зависимости Python из файла requirements.txt
 RUN pip install --no-cache-dir -r requirements.txt
@@ -36,6 +31,7 @@ COPY unit.config.json /docker-entrypoint.d/config.json
 # Выполняем команду collectstatic для Django
 # Обратите внимание, что вы должны настроить Django на использование файловой системы для статических файлов
 # Это может потребовать изменения в settings.py вашего приложения Django
+RUN mkdir -p /vol/web/static
 RUN python manage.py collectstatic --no-input
 # Указываем пути для статических файлов и медиа
 #VOLUME ["/vol/web"]

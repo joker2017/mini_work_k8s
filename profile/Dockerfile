@@ -30,6 +30,7 @@ COPY unit.config.json /docker-entrypoint.d/config.json
 # Выполняем команду collectstatic для Django
 # Обратите внимание, что вы должны настроить Django на использование файловой системы для статических файлов
 # Это может потребовать изменения в settings.py вашего приложения Django
+RUN mkdir -p /vol/web/static
 RUN python manage.py collectstatic --no-input
 # Указываем пути для статических файлов и медиа
 #VOLUME ["/vol/web"]
