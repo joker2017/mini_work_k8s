@@ -19,7 +19,7 @@ RUN apt-get update && apt-get install -y tree && apt-get clean
 # Вывод структуры директорий
 RUN ls -lah
 # Или используйте tree для более детального представления
-RUN tree
+#RUN tree
 
 
 # Устанавливаем зависимости Python из файла requirements.txt
@@ -37,7 +37,8 @@ RUN mkdir -p /vol/web/static
 #RUN adduser user
 #RUN chown -R user:user /vol/
 RUN chmod -R 777 /vol/web
-USER user
+#USER user
+RUN tree
 RUN python manage.py collectstatic --no-input
 # Указываем пути для статических файлов и медиа
 #VOLUME ["/vol/web"]
