@@ -189,7 +189,7 @@ jobs:
                   helm install $RELEASE_NAME_NEXT ./.k8s/ingress --namespace default --kubeconfig=kubeconfig.yml --set global.activeVersion=$NEXT_VERSION --debug
             else
                   echo "Upgrading $RELEASE_NAME_CURRENT to $RELEASE_NAME_NEXT..."
-                  helm upgrade --install $RELEASE_NAME_NEXT ./.k8s/ingress --namespace default --kubeconfig=kubeconfig.yml --set global.activeVersion=$NEXT_VERSION --debug
+                  helm upgrade $RELEASE_NAME_NEXT ./.k8s/ingress --namespace default --kubeconfig=kubeconfig.yml --set global.activeVersion=$NEXT_VERSION --debug
             fi
           else
             echo "Ingress $RELEASE_NAME_NEXT already exists, no action required."
