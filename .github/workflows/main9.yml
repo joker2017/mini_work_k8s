@@ -202,20 +202,20 @@ jobs:
       
       
 
-      - name: Cleaning up old resources
-        run: |
-          if [[ "${CURRENT_VERSION}" != "" ]]; then
-            # Проверяем, существует ли релиз
-            if helm --kubeconfig=kubeconfig.yml list --namespace default --filter "^app-${env.CURRENT_VERSION}$" | grep -q "app-${env.CURRENT_VERSION}"; then
-              echo "Uninstalling old Helm release for the version: ${env.CURRENT_VERSION}"
-              helm --kubeconfig=kubeconfig.yml uninstall app-${env.CURRENT_VERSION} --namespace default
-              echo "Resources of the old application version ${env.CURRENT_VERSION} have been successfully deleted."
-            else
-              echo "Release app-${CURRENT_VERSION} does not exist. Moving on to the next step."
-            fi
-          else
-            echo "Version is not specified, no need to clean up old resources."
-          fi
+     # - name: Cleaning up old resources
+     #   run: |
+     #     if [[ "${CURRENT_VERSION}" != "" ]]; then
+     #       # Проверяем, существует ли релиз
+     #       if helm --kubeconfig=kubeconfig.yml list --namespace default --filter "^app-${env.CURRENT_VERSION}$" | grep -q "app-${env.CURRENT_VERSION}"; then
+     #         echo "Uninstalling old Helm release for the version: ${env.CURRENT_VERSION}"
+     #         helm --kubeconfig=kubeconfig.yml uninstall app-${env.CURRENT_VERSION} --namespace default
+     #         echo "Resources of the old application version ${env.CURRENT_VERSION} have been successfully deleted."
+     #       else
+     #         echo "Release app-${CURRENT_VERSION} does not exist. Moving on to the next step."
+     #       fi
+     #     else
+     #       echo "Version is not specified, no need to clean up old resources."
+     #     fi
 
 
         
@@ -224,5 +224,5 @@ jobs:
 
       - name: Update current version information
         run: |
-          kubectl --kubeconfig=kubeconfig.yml create configmap app-version --from-literal=CURRENT_VERSION=${{ env.NEXT_VERSION }} --dry-run=client -o yaml | kubectl apply -f - --namespace default
+          kubectl create configmap app-version --from-literal=CURRENT_VERSION=${{ env.NEXT_VERSION }} --dry-run=client -o yaml | kubectl apply -f - --namespace default --kubeconfig=kubeconfig.yml
 
