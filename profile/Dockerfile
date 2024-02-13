@@ -27,6 +27,12 @@ COPY . /app
 ### Final image
 FROM unit:1.31.1-python3.11
 COPY --from=build-python /app /app
+
+# Установка утилиты tree
+RUN apt-get update && \
+    apt-get install -y tree && \
+    apt-get clean && \
+    rm -rf /var/lib/apt/lists/*
 RUN tree
 WORKDIR /app
 ENV PYTHONUNBUFFERED 1
