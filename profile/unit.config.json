@@ -22,8 +22,8 @@
   "applications": {
     "app": {
       "type": "python 3",
-      "path": "/app",
-      "module": "app.app.wsgi"
+      "path": "./app",
+      "module": "app.wsgi"
     }
   }
 }
