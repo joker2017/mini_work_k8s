@@ -17,7 +17,7 @@ RUN apk del .tmp-build-deps
 # Вывод структуры директорий
 RUN ls -lah
 # Или используйте tree для более детального представления
-RUN tree
+#RUN tree
 
 #COPY requirements.txt /app/
 
