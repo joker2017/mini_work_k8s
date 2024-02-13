@@ -1,40 +1,41 @@
 # Используем официальный образ NGINX Unit для Python
-FROM python:3.11-alpine as build-python
-WORKDIR /app
+FROM unit:1.31.1-python3.11
 #FROM unit:1.31.1-minimal
 # Обновляем список пакетов и устанавливаем необходимые зависимости
-RUN pip install --upgrade pip --no-cache-dir
-COPY requirements.txt /app/
-RUN pip install -r requirements.txt --no-cache-dir -v
+RUN apt-get update && \
+    apt-get install -y gcc && \
+    apt-get clean && \
+    rm -rf /var/lib/apt/lists/*
 
-RUN apk add --update --no-cache postgresql-client jpeg-dev
-RUN apk add --update --no-cache --virtual .tmp-build-deps \
-  gcc libc-dev linux-headers postgresql-dev musl-dev zlib zlib-dev
+# Создаем рабочую директорию для приложения
+WORKDIR /app
 
-RUN apk del .tmp-build-deps
+# Копируем файлы приложения в контейнер
+COPY . .
+RUN chown -R unit:unit /app
+
 # Установка tree для просмотра структуры директорий, если необходимо
-
+RUN apt-get update && apt-get install -y tree && apt-get clean
 # Вывод структуры директорий
 RUN ls -lah
 # Или используйте tree для более детального представления
-#RUN tree
-
-#COPY requirements.txt /app/
-
-
-COPY . /app
-
-### Final image
-FROM unit:1.31.1-python3.11
-COPY --from=build-python /app /app
-
-# Установка утилиты tree
-RUN apt-get update && \
-    apt-get install -y tree && \
-    apt-get clean && \
-    rm -rf /var/lib/apt/lists/*
 RUN tree
-WORKDIR /app
-ENV PYTHONUNBUFFERED 1
+
+# Установка tree для просмотра структуры директорий, если необходимо
+RUN apt-get update && apt-get install -y tree && apt-get clean
+# Вывод структуры директорий
+RUN ls -lah
+# Или используйте tree для более детального представления
+RUN tree
+
+# Устанавливаем зависимости Python из файла requirements.txt
+RUN pip install --no-cache-dir -r requirements.txt
+
+# Копируем конфигурационный файл NGINX Unit для автоматической настройки
 COPY unit.config.json /docker-entrypoint.d/config.json
+
+# Указываем пути для статических файлов и медиа
+#VOLUME ["/vol/web"]
+
+# Определяем порт, который будет прослушивать приложение
 EXPOSE 8300

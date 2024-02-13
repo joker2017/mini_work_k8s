@@ -23,7 +23,8 @@
     "app": {
       "type": "python 3",
       "path": "./app",
-      "module": "app.wsgi"
+      "module": "app.wsgi",
+      "callable": "application"
     }
   }
 }
