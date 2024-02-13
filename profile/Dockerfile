@@ -39,7 +39,7 @@ RUN mkdir -p /vol/web/static
 RUN chmod -R 777 /vol/web
 #USER user
 RUN tree
-RUN python manage.py collectstatic --no-input
+RUN python app/manage.py collectstatic --no-input
 # Указываем пути для статических файлов и медиа
 #VOLUME ["/vol/web"]
 
