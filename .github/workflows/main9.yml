@@ -135,10 +135,10 @@ jobs:
           
             # Обновление Helm чартов с новым образом
             helm upgrade --install $RELEASE_NAME ./.k8s/charts/ --set account.image.tag=${{ github.sha }},profile.image.tag=${{ github.sha }} --namespace default --create-namespace --kubeconfig=kubeconfig.yml
-
+            kubectl argo rollouts get rollout $RELEASE_NAME -n default
             # Использование Argo Rollouts для начала процесса обновления
-            kubectl argo-rollouts restart account-rollout -n default --kubeconfig=kubeconfig.yml
-            kubectl argo-rollouts restart profile-rollout -n default --kubeconfig=kubeconfig.yml
+            #kubectl-argo-rollouts restart account-rollout -n default --kubeconfig=kubeconfig.yml
+            #kubectl-argo-rollouts restart profile-rollout -n default --kubeconfig=kubeconfig.yml
 
       #Проверка здоровья развертывания
       - name: Check health of new application versions
