@@ -1,0 +1,39 @@
+{{- range .Values.apps }}
+apiVersion: argoproj.io/v1alpha1
+kind: Rollout
+metadata:
+  name: {{ .name }}-rollout
+spec:
+  replicas: {{ .replicas }}
+  selector:
+    matchLabels:
+      app: {{ .name }}
+  template:
+    metadata:
+      labels:
+        app: {{ .name }}
+    spec:
+      containers:
+        - name: {{ .name }}
+          image: {{ .image.repository }}/{{ .name }}:{{ .image.tag }}
+          ports:
+            - containerPort: {{ .containerPort }}
+          livenessProbe:
+            httpGet:
+              path: /healthz
+              port: {{ .containerPort }}
+            initialDelaySeconds: 15
+            periodSeconds: 20
+          readinessProbe:
+            httpGet:
+              path: /ready
+              port: {{ .containerPort }}
+            initialDelaySeconds: 5
+            periodSeconds: 20
+  strategy:
+    blueGreen:
+      activeService: {{ .name }}-service
+      previewService: {{ .name }}-preview-service
+      autoPromotionEnabled: false
+---
+{{- end }}

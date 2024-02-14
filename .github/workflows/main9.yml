@@ -117,111 +117,47 @@ jobs:
           echo "${{ secrets.KUBECONFIG }}" > kubeconfig.yml
           chmod 600 kubeconfig.yml
 
-
-      - name: Determine current and next versions
+      - name: Install Argo Rollouts CLI
         run: |
-          CURRENT_VERSION=$(kubectl --kubeconfig=kubeconfig.yml get configmap app-version -o=jsonpath='{.data.CURRENT_VERSION}' || echo "")
-          if [[ "$CURRENT_VERSION" == "" ]]; then
-            echo "This is a fresh install."
-            NEXT_VERSION="green"
-          elif [[ "$CURRENT_VERSION" == "blue" ]]; then
-            NEXT_VERSION="green"
-          else
-            NEXT_VERSION="blue"
-          fi
-          echo "NEXT_VERSION=$NEXT_VERSION" >> $GITHUB_ENV
-          echo "CURRENT_VERSION=$CURRENT_VERSION" >> $GITHUB_ENV
-
-      - name: Deploy applications using Helm
-        run: |
+            curl -LO https://github.com/argoproj/argo-rollouts/releases/latest/download/kubectl-argo-rollouts-linux-amd64
+            chmod +x ./kubectl-argo-rollouts-linux-amd64
+            sudo mv ./kubectl-argo-rollouts-linux-amd64 /usr/local/bin/kubectl-argo-rollouts
           
-          helm upgrade --install app-${{ env.NEXT_VERSION }} ./.k8s/charts --set global.deploymentColor=${{ env.NEXT_VERSION }},account.image.tag=${{ github.sha }},account.image.repository=${{ secrets.DOCKER_HUB_USERNAME }},profile.image.tag=${{ github.sha }},profile.image.repository=${{ secrets.DOCKER_HUB_USERNAME }},account.version=${{ env.NEXT_VERSION }},profile.version=${{ env.NEXT_VERSION }} --namespace default --create-namespace --kubeconfig=kubeconfig.yml
 
 
+      - name: Deploy to Kubernetes
+        run: |
+      
+            DATE=$(date +%Y%m%d-%H%M)
+            COMMIT_SHA=$(echo $GITHUB_SHA | cut -c1-7)
+            RELEASE_NAME=myapp-${DATE}-${COMMIT_SHA}
+          
+          
+            # Обновление Helm чартов с новым образом
+            helm upgrade --install $RELEASE_NAME ./.k8s/charts/ --set account.image.tag=${{ github.sha }},profile.image.tag=${{ github.sha }} --namespace default --create-namespace --kubeconfig=kubeconfig.yml
 
+            # Использование Argo Rollouts для начала процесса обновления
+            kubectl argo rollouts -n default restart rollout myapp-rollout --kubeconfig=kubeconfig.yml
+          
+
+      #Проверка здоровья развертывания
       - name: Check health of new application versions
         run: |
-          # Получаем время начала выполнения задания
-           start_time=$(date +%s)
+          # Ожидание, пока развертывание не станет здоровым
+          kubectl argo rollouts -n default wait rollout minibank-rollout --for condition=Healthy --kubeconfig=kubeconfig.yml
           
-           # Переменная для хранения текущего времени
-           current_time=$(date +%s)
-          
-           # Определение максимального времени ожидания в секундах
-           max_wait=360
-          
-           # Цикл ожидания в течение максимального времени
-           while [ $((current_time - start_time)) -lt $max_wait ]; do
-              # Проверка готовности подов
-              kubectl --kubeconfig=kubeconfig.yml wait --for=condition=ready pod -l "type=account,version=${{ env.NEXT_VERSION }}" --timeout=60s -n default >/dev/null 2>&1 &&
-              kubectl --kubeconfig=kubeconfig.yml wait --for=condition=ready pod -l "type=profile,version=${{ env.NEXT_VERSION }}" --timeout=60s -n default >/dev/null 2>&1
-          
-              # Проверяем, что поды находятся в статусе Running
-              if kubectl --kubeconfig=kubeconfig.yml get pod -l "type=account,version=${{ env.NEXT_VERSION }}" -n default | grep 'Running' >/dev/null && \
-                 kubectl --kubeconfig=kubeconfig.yml get pod -l "type=profile,version=${{ env.NEXT_VERSION }}" -n default | grep 'Running' >/dev/null; then
-                   echo "All pods are ready"
-                   exit 0
-              else
-                  # Если не все компоненты готовы, ждем некоторое время и увеличиваем текущее время
-                  sleep 10
-                  current_time=$(date +%s)
-              fi
-           done
-           echo "Timeout reached, not all pods are ready."
-           exit 1
+          # Здесь можно добавить дополнительные тесты для проверки работоспособности приложения
+          # Пример проверки доступности HTTP эндпоинта
+          # curl --fail http://myapp.example.com/health || exit 1
+
+      #Продвижение развертывания
+      - name: Promote Rollout
+        run: |
+          # Промоушн новой версии после успешной проверки
+          kubectl argo rollouts -n default promote minibank-rollout --kubeconfig=kubeconfig.yml
+
      
       
       
       
-
-      - name: Check and deploy Ingress
-        run: |
-          CURRENT_VERSION="${{ env.CURRENT_VERSION }}"
-          NEXT_VERSION="${{ env.NEXT_VERSION }}"
-          RELEASE_NAME_CURRENT="minibank-ingress-$CURRENT_VERSION"
-          RELEASE_NAME_NEXT="minibank-ingress-$NEXT_VERSION"
-
-          # Проверяем существование Ingress следующей версии
-          if ! kubectl get ingress $RELEASE_NAME_NEXT -n default --kubeconfig=kubeconfig.yml > /dev/null 2>&1; then
-            # Если Ingress следующей версии не существует, проверяем существование текущей версии
-            if ! kubectl get ingress $RELEASE_NAME_CURRENT -n default --kubeconfig=kubeconfig.yml > /dev/null 2>&1; then
-                  echo "Ingress for current and next versions does not exist. Installing $RELEASE_NAME_NEXT..."
-                  helm install $RELEASE_NAME_NEXT ./.k8s/ingress --namespace default --kubeconfig=kubeconfig.yml --set global.activeVersion=$NEXT_VERSION --debug
-            else
-                  echo "Upgrading $RELEASE_NAME_CURRENT to $RELEASE_NAME_NEXT..."
-                  helm upgrade $RELEASE_NAME_NEXT ./.k8s/ingress --namespace default --kubeconfig=kubeconfig.yml --set global.activeVersion=$NEXT_VERSION --debug
-            fi
-          else
-            echo "Ingress $RELEASE_NAME_NEXT already exists, no action required."
-          fi
-
-
-
-      
-      
-      
-
-      - name: Cleaning up old resources
-        run: |
-          if [[ "${CURRENT_VERSION}" != "" ]]; then
-            # Проверяем, существует ли релиз
-            if helm --kubeconfig=kubeconfig.yml list --namespace default --filter "^app-${env.CURRENT_VERSION}$" | grep -q "app-${env.CURRENT_VERSION}"; then
-              echo "Uninstalling old Helm release for the version: ${env.CURRENT_VERSION}"
-              helm --kubeconfig=kubeconfig.yml uninstall app-${env.CURRENT_VERSION} --namespace default
-              echo "Resources of the old application version ${env.CURRENT_VERSION} have been successfully deleted."
-            else
-              echo "Release app-${CURRENT_VERSION} does not exist. Moving on to the next step."
-            fi
-          else
-            echo "Version is not specified, no need to clean up old resources."
-          fi
-
-
-        
-      
-      
-
-      - name: Update current version information
-        run: |
-          kubectl create configmap app-version --from-literal=CURRENT_VERSION=${{ env.NEXT_VERSION }} --dry-run=client -o yaml | kubectl apply -f - --namespace default --kubeconfig=kubeconfig.yml
 

@@ -1,36 +1,15 @@
+{{- range .Values.apps }}
 apiVersion: v1
 kind: Service
 metadata:
-  #name: "service-{{ .Values.app.name }}-{{ .Values.component }}-{{ .Values.global.deploymentColor }}"
-  name: "account-service-{{ .Values.global.deploymentColor }}"
-  labels: # Добавленные лейблы для сервиса
-    type: "account-service"
-    version: "{{ .Values.account.version }}" # Новый лейбл с версией
+  name: {{ .name }}-service
 spec:
-  type: ClusterIP
+  type: {{ .service.type }}
   ports:
-    - port: 8300
-      targetPort: 8300
+    - port: {{ .service.port }}
+      targetPort: {{ .service.targetPort }}
   selector:
-    #app: "{{ .Values.app.name }}-{{ .Values.component }}-{{ .Values.global.deploymentColor }}"
-    app: "{{ .Values.app.name }}-account"
-    environment: "{{ .Values.global.deploymentColor }}"
+    app: {{ .name }}
 ---
-apiVersion: v1
-kind: Service
-metadata:
-  #name: "service-{{ .Values.app.name }}-{{ .Values.component }}-{{ .Values.global.deploymentColor }}"
-  name: "profile-service-{{ .Values.global.deploymentColor }}"
-  labels: # Добавленные лейблы для сервиса
-    type: "profile-service"
-    version: "{{ .Values.profile.version }}" # Новый лейбл с версие
-spec:
-  type: ClusterIP
-  ports:
-    - port: 8300
-      targetPort: 8300
-  selector:
-    #app: "{{ .Values.app.name }}-{{ .Values.component }}-{{ .Values.global.deploymentColor }}"
-    app: "{{ .Values.app.name }}-profile"
-    environment: "{{ .Values.global.deploymentColor }}"
+{{- end }}
 
