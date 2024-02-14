@@ -136,15 +136,15 @@ jobs:
             helm upgrade --install $RELEASE_NAME ./.k8s/charts/ --set account.image.tag=${{ github.sha }},profile.image.tag=${{ github.sha }} --namespace default --create-namespace --kubeconfig=kubeconfig.yml
 
             # Использование Argo Rollouts для начала процесса обновления
-            kubectl argo rollouts -n default restart rollout account-rollout --kubeconfig=kubeconfig.yml
-            kubectl argo rollouts -n default restart rollout profile-rollout --kubeconfig=kubeconfig.yml
+            kubectl argo restart rollout account-rollout -n default --kubeconfig=kubeconfig.yml
+            kubectl argo restart rollout profile-rollout -n default --kubeconfig=kubeconfig.yml
 
       #Проверка здоровья развертывания
       - name: Check health of new application versions
         run: |
             # Ожидание, пока развертывание не станет здоровым
-            kubectl argo rollouts -n default wait rollout profile-rollout --for condition=Healthy --kubeconfig=kubeconfig.yml
-            kubectl argo rollouts -n default wait rollout account-rollout --for condition=Healthy --kubeconfig=kubeconfig.yml
+            kubectl argo rollouts -n default wait profile-rollout --for condition=Healthy --kubeconfig=kubeconfig.yml
+            kubectl argo rollouts -n default wait account-rollout --for condition=Healthy --kubeconfig=kubeconfig.yml
             # Здесь можно добавить дополнительные тесты для проверки работоспособности приложения
             # Пример проверки доступности HTTP эндпоинта
             # curl --fail http://myapp.example.com/health || exit 1
