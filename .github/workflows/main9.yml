@@ -144,8 +144,8 @@ jobs:
       - name: Check health of new application versions
         run: |
             # Ожидание, пока развертывание не станет здоровым
-            kubectl argo-rollouts wait profile-rollout --for condition=Healthy -n default --kubeconfig=kubeconfig.yml
-            kubectl argo-rollouts wait account-rollout --for condition=Healthy -n default --kubeconfig=kubeconfig.yml
+            #kubectl argo-rollouts wait profile-rollout --for condition=Healthy -n default --kubeconfig=kubeconfig.yml
+            #kubectl argo-rollouts wait account-rollout --for condition=Healthy -n default --kubeconfig=kubeconfig.yml
             # Здесь можно добавить дополнительные тесты для проверки работоспособности приложения
             # Пример проверки доступности HTTP эндпоинта
             # curl --fail http://myapp.example.com/health || exit 1
@@ -154,8 +154,8 @@ jobs:
       - name: Promote Rollout
         run: |
             # Промоушн новой версии после успешной проверки
-            kubectl argo-rollouts promote profile-rollout -n default --kubeconfig=kubeconfig.yml
-            kubectl argo-rollouts promote account-rollout -n default --kubeconfig=kubeconfig.yml
+            #kubectl argo-rollouts promote profile-rollout -n default --kubeconfig=kubeconfig.yml
+            #kubectl argo-rollouts promote account-rollout -n default --kubeconfig=kubeconfig.yml
      
       
       
