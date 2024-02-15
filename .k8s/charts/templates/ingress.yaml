@@ -2,6 +2,10 @@ apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   name: minibank-ingress
+  annotations:
+    ingress.alb.yc.io/subnets: ingresbalance
+    ingress.alb.yc.io/security-groups: k8s
+    ingress.alb.yc.io/external-ipv4-address: 158.160.127.41
 spec:
   rules:
   - host: {{ .Values.global.ingress.host }}
