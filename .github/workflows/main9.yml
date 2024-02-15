@@ -73,8 +73,8 @@ jobs:
       - name: Build and push
         uses: docker/build-push-action@v5
         with:
-          context: ./profile
-          file: ./profile/Dockerfile
+          context: ./account
+          file: ./account/Dockerfile
           push: true
           tags: ${{ secrets.DOCKER_HUB_USERNAME }}/account:${{ github.sha }}
 
@@ -93,8 +93,8 @@ jobs:
       - name: Build and push
         uses: docker/build-push-action@v5
         with:
-          context: ./account
-          file: ./account/Dockerfile
+          context: ./profile
+          file: ./profile/Dockerfile
           push: true
           tags: ${{ secrets.DOCKER_HUB_USERNAME }}/profile:${{ github.sha }}
 
