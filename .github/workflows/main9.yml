@@ -141,8 +141,9 @@ jobs:
             # Обновление Helm чартов с новым образом
             helm install $RELEASE_NAME ./.k8s/charts/ --set global.imageTag=${{ github.sha }} --namespace default --kubeconfig=kubeconfig.yml
       
-            kubectl-argo-rollouts get rollout account-rollout -n default
-            kubectl-argo-rollouts get rollout profile-rollout -n default
+            kubectl-argo-rollouts get rollout account-rollout -n default --kubeconfig=kubeconfig.yml
+            kubectl-argo-rollouts get rollout profile-rollout -n default --kubeconfig=kubeconfig.yml
+          
             # Использование Argo Rollouts для начала процесса обновления
             #kubectl-argo-rollouts restart account-rollout -n default --kubeconfig=kubeconfig.yml
             #kubectl-argo-rollouts restart profile-rollout -n default --kubeconfig=kubeconfig.yml
