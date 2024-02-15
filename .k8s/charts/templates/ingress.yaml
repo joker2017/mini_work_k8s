@@ -3,8 +3,8 @@ kind: Ingress
 metadata:
   name: minibank-ingress
   annotations:
-    ingress.alb.yc.io/subnets: ingresbalance
-    ingress.alb.yc.io/security-groups: k8s
+    ingress.alb.yc.io/subnets: e9bcaajrdoservrkp4ec
+    ingress.alb.yc.io/security-groups: enpf64v0tbjnqti9rfkt
     ingress.alb.yc.io/external-ipv4-address: 158.160.127.41
 spec:
   rules:
