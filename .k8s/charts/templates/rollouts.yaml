@@ -18,18 +18,6 @@ spec:
           image: {{ .image.repository }}/{{ .name }}:{{ .image.tag }}
           ports:
             - containerPort: {{ .containerPort }}
-          livenessProbe:
-            httpGet:
-              path: /healthz
-              port: {{ .containerPort }}
-            initialDelaySeconds: 15
-            periodSeconds: 20
-          readinessProbe:
-            httpGet:
-              path: /ready
-              port: {{ .containerPort }}
-            initialDelaySeconds: 5
-            periodSeconds: 20
   strategy:
     blueGreen:
       activeService: {{ .name }}-service
