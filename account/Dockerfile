@@ -9,7 +9,8 @@ RUN apt-get update && \
 
 # Создаем рабочую директорию для приложения
 WORKDIR /app
-
+# Создаем директорию для статических файлов
+RUN mkdir -p /vol/web/static
 # Копируем файлы приложения в контейнер
 COPY . .
 RUN chown -R unit:unit /app
@@ -35,6 +36,7 @@ RUN mkdir -p /vol/web/static
 RUN python app/manage.py collectstatic --no-input
 # Указываем пути для статических файлов и медиа
 #VOLUME ["/vol/web"]
-
+# Вывод структуры директорий
+RUN ls -lah
 # Определяем порт, который будет прослушивать приложение
 EXPOSE 8300
