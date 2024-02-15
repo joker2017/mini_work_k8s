@@ -28,10 +28,3 @@ spec:
             name: profile-service
             port:
               number: 8300
-      - pathType: Prefix
-        path: "/"
-        backend:
-            service:
-              name: alb-demo-2
-              port:
-                name: http
