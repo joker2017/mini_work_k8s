@@ -139,7 +139,7 @@ jobs:
             RELEASE_NAME=minibank-release-${DATE}-${COMMIT_SHA}
           
             # Обновление Helm чартов с новым образом
-            helm install minibank-release ./.k8s/charts/ --set global.imageTag=${{ github.sha }} --namespace default --kubeconfig=kubeconfig.yml
+            helm upgrade --install minibank-release ./.k8s/charts/ --set global.imageTag=${{ github.sha }} --namespace default --kubeconfig=kubeconfig.yml
       
             kubectl-argo-rollouts get rollout account-rollout -n default --kubeconfig=kubeconfig.yml
             kubectl-argo-rollouts get rollout profile-rollout -n default --kubeconfig=kubeconfig.yml
