@@ -19,10 +19,16 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Set up Helm
-        uses: azure/setup-helm@v4
+      #- name: Set up Helm
+      #  uses: azure/setup-helm@v4
+      #  with:
+      #    version: v3.12.1
+
+      - uses: azure/setup-helm@v4
         with:
-          version: v3.12.1
+          version: '<version>' # default is latest (stable)
+          token: ${{ secrets.GITHUB_TOKEN }} # only needed if version is 'latest'
+        id: install
 
       - uses: actions/setup-python@v5
         with:
