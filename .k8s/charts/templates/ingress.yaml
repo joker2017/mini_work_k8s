@@ -5,13 +5,15 @@ metadata:
   annotations:
     ingress.alb.yc.io/external-ipv4-address: 158.160.130.249
     kubernetes.io/ingress.class: "nginx"
+    ingress.alb.yc.io/subnets: e9bcaajrdoservrkp4ec, e9bgptmrq2jisi775alg, e9bnutjnejhhcnimm19v
+    ingress.alb.yc.io/security-groups: enpf64v0tbjnqti9rfkt
 spec:
-  #tls:
-  #  - hosts:
-  #      - {{ .Values.global.ingress.host }}
-  #    secretName: yc-certmgr-cert-id-fpqnm4m3n74eqft6g5p1
+  tls:
+    - hosts:
+        - bmini.ru
+      secretName: yc-certmgr-cert-id-fpqnm4m3n74eqft6g5p1
   rules:
-  - host: {{ .Values.global.ingress.host }}
+  - host: bmini.ru
     http:
       paths:
       - path: /account
