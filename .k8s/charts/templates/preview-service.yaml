@@ -3,12 +3,12 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: {{ .name }}-service
+  name: {{ .name }}-preview-service
 spec:
   type: {{ .service.type }}
   ports:
-    - port: {{ .service.port }}
-      targetPort: {{ .service.targetPort }}
+  - port: {{ .service.port }}
+    targetPort: {{ .containerPort }}
   selector:
     app: {{ .name }}
 {{- end }}

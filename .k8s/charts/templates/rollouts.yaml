@@ -1,4 +1,5 @@
 {{- range .Values.apps }}
+--
 apiVersion: argoproj.io/v1alpha1
 kind: Rollout
 metadata:
@@ -23,5 +24,4 @@ spec:
       activeService: {{ .name }}-service
       previewService: {{ .name }}-preview-service
       autoPromotionEnabled: false
----
 {{- end }}
