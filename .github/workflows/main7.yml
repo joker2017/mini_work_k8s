@@ -36,45 +36,13 @@ jobs:
         run: |
           echo "${{ secrets.KUBECONFIG }}" | kubectl --kubeconfig=/dev/stdin auth can-i create pods --namespace default   
       
-      # Ingress-контроллера NGINX
-      #- name: Create Ingress
-      #  run: |
-      #    echo "${{ secrets.KUBECONFIG }}" | kubectl --kubeconfig=/dev/stdin helm repo add ingress-nginx https://kubernetes.github.io/ingress-nginx
-
-      - name: TEST!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+       #Ingress-контроллера NGINX
+      - name: Create Ingress
         run: |
-          echo "${{ secrets.KUBECONFIG }}" | kubectl --kubeconfig=/dev/stdin get configmap app-version -o=jsonpath='{.data.CURRENT_VERSION}' || echo ""
-          
-          
+          echo "${{ secrets.KUBECONFIG }}" | kubectl --kubeconfig=/dev/stdin helm repo add ingress-nginx https://kubernetes.github.io/ingress-nginx
+
+      
           
 
-      - name: Wait for Pod to be Ready in Loop
-        run: |
-          end=$(date +%s) # current time
-          timeout=$((end + 360)) # 6 minutes from now
-          while [ $(date +%s) -lt $timeout ]; do
-            statuses=$(echo "${{ secrets.KUBECONFIG }}" | kubectl --kubeconfig=/dev/stdin get pods -l app=test-app -o jsonpath='{.items[*].status.phase}')
-            ready=true
-            for status in $statuses; do
-              if [[ "$status" != "Running" ]]; then
-                ready=false
-                break
-              fi
-            done
-            if [ "$ready" = true ]; then
-              echo "All pods are ready"
-              break
-            fi
-            echo "Waiting for all pods to be ready... Current statuses: $statuses"
-            sleep 5
-          done
-          if [ "$ready" != true ]; then
-            echo "Not all pods became ready in time"
-            exit 1
-          fi
-        shell: /usr/bin/bash -e {0}
+      
 
-
-      - name: install ingress
-        run: |
-          echo "${{ secrets.KUBECONFIG }}" | kubectl --kubeconfig=/dev/stdin apply -f .github/workflows/your-pod-definition.yaml
