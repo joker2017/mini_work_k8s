@@ -154,8 +154,8 @@ jobs:
       - name: Promote Rollout
         run: |
             # Промоушн новой версии после успешной проверки
-            kubectl argo-rollouts promote profile-rollout -n default --kubeconfig=kubeconfig.yml
-            kubectl argo-rollouts promote account-rollout -n default --kubeconfig=kubeconfig.yml
+            kubectl-argo-rollouts promote profile-rollout -n default --kubeconfig=kubeconfig.yml
+            kubectl-argo-rollouts promote account-rollout -n default --kubeconfig=kubeconfig.yml
      
       
       
