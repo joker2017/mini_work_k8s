@@ -2,6 +2,7 @@ apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   name: minibank-ingress
+  namespace: ns
   annotations:
     ingress.alb.yc.io/external-ipv4-address: 158.160.146.151
     kubernetes.io/ingress.class: "nginx"
@@ -11,7 +12,7 @@ spec:
   tls:
     - hosts:
         - bmini.ru
-      secretName: yc-certmgr-cert-id-fpqnm4m3n74eqft6g5p1
+      secretName: k8s-secret
   rules:
   - host: bmini.ru
     http:
