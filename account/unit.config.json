@@ -11,7 +11,7 @@
           "uri": "/static/*"
         },
         "action": {
-          "share": "/app/app/vol/web/static"
+          "share": "./app/vol/web/static"
         }
       },
       {
