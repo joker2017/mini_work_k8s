@@ -16,7 +16,7 @@ spec:
     spec:
       containers:
         - name: {{ .name }}
-          image: {{ .image.repository }}/{{ .name }}:{{ .image.tag }}
+          image: {{ .image.repository }}/{{ .name }}:{{ $.Values.global.imageTag }}
           ports:
             - containerPort: {{ .containerPort }}
   strategy:
