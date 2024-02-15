@@ -3,8 +3,6 @@ kind: Ingress
 metadata:
   name: minibank-ingress
   annotations:
-    ingress.alb.yc.io/subnets: e9bcaajrdoservrkp4ec, e9bgptmrq2jisi775alg, e9bnutjnejhhcnimm19v
-    ingress.alb.yc.io/security-groups: enpf64v0tbjnqti9rfkt
     ingress.alb.yc.io/external-ipv4-address: 158.160.130.249
     kubernetes.io/ingress.class: "nginx"
 spec:
@@ -26,3 +24,10 @@ spec:
             name: profile-service
             port:
               number: 8300
+      - pathType: Prefix
+        path: "/"
+        backend:
+            service:
+              name: alb-demo-2
+              port:
+                name: http
