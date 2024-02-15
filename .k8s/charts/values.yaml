@@ -1,7 +1,7 @@
 global:
   imageTag: latest
   ingress:
-    host: dmini.ru
+    host: bmini.ru
 
 apps:
   - name: account

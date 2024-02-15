@@ -6,6 +6,10 @@ metadata:
     ingress.alb.yc.io/external-ipv4-address: 158.160.130.249
     kubernetes.io/ingress.class: "nginx"
 spec:
+  tls:
+    - hosts:
+        - {{ .Values.global.ingress.host }}
+      secretName: yc-certmgr-cert-id-fpqnm4m3n74eqft6g5p1
   rules:
   - host: {{ .Values.global.ingress.host }}
     http:
