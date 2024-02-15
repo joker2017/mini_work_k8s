@@ -1,5 +1,5 @@
 {{- range .Values.apps }}
---
+---
 apiVersion: argoproj.io/v1alpha1
 kind: Rollout
 metadata:
