@@ -146,19 +146,19 @@ jobs:
           
           
             # Добавляем задержку для стабилизации подов
-            echo "Waiting for pods to stabilize"
-            sleep 60
+            #echo "Waiting for pods to stabilize"
+            #sleep 60
           
             # Предполагается, что поды уже стабилизировались после развертывания
             # Выполнение миграций для пода приложения account
-            echo "Applying migrations for the account application"
-            ACCOUNT_POD=$(kubectl get pods -l app=account -n default -o jsonpath="{.items[0].metadata.name}")
-            kubectl exec $ACCOUNT_POD -n default --kubeconfig=kubeconfig.yml -- python manage.py migrate
+            #echo "Applying migrations for the account application"
+            #ACCOUNT_POD=$(kubectl get pods -l app=account -n default -o jsonpath="{.items[0].metadata.name}")
+            #kubectl exec $ACCOUNT_POD -n default --kubeconfig=kubeconfig.yml -- python manage.py migrate
             
             # Выполнение миграций для пода приложения profile
-            echo "Applying migrations for the profile application"
-            PROFILE_POD=$(kubectl get pods -l app=profile -n default -o jsonpath="{.items[0].metadata.name}")
-            kubectl exec $PROFILE_POD -n default --kubeconfig=kubeconfig.yml -- python manage.py migrate
+            #echo "Applying migrations for the profile application"
+            #PROFILE_POD=$(kubectl get pods -l app=profile -n default -o jsonpath="{.items[0].metadata.name}")
+            #kubectl exec $PROFILE_POD -n default --kubeconfig=kubeconfig.yml -- python manage.py migrate
 
       - name: Wait for Rollout to be ready (Account Service)
         run: |
