@@ -1,5 +1,5 @@
 FROM nginx/unit:1.26.1-python3.9
-
+WORKDIR /app
 # Установка зависимостей проекта
 COPY requirements.txt /tmp/
 RUN pip install --no-cache-dir -r /tmp/requirements.txt
@@ -9,7 +9,7 @@ COPY . .
 
 # Настройка рабочего каталога
 WORKDIR /app
-
+RUN ls -lah
 # Команда для сбора статических файлов Django
 RUN python app/manage.py collectstatic --noinput
 
