@@ -9,11 +9,11 @@ from flags.urls import flagged_path, flagged_paths, flagged_re_path, flagged_re_
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    flagged_path('ACCOUNT_LIST_FLAG', 'account/list/', AccountList.as_view({'get': 'list'}), state=False),
-    flagged_path('ACCOUNT_CREATE_FLAG', 'account/create/', AccountCreate.as_view({'post': 'create'}), state=False),
-    flagged_path('ACCOUNT_UPDATE_FLAG', 'account/update/<str:pk>/', AccountUpdate.as_view(), state=False),
-    flagged_path('ACCOUNT_DESTROY_FLAG', 'account/destroy/<str:pk>/', AccountDestroy.as_view(), state=False),
-    flagged_path('ACCOUNT_DETAIL_FLAG', 'account/detail/<str:usernameid>/', AccountDetail.as_view(), state=False),
+    flagged_path('ACCOUNT_LIST_FLAG', 'list/', AccountList.as_view({'get': 'list'}), state=False),
+    flagged_path('ACCOUNT_CREATE_FLAG', 'create/', AccountCreate.as_view({'post': 'create'}), state=False),
+    flagged_path('ACCOUNT_UPDATE_FLAG', 'update/<str:pk>/', AccountUpdate.as_view(), state=False),
+    flagged_path('ACCOUNT_DESTROY_FLAG', 'destroy/<str:pk>/', AccountDestroy.as_view(), state=False),
+    flagged_path('ACCOUNT_DETAIL_FLAG', 'detail/<str:usernameid>/', AccountDetail.as_view(), state=False),
     
 
 ]
