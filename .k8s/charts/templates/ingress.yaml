@@ -18,14 +18,14 @@ spec:
   - host: bmini.ru
     http:
       paths:
-      - path: /account(/|$)(.*)
+      - path: /account
         pathType: Prefix
         backend:
           service:
             name: account-service
             port:
               number: 8300
-      - path: /profile(/|$)(.*)
+      - path: /profile
         pathType: Prefix
         backend:
           service:
