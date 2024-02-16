@@ -171,16 +171,16 @@ jobs:
       - name: Apply Django makemigrations, migrate and collectstatic (Account Service)
         run: |
           ACCOUNT_POD=$(kubectl get pod -l app=account -n default -o jsonpath="{.items[0].metadata.name}" --kubeconfig=kubeconfig.yml)
-          kubectl exec $ACCOUNT_POD -n default --kubeconfig=kubeconfig.yml -- python manage.py makemigrations
-          kubectl exec $ACCOUNT_POD -n default --kubeconfig=kubeconfig.yml -- python manage.py migrate
-          kubectl exec $ACCOUNT_POD -n default --kubeconfig=kubeconfig.yml -- python manage.py collectstatic --noinput
+          kubectl exec $ACCOUNT_POD -n default --kubeconfig=kubeconfig.yml -- python ./app/manage.pymanage.py makemigrations
+          kubectl exec $ACCOUNT_POD -n default --kubeconfig=kubeconfig.yml -- python ./app/manage.pymanage.py migrate
+          kubectl exec $ACCOUNT_POD -n default --kubeconfig=kubeconfig.yml -- python ./app/manage.pymanage.py collectstatic --noinput
 
       - name: Apply Django makemigrations, migrate and collectstatic (Profile Service)
         run: |
           PROFILE_POD=$(kubectl get pod -l app=profile -n default -o jsonpath="{.items[0].metadata.name}" --kubeconfig=kubeconfig.yml)
-          kubectl exec $PROFILE_POD -n default --kubeconfig=kubeconfig.yml -- python manage.py makemigrations
-          kubectl exec $PROFILE_POD -n default --kubeconfig=kubeconfig.yml -- python manage.py migrate
-          kubectl exec $PROFILE_POD -n default --kubeconfig=kubeconfig.yml -- python manage.py collectstatic --noinput
+          kubectl exec $PROFILE_POD -n default --kubeconfig=kubeconfig.yml -- python ./app/manage.pymanage.py makemigrations
+          kubectl exec $PROFILE_POD -n default --kubeconfig=kubeconfig.yml -- python ./app/manage.pymanage.py migrate
+          kubectl exec $PROFILE_POD -n default --kubeconfig=kubeconfig.yml -- python ./app/manage.pymanage.py collectstatic --noinput
 
       - name: Promote Rollout (Account Service)
         run: |
