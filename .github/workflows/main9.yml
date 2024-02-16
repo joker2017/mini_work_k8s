@@ -152,8 +152,9 @@ jobs:
             # Предполагается, что поды уже стабилизировались после развертывания
             # Выполнение миграций для пода приложения account
             #echo "Applying migrations for the account application"
-            #ACCOUNT_POD=$(kubectl get pods -l app=account -n default -o jsonpath="{.items[0].metadata.name}")
-            #kubectl exec $ACCOUNT_POD -n default --kubeconfig=kubeconfig.yml -- python manage.py migrate
+            ACCOUNT_POD=$(kubectl get pods -l app=account -n default -o jsonpath="{.items[0].metadata.name}")
+            echo "Applying migrations for the account application $ACCOUNT_POD"
+            kubectl exec $ACCOUNT_POD -n default --kubeconfig=kubeconfig.yml -- python ./app/manage.py migrate
             
             # Выполнение миграций для пода приложения profile
             #echo "Applying migrations for the profile application"
@@ -170,7 +171,7 @@ jobs:
 
       - name: Apply Django makemigrations, migrate and collectstatic (Account Service)
         run: |
-          #ACCOUNT_POD=$(kubectl get pod -l app=account -n default -o jsonpath="{.items[0].metadata.name}" --kubeconfig=kubeconfig.yml)
+          #ACCOUNT_POD=$(kubectl get pod app=account -n default -o jsonpath="{.items[0].metadata.name}" --kubeconfig=kubeconfig.yml)
           #kubectl exec $ACCOUNT_POD -n default --kubeconfig=kubeconfig.yml -- python ./app/manage.py makemigrations
           #kubectl exec $ACCOUNT_POD -n default --kubeconfig=kubeconfig.yml -- python ./app/manage.py migrate
           #kubectl exec $ACCOUNT_POD -n default --kubeconfig=kubeconfig.yml -- python ./app/manage.py collectstatic --noinput

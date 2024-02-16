@@ -12,7 +12,7 @@ COPY . .
 WORKDIR /app
 RUN ls -lah
 # Команда для сбора статических файлов Django
-RUN python app/manage.py collectstatic --noinput
+#RUN python app/manage.py collectstatic --noinput
 
 # Выставление прав доступа
 RUN chown -R unit:unit /app
