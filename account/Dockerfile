@@ -1,4 +1,5 @@
-FROM nginx/unit:1.26.1-python3.9
+#FROM nginx/unit:1.26.1-python3.9
+FROM unit:1.31.1-python3.11
 WORKDIR /app
 # Установка зависимостей проекта
 COPY requirements.txt /tmp/
