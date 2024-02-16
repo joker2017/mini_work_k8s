@@ -1,39 +1,7 @@
-{
-  "listeners": {
-    "*:8300": {
-      "pass": "routes"
-    }
-  },
-  "routes": [
-
-      {
-        "match": {
-          "uri": "/static/*"
-        },
-        "action": {
-          "share": "/app/app/vol/web/static"
-        }
-      },
-      {
-        "action": {
-          "pass": "applications/account"
-        }
-      }
-    ],
-  "applications": {
-    "account": {
-      "type": "python",
-      "path": "./app",
-      "module": "app.wsgi",
-      "callable": "application"
-    }
-  }
-}
-
 
 {
     "listeners": {
-        "*:80": {
+        "*:8300": {
             "pass": "routes"
         }
     },
