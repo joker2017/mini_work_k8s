@@ -1,42 +1,23 @@
-# Используем официальный образ NGINX Unit для Python
-FROM unit:1.31.1-python3.11
-#FROM unit:1.31.1-minimal
-# Обновляем список пакетов и устанавливаем необходимые зависимости
-RUN apt-get update && \
-    apt-get install -y gcc && \
-    apt-get clean && \
-    rm -rf /var/lib/apt/lists/*
+FROM nginx/unit:1.26.1-python3.9
 
-# Создаем рабочую директорию для приложения
+# Установка зависимостей проекта
+COPY requirements.txt /tmp/
+RUN pip install --no-cache-dir -r /tmp/requirements.txt
+
+# Копирование проекта в контейнер
+COPY . /app
+
+# Настройка рабочего каталога
 WORKDIR /app
-# Создаем директорию для статических файлов
-#RUN mkdir -p /vol/web/static
-# Копируем файлы приложения в контейнер
-COPY . .
+
+# Команда для сбора статических файлов Django
+RUN python manage.py collectstatic --noinput
+
+# Выставление прав доступа
 RUN chown -R unit:unit /app
 
-# Установка tree для просмотра структуры директорий, если необходимо
-RUN apt-get update && apt-get install -y tree && apt-get clean
-# Вывод структуры директорий
-RUN ls -lah
-# Или используйте tree для более детального представления
-RUN tree
-
-
-
-# Устанавливаем зависимости Python из файла requirements.txt
-RUN pip install --no-cache-dir -r requirements.txt
-
-# Копируем конфигурационный файл NGINX Unit для автоматической настройки
+# Удаление файла конфигурации по умолчанию и копирование нашей конфигурации
+RUN rm -f /docker-entrypoint.d/*.json
 COPY unit.config.json /docker-entrypoint.d/config.json
-# Выполняем команду collectstatic для Django
-# Обратите внимание, что вы должны настроить Django на использование файловой системы для статических файлов
-# Это может потребовать изменения в settings.py вашего приложения Django
-#RUN mkdir -p /vol/web/static
-RUN python app/manage.py collectstatic --no-input
-# Указываем пути для статических файлов и медиа
-#VOLUME ["/vol/web"]
-# Вывод структуры директорий
-RUN ls -lah
 # Определяем порт, который будет прослушивать приложение
 EXPOSE 8300

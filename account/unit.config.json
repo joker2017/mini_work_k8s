@@ -29,3 +29,40 @@
     }
   }
 }
+
+
+{
+    "listeners": {
+        "*:80": {
+            "pass": "routes"
+        }
+    },
+
+    "routes": [
+        {
+            "match": {
+                "uri": "/static/*"
+            },
+
+            "action": {
+                "share": "/app/static$uri"
+            }
+        },
+        {
+            "action": {
+                "pass": "applications/django"
+            }
+        }
+    ],
+
+    "applications": {
+        "django": {
+            "type": "python 3.9",
+            "path": "./app",
+            "module": "app.wsgi",
+            "environment": {
+                "DJANGO_SETTINGS_MODULE": "app.settings"
+            }
+        }
+    }
+}
