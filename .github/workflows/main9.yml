@@ -144,26 +144,53 @@ jobs:
             kubectl-argo-rollouts get rollout account-rollout -n default --kubeconfig=kubeconfig.yml
             kubectl-argo-rollouts get rollout profile-rollout -n default --kubeconfig=kubeconfig.yml
           
-            # Использование Argo Rollouts для начала процесса обновления
-            #kubectl-argo-rollouts restart account-rollout -n default --kubeconfig=kubeconfig.yml
-            #kubectl-argo-rollouts restart profile-rollout -n default --kubeconfig=kubeconfig.yml
+          
+            # Добавляем задержку для стабилизации подов
+            echo "Waiting for pods to stabilize"
+            sleep 60
+          
+            # Предполагается, что поды уже стабилизировались после развертывания
+            # Выполнение миграций для пода приложения account
+            echo "Applying migrations for the account application"
+            ACCOUNT_POD=$(kubectl get pods -l app=account -n default -o jsonpath="{.items[0].metadata.name}")
+            kubectl exec $ACCOUNT_POD -n default --kubeconfig=kubeconfig.yml -- python manage.py migrate
+            
+            # Выполнение миграций для пода приложения profile
+            echo "Applying migrations for the profile application"
+            PROFILE_POD=$(kubectl get pods -l app=profile -n default -o jsonpath="{.items[0].metadata.name}")
+            kubectl exec $PROFILE_POD -n default --kubeconfig=kubeconfig.yml -- python manage.py migrate
 
-      #Проверка здоровья развертывания
-      - name: Check health of new application versions
+      - name: Wait for Rollout to be ready (Account Service)
         run: |
-            # Ожидание, пока развертывание не станет здоровым
-            #kubectl argo-rollouts wait profile-rollout --for condition=Healthy -n default --kubeconfig=kubeconfig.yml
-            #kubectl argo-rollouts wait account-rollout --for condition=Healthy -n default --kubeconfig=kubeconfig.yml
-            # Здесь можно добавить дополнительные тесты для проверки работоспособности приложения
-            # Пример проверки доступности HTTP эндпоинта
-            # curl --fail http://myapp.example.com/health || exit 1
+          kubectl-argo-rollouts status account-rollout -n default --watch --timeout=600s --kubeconfig=kubeconfig.yml
 
-      #Продвижение развертывания
-      - name: Promote Rollout
+      - name: Wait for Rollout to be ready (Profile Service)
         run: |
-            # Промоушн новой версии после успешной проверки
-            kubectl-argo-rollouts promote profile-rollout -n default --kubeconfig=kubeconfig.yml
-            kubectl-argo-rollouts promote account-rollout -n default --kubeconfig=kubeconfig.yml
+          kubectl-argo-rollouts status profile-rollout -n default --watch --timeout=600s --kubeconfig=kubeconfig.yml
+
+      - name: Apply Django makemigrations, migrate and collectstatic (Account Service)
+        run: |
+          ACCOUNT_POD=$(kubectl get pod -l app=account -n default -o jsonpath="{.items[0].metadata.name}" --kubeconfig=kubeconfig.yml)
+          kubectl exec $ACCOUNT_POD -n default --kubeconfig=kubeconfig.yml -- python manage.py makemigrations
+          kubectl exec $ACCOUNT_POD -n default --kubeconfig=kubeconfig.yml -- python manage.py migrate
+          kubectl exec $ACCOUNT_POD -n default --kubeconfig=kubeconfig.yml -- python manage.py collectstatic --noinput
+
+      - name: Apply Django makemigrations, migrate and collectstatic (Profile Service)
+        run: |
+          PROFILE_POD=$(kubectl get pod -l app=profile -n default -o jsonpath="{.items[0].metadata.name}" --kubeconfig=kubeconfig.yml)
+          kubectl exec $PROFILE_POD -n default --kubeconfig=kubeconfig.yml -- python manage.py makemigrations
+          kubectl exec $PROFILE_POD -n default --kubeconfig=kubeconfig.yml -- python manage.py migrate
+          kubectl exec $PROFILE_POD -n default --kubeconfig=kubeconfig.yml -- python manage.py collectstatic --noinput
+
+      - name: Promote Rollout (Account Service)
+        run: |
+          kubectl-argo-rollouts promote account-rollout -n default --kubeconfig=kubeconfig.yml
+
+      - name: Promote Rollout (Profile Service)
+        run: |
+          kubectl-argo-rollouts promote profile-rollout -n default --kubeconfig=kubeconfig.yml
+
+      
      
       
       
