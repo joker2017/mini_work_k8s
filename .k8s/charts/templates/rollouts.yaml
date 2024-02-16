@@ -23,5 +23,5 @@ spec:
     blueGreen:
       activeService: {{ .name }}-service
       previewService: {{ .name }}-preview-service
-      autoPromotionEnabled: true
+      autoPromotionEnabled: false
 {{- end }}

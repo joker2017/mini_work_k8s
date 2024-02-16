@@ -153,8 +153,8 @@ jobs:
             # Выполнение миграций для пода приложения account
             echo "Applying migrations for the account application"
             ACCOUNT_POD=$(kubectl get pods -l account-rollout -n default -o jsonpath="{.items[0].metadata.name}")
-            echo "Applying migrations for the account application $ACCOUNT_POD"
-            kubectl exec $ACCOUNT_POD -n default --kubeconfig=kubeconfig.yml -- python ./app/manage.py migrate
+            echo "!!!!!!!! Applying migrations for the account application $ACCOUNT_POD"
+            #kubectl exec $ACCOUNT_POD -n default --kubeconfig=kubeconfig.yml -- python ./app/manage.py migrate
             
             # Выполнение миграций для пода приложения profile
             #echo "Applying migrations for the profile application"
