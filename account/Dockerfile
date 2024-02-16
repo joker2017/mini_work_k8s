@@ -11,7 +11,7 @@ COPY . .
 WORKDIR /app
 
 # Команда для сбора статических файлов Django
-RUN python manage.py collectstatic --noinput
+RUN python app/manage.py collectstatic --noinput
 
 # Выставление прав доступа
 RUN chown -R unit:unit /app
