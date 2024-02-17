@@ -1,7 +1,6 @@
 #FROM nginx/unit:1.26.1-python3.9
 FROM unit:1.31.1-python3.11
-RUN chown -R unit:unit ./
-RUN mkdir -p /vol/web/static/
+
 RUN ls -lah
 WORKDIR /app
 # Установка зависимостей проекта
@@ -13,7 +12,8 @@ COPY . .
 
 # Настройка рабочего каталога
 #WORKDIR /app
-
+RUN chown -R unit:unit ./
+RUN mkdir -p /vol/web/static/
 
 # Команда для сбора статических файлов Django
 #RUN python app/manage.py collectstatic --noinput
