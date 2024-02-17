@@ -1,5 +1,8 @@
 #FROM nginx/unit:1.26.1-python3.9
 FROM unit:1.31.1-python3.11
+RUN chown -R unit:unit ./
+RUN mkdir -p /vol/web/static/
+RUN ls -lah
 WORKDIR /app
 # Установка зависимостей проекта
 COPY requirements.txt /tmp/
@@ -17,7 +20,7 @@ COPY . .
 
 # Выставление прав доступа
 RUN chown -R unit:unit ./
-RUN mkdir -p /vol/web/static
+RUN mkdir -p /vol/web/static/
 RUN ls -lah
 # Удаление файла конфигурации по умолчанию и копирование нашей конфигурации
 RUN rm -f /docker-entrypoint.d/*.json

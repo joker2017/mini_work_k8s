@@ -13,7 +13,7 @@
             },
 
             "action": {
-                "share": "app/vol/web/static/$uri"
+                "share": "/vol/web/static/$uri"
             }
         },
         {
