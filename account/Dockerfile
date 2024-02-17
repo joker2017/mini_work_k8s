@@ -12,15 +12,14 @@ COPY . .
 
 # Настройка рабочего каталога
 #WORKDIR /app
+# Выставление прав доступа
 RUN chown -R unit:unit ./
-RUN mkdir -p /vol/web/static/
-
+RUN mkdir -p /app/static/
+RUN chown -R unit:unit app/static
 # Команда для сбора статических файлов Django
 #RUN python app/manage.py collectstatic --noinput
 
-# Выставление прав доступа
-RUN chown -R unit:unit ./
-RUN mkdir -p /vol/web/static/
+#RUN mkdir -p /vol/web/static/
 RUN ls -lah
 # Удаление файла конфигурации по умолчанию и копирование нашей конфигурации
 RUN rm -f /docker-entrypoint.d/*.json
