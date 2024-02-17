@@ -13,7 +13,7 @@
             },
 
             "action": {
-                "share": "/app/static"
+                "share": "/static/"
             }
         },
         {
@@ -28,7 +28,7 @@
             "type": "python 3",
             "processes": 4,
             "threads": 4,
-            "path": "./app",
+            "path": "/app/app",
             "module": "app.wsgi"
 
             }
