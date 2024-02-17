@@ -13,7 +13,7 @@
             },
 
             "action": {
-                "share": "/vol/web/static/"
+                "share": "/app/$uri"
             }
         },
         {
@@ -28,10 +28,10 @@
             "type": "python 3",
             "processes": 4,
             "threads": 4,
-            "path": "./app",
+            "path": "/app",
             "module": "app.wsgi"
 
             }
         }
     }
-}
+
