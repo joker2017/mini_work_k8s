@@ -1,0 +1,58 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  #name: "{{ .Values.app.name }}-{{ .Values.component }}-{{ .Values.global.deploymentColor }}"
+  name: "{{ .Values.app.name }}-account-{{ .Values.global.deploymentColor }}"
+  labels: # Добавленные лейблы для деплоймента
+    type: "account"
+    version: "{{ .Values.account.version }}" # Новый лейбл с версией
+spec:
+  replicas: {{ .Values.replicaCount }}
+  selector:
+    matchLabels:
+       #app: "{{ .Values.app.name }}-{{ .Values.component }}-{{ .Values.global.deploymentColor }}"
+       app: "{{ .Values.app.name }}-account"
+       environment: {{ .Values.global.deploymentColor }}
+  template:
+    metadata:
+      labels:   #!!!!!!!!!!!!!!!!!!!!!!!!!!
+         type: "account" # Добавьте лейблы сюда
+         version: "{{ .Values.account.version }}" # Добавьте лейблы сюда
+         app: "{{ .Values.app.name }}-account"
+         environment: {{ .Values.global.deploymentColor }}
+    spec:
+      containers:
+        - name: account
+          image: "{{ .Values.account.image.repository }}/account:{{ .Values.account.image.tag }}"
+          ports:
+            - containerPort: 8300
+
+
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: "{{ .Values.app.name }}-profile-{{ .Values.global.deploymentColor }}"
+  labels: # Добавленные лейблы для деплоймента
+    type: "profile"
+    version: "{{ .Values.profile.version }}" # Новый лейбл с версией
+spec:
+  replicas: {{ .Values.replicaCount }}
+  selector:
+    matchLabels:
+      app: "{{ .Values.app.name }}-profile"
+      environment: "{{ .Values.global.deploymentColor }}"
+  template:
+    metadata:
+      labels:
+        type: "profile" # Добавьте лейблы сюда
+        version: "{{ .Values.profile.version }}" # Добавьте лейблы сюда
+        app: "{{ .Values.app.name }}-profile"
+        environment: "{{ .Values.global.deploymentColor }}"
+    spec:
+      containers:
+      - name: profile
+        image: "{{ .Values.profile.image.repository }}/profile:{{ .Values.profile.image.tag }}"
+        ports:
+        - containerPort: 8300

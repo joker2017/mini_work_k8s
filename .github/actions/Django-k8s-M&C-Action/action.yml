@@ -67,7 +67,7 @@ runs:
           sleep 5
         done
 
-    # Шаг 4: Применение миграций Django и сбор статических файлов
+    # Шаг 4: Применение миграций Django и сбор статических файлов !!!!
     - name: Apply Django migrations and collect static files
       shell: bash
       run: |

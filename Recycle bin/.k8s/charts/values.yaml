@@ -1,0 +1,45 @@
+global:
+  imagePullSecrets: []
+  deploymentColor: green # Добавляем переменную deploymentColor и устанавливаем ее значение по умолчанию
+  activeVersion:
+
+
+app:
+  name: "minibank"
+  port: 8080
+
+component: ""  # Этот параметр будет переопределён в командной строке Helm
+
+service:
+  type: ClusterIP
+
+ingress:
+  #enabled: true
+  host: "example.com"
+  type: ClusterIP
+  manage: false
+#environment: "green"
+
+replicaCount: 1
+
+account:
+  name: account
+  port: 8082
+  version:
+  image:
+    repository: "${{ secrets.DOCKER_HUB_USERNAME }}"
+    tag:
+  service:
+    port: 80
+
+
+profile:
+  name: profile
+  port: 8081
+  version:
+  image:
+    repository: "${{ secrets.DOCKER_HUB_USERNAME }}"
+    tag:
+  service:
+    port: 80
+
