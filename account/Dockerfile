@@ -13,8 +13,9 @@ COPY . .
 # Настройка рабочего каталога
 #WORKDIR /app
 # Выставление прав доступа
-RUN chown -R unit:unit ./
+
 RUN mkdir -p /app/static/
+RUN chown -R unit:unit ./
 RUN ls -la app/
 RUN id unit
 RUN chown -R unit:unit app/static
