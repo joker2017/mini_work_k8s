@@ -16,7 +16,7 @@ COPY . .
 #RUN python app/manage.py collectstatic --noinput
 
 # Выставление прав доступа
-RUN chown -R unit:unit /app
+RUN chown -R unit:unit ./
 RUN mkdir -p /vol/web/static
 RUN ls -lah
 # Удаление файла конфигурации по умолчанию и копирование нашей конфигурации
