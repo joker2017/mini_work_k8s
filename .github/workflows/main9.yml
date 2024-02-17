@@ -130,7 +130,7 @@ jobs:
             STATUS=""
             while [[ "$STATUS" != *"Paused - BlueGreenPause"* ]]; do
               echo "Checking rollout status..."
-              STATUS=$(kubectl argo rollouts status ${{ app }}-rollout --watch=false --kubeconfig=kubeconfig.yml)
+              STATUS=$(kubectl argo rollouts status ${{ matrix.app }}-rollout --watch=false --kubeconfig=kubeconfig.yml)
               echo "$STATUS"
               if [[ "$STATUS" == *"Paused - BlueGreenPause"* ]]; then
                 break
