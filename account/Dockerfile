@@ -16,9 +16,7 @@ COPY . .
 
 RUN mkdir -p app/static/
 #RUN chown -R unit:unit ./
-RUN ls -la app/
-RUN id unit
-RUN chown -R unit:unit app/static/
+
 # Команда для сбора статических файлов Django
 #RUN python app/manage.py collectstatic --noinput
 WORKDIR /app
@@ -27,6 +25,8 @@ RUN ls -lah
 # Удаление файла конфигурации по умолчанию и копирование нашей конфигурации
 RUN rm -f /docker-entrypoint.d/*.json
 COPY unit.config.json /docker-entrypoint.d/config.json
+RUN chown -R unit:unit /app
+#RUN chown -R unit:unit app/static/
 # Определяем порт, который будет прослушивать приложение
 EXPOSE 8300
 #CMD ["unitd", "--no-daemon", "--control", "unix:/var/run/control.unit.sock"]
