@@ -13,7 +13,7 @@
             },
 
             "action": {
-                "share": "/static/"
+                "share": "/app/app/static"
             }
         },
         {
