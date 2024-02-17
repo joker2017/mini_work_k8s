@@ -59,7 +59,7 @@ runs:
         POD_STATUS=""
         while [[ "$POD_STATUS" != "Running" ]]; do
           echo "Checking pod status..."
-          POD_STATUS=$(kubectl get pod $LATEST_POD -o=jsonpath='{.status.phase}' --kubeconfig=${{ secrets.KUBE_CONFIG }}) || { echo "Failed to get pod status"; exit 1; }
+          POD_STATUS=$(kubectl get pod $LATEST_POD -o=jsonpath='{.status.phase}' --kubeconfig=${{ inputs.kubeconfig }}) || { echo "Failed to get pod status"; exit 1; }
           echo "Pod status: $POD_STATUS"
           if [[ "$POD_STATUS" == "Running" ]]; then
             break
