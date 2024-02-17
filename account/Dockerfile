@@ -24,7 +24,7 @@ WORKDIR /app
 RUN ls -lah
 # Удаление файла конфигурации по умолчанию и копирование нашей конфигурации
 RUN rm -f /docker-entrypoint.d/*.json
-COPY unit.config.json /docker-entrypoint.d/config.json
+COPY /unit.config.json /docker-entrypoint.d/config.json
 RUN chown -R unit:unit /app
 #RUN chown -R unit:unit app/static/
 # Определяем порт, который будет прослушивать приложение
