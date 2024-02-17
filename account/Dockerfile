@@ -10,8 +10,9 @@ COPY . .
 
 # Настройка рабочего каталога
 WORKDIR /app
-RUN ls -lah
 RUN mkdir -p /vol/web/static
+RUN ls -lah
+
 # Команда для сбора статических файлов Django
 #RUN python app/manage.py collectstatic --noinput
 
