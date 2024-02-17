@@ -111,13 +111,13 @@ jobs:
           helm upgrade --install minibank-release ./.k8s/charts/ --set global.imageTag=${{ github.sha }} --namespace default --kubeconfig=kubeconfig.yml
 
       - name: Migrate and collectstatic account
-        uses: action/Django-k8s-M&C-Action@main
+        uses: ./.github/action/Django-k8s-M&C-Action@main
         with:
           apps: account
           kubeconfig: kubeconfig.yml
 
       - name: Migrate and collectstatic profile
-        uses: action/Django-k8s-M&C-Action@main
+        uses: ./.github/action/Django-k8s-M&C-Action@main
         with:
           apps: profile
           kubeconfig: kubeconfig.yml

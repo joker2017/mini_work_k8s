@@ -1,0 +1,61 @@
+name: 'Django-k8s-M&C-Action'
+description: 'migrate and collectstatic in k8s with argo rollouts'
+inputs:
+  apps:
+    description: 'Name of the app'
+    required: true
+  kubeconfig:
+    description: 'Path to the kubeconfig file'
+    required: true
+runs:
+  using: 'composite'
+  steps:
+    - name: Check rollout status and get pod name
+      id: get_pod_name
+      run: |
+        # Проверяем статус rollout до получения "Paused - BlueGreenPause"
+        STATUS=""
+        while [[ "$STATUS" != *"Paused - BlueGreenPause"* ]]; do
+          echo "Checking rollout status..."
+          STATUS=$(kubectl argo rollouts status ${{ inputs.apps }}-rollout --watch=false --kubeconfig=${{ inputs.kubeconfig }})
+          echo "$STATUS"
+          if [[ "$STATUS" == *"Paused - BlueGreenPause"* ]]; then
+            break
+          fi
+          sleep 5
+        done
+
+        # Цикл для получения списка подов
+        POD_COUNT=0
+        while [ $POD_COUNT -le 1 ]; do
+          PODS=$(kubectl get pods -l app=${{ inputs.apps }} -o custom-columns=NAME:.metadata.name,CREATED:.metadata.creationTimestamp,STATUS:.status.phase -n default --sort-by=.metadata.creationTimestamp --kubeconfig=${{ inputs.kubeconfig }})
+          echo "$PODS"
+          POD_COUNT=$(echo "$PODS" | wc -l)
+          POD_COUNT=$((POD_COUNT-1))  # Уменьшаем на 1 из-за строки заголовка
+          if [ $POD_COUNT -gt 1 ]; then
+            break
+          fi
+          echo "Waiting for more pods..."
+          sleep 5
+        done
+
+        # Получение имени и статуса самого свежего пода
+        while true; do
+          POD_NAME=$(kubectl get pods --sort-by=.metadata.creationTimestamp -o jsonpath="{.items[-1:].metadata.name}" --kubeconfig=${{ inputs.kubeconfig }})
+          POD_STATUS=$(kubectl get pod $POD_NAME -o jsonpath="{.status.phase}" --kubeconfig=${{ inputs.kubeconfig }})
+          if [[ "$POD_STATUS" == "Running" ]]; then
+            echo "::set-output name=pod_name::$POD_NAME"
+            break
+          else
+            sleep 3
+          fi
+        done
+      shell: bash
+
+    - name: Apply Django migrations and collect static files
+      run: |
+        APP_POD=${{ steps.get_pod_name.outputs.pod_name }}
+        kubectl exec $APP_POD -n default --kubeconfig=${{ inputs.kubeconfig }} -- bash -c "python ./app/manage.py makemigrations"
+        kubectl exec $APP_POD -n default --kubeconfig=${{ inputs.kubeconfig }} -- bash -c "python ./app/manage.py migrate"
+        kubectl exec $APP_POD -n default --kubeconfig=${{ inputs.kubeconfig }} -- bash -c "python ./app/manage.py collectstatic --noinput"
+      shell: bash
