@@ -13,7 +13,7 @@
             },
 
             "action": {
-                "share": "/app/app$uri"
+                "share": "/app$uri"
             }
         },
         {
