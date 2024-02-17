@@ -1,5 +1,5 @@
 name: 'Django-k8s-M&C-Action'
-description: 'migrate and collectstatic in k8s with argo rollouts'
+description: 'Migrate and collectstatic in k8s with Argo Rollouts'
 inputs:
   apps:
     description: 'Name of the app'
@@ -10,14 +10,15 @@ inputs:
 runs:
   using: 'composite'
   steps:
+    # Шаг 1: Проверка статуса развертывания и получение имени пода
     - name: Check rollout status and get pod name
       id: get_pod_name
       run: |
-        # Проверяем статус rollout до получения "Paused - BlueGreenPause"
+        # Проверяем статус rollout до достижения состояния "Paused - BlueGreenPause"
         STATUS=""
         while [[ "$STATUS" != *"Paused - BlueGreenPause"* ]]; do
           echo "Checking rollout status..."
-          STATUS=$(kubectl argo rollouts status ${{ inputs.apps }}-rollout --watch=false --kubeconfig=${{ inputs.kubeconfig }})
+          STATUS=$(kubectl argo rollouts status ${{ inputs.apps }}-rollout --watch=false --kubeconfig=${{ inputs.kubeconfig }}) || { echo "Failed to get rollout status"; exit 1; }
           echo "$STATUS"
           if [[ "$STATUS" == *"Paused - BlueGreenPause"* ]]; then
             break
@@ -25,10 +26,10 @@ runs:
           sleep 5
         done
 
-        # Цикл для получения списка подов
+        # Цикл для получения списка подов, ждем пока не будет больше одного пода
         POD_COUNT=0
         while [ $POD_COUNT -le 1 ]; do
-          PODS=$(kubectl get pods -l app=${{ inputs.apps }} -o custom-columns=NAME:.metadata.name,CREATED:.metadata.creationTimestamp,STATUS:.status.phase -n default --sort-by=.metadata.creationTimestamp --kubeconfig=${{ inputs.kubeconfig }})
+          PODS=$(kubectl get pods -l app=${{ inputs.apps }} -o custom-columns=NAME:.metadata.name,CREATED:.metadata.creationTimestamp,STATUS:.status.phase -n default --sort-by=.metadata.creationTimestamp --kubeconfig=${{ inputs.kubeconfig }}) || { echo "Failed to get pods"; exit 1; }
           echo "$PODS"
           POD_COUNT=$(echo "$PODS" | wc -l)
           POD_COUNT=$((POD_COUNT-1))  # Уменьшаем на 1 из-за строки заголовка
@@ -38,20 +39,24 @@ runs:
           echo "Waiting for more pods..."
           sleep 5
         done
-      shell:
+      shell: bash
 
-      # Получение имени и статуса самого свежего пода
+    # Шаг 2: Получение имени последнего пода
     - name: Get the name of the latest pod
       run: |
-          LATEST_POD=$(kubectl get pods --sort-by=.metadata.creationTimestamp -o=custom-columns=NAME:.metadata.name,CREATED:.metadata.creationTimestamp --no-headers | tail -n 1 | awk '{print $1}')
+          LATEST_POD=$(kubectl get pods --sort-by=.metadata.creationTimestamp -o=custom-columns=NAME:.metadata.name,CREATED:.metadata.creationTimestamp --no-headers | tail -n 1 | awk '{print $1}') || { echo "Failed to get the latest pod"; exit 1; }
           echo "The latest pod is: $LATEST_POD"
           echo "LATEST_POD=$LATEST_POD" >> $GITHUB_ENV
       shell: bash
 
+    # Шаг 3: Применение миграций Django и сбор статических файлов
     - name: Apply Django migrations and collect static files
       run: |
+        # Устанавливаем переменную с именем последнего пода
         APP_POD=${{ env.LATEST_POD }}
-        kubectl exec $APP_POD -n default --kubeconfig=${{ inputs.kubeconfig }} -- bash -c "python ./app/manage.py makemigrations"
-        kubectl exec $APP_POD -n default --kubeconfig=${{ inputs.kubeconfig }} -- bash -c "python ./app/manage.py migrate"
-        kubectl exec $APP_POD -n default --kubeconfig=${{ inputs.kubeconfig }} -- python ./app/manage.py collectstatic --noinput
+        # Выполняем миграции внутри пода
+        kubectl exec $APP_POD -n default --kubeconfig=${{ inputs.kubeconfig }} -- bash -c "python ./app/manage.py makemigrations" || { echo "Failed to make migrations"; exit 1; }
+        kubectl exec $APP_POD -n default --kubeconfig=${{ inputs.kubeconfig }} -- bash -c "python ./app/manage.py migrate" || { echo "Failed to apply migrations"; exit 1; }
+        # Собираем статические файлы
+        kubectl exec $APP_POD -n default --kubeconfig=${{ inputs.kubeconfig }} -- python ./app/manage.py collectstatic --noinput || { echo "Failed to collect static files"; exit 1; }
       shell: bash
