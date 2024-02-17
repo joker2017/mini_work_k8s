@@ -15,6 +15,8 @@ COPY . .
 # Выставление прав доступа
 RUN chown -R unit:unit ./
 RUN mkdir -p /app/static/
+RUN ls -la app/
+RUN id unit
 RUN chown -R unit:unit app/static
 # Команда для сбора статических файлов Django
 #RUN python app/manage.py collectstatic --noinput
