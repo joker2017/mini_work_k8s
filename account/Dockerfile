@@ -14,11 +14,11 @@ COPY . .
 #WORKDIR /app
 # Выставление прав доступа
 
-RUN mkdir -p /app/static/
+RUN mkdir -p app/static/
 #RUN chown -R unit:unit ./
 RUN ls -la app/
 RUN id unit
-RUN chown -R unit:unit app/
+RUN chown -R unit:unit app/static/
 # Команда для сбора статических файлов Django
 #RUN python app/manage.py collectstatic --noinput
 WORKDIR /app
