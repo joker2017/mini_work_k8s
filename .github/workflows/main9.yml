@@ -1,30 +1,21 @@
 name: CI/CD with Blue-Green Deployment NEW
 
-#on:
-#  workflow_dispatch:
 on: [push]
-#env:
-#  PROFILE_IMAGE: ${{ secrets.DOCKER_HUB_USERNAME }}/profile:${{ github.sha }}
-#  ACCOUNT_IMAGE: ${{ secrets.DOCKER_HUB_USERNAME }}/account:${{ github.sha }}
-#  FOLDER_ID: ${{ secrets.YANDEX_FOLDER_ID }}
-
 
 jobs:
-
   lint-test:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
 
       - name: Install Helm
         uses: azure/setup-helm@v4.0.0
         with:
-            version: v3.14.0
+          version: '3.14.0'
 
-      - uses: actions/setup-python@v5
+      - name: Set up Python
+        uses: actions/setup-python@v5
         with:
           python-version: '3.10'
           check-latest: true
@@ -38,6 +29,8 @@ jobs:
           changed=$(ct list-changed --target-branch ${{ github.event.repository.default_branch }})
           if [[ -n "$changed" ]]; then
             echo "changed=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "changed=false" >> "$GITHUB_OUTPUT"
           fi
 
       - name: Run chart-testing (lint)
@@ -56,20 +49,21 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        app: [ account, profile ]
-
+        app: [account, profile]
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
+
       - name: Login to Docker Hub
         uses: docker/login-action@v3
         with:
           username: ${{ secrets.DOCKER_HUB_USERNAME }}
           password: ${{ secrets.DOCKER_HUB_ACCESS_TOKEN }}
 
-      - name: Build and push
+      - name: Build and push Docker image
         uses: docker/build-push-action@v5
         with:
           context: ./${{ matrix.app }}
@@ -77,13 +71,9 @@ jobs:
           push: true
           tags: ${{ secrets.DOCKER_HUB_USERNAME }}/${{ matrix.app }}:${{ github.sha }}
 
-
   deploy-in-k8s:
     runs-on: ubuntu-latest
-    needs: [ build-app, lint-test ]
-    strategy:
-      matrix:
-        app: [ account, profile ]
+    needs: [build-app, lint-test]
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -91,100 +81,52 @@ jobs:
       - name: Install Helm
         uses: azure/setup-helm@v4.0.0
         with:
-          version: v3.14.0
+          version: '3.14.0'
 
       - name: Install kubectl
         uses: azure/setup-kubectl@v3
 
       - name: Install Yandex Cloud CLI non-interactively
         run: |
-            curl https://storage.yandexcloud.net/yandexcloud-yc/install.sh | bash -s -- -i $HOME/.yandex-cloud -n
-            echo "$HOME/.yandex-cloud/bin" >> $GITHUB_PATH
+          curl https://storage.yandexcloud.net/yandexcloud-yc/install.sh | bash -s -- -i $HOME/.yandex-cloud -n
+          echo "$HOME/.yandex-cloud/bin" >> $GITHUB_PATH
 
-      - name: Save Kubeconfig to File.
+      - name: Save Kubeconfig to File
         run: |
-            echo "${{ secrets.KUBECONFIG }}" > kubeconfig.yml
-            chmod 600 kubeconfig.yml
+          echo "${{ secrets.KUBECONFIG }}" > kubeconfig.yml
+          chmod 600 kubeconfig.yml
 
       - name: Install Argo Rollouts CLI
         run: |
-            curl -LO https://github.com/argoproj/argo-rollouts/releases/latest/download/kubectl-argo-rollouts-linux-amd64
-            chmod +x ./kubectl-argo-rollouts-linux-amd64
-            sudo mv ./kubectl-argo-rollouts-linux-amd64 /usr/local/bin/kubectl-argo-rollouts
-            kubectl-argo-rollouts version
+          curl -LO https://github.com/argoproj/argo-rollouts/releases/latest/download/kubectl-argo-rollouts-linux-amd64
+          chmod +x ./kubectl-argo-rollouts-linux-amd64
+          sudo mv ./kubectl-argo-rollouts-linux-amd64 /usr/local/bin/kubectl-argo-rollouts
+          kubectl-argo-rollouts version
 
-      - name: Deploy to Kubernetes
+      - name: Deploy to K8S
         run: |
-            DATE=$(date +%Y%m%d-%H%M)
-            COMMIT_SHA=$(echo $GITHUB_SHA | cut -c1-7)
-            RELEASE_NAME=minibank-release-${DATE}-${COMMIT_SHA}
-          
-            # Обновление Helm чартов с новым образом
-            helm upgrade --install minibank-release ./.k8s/charts/ --set global.imageTag=${{ github.sha }} --namespace default --kubeconfig=kubeconfig.yml
-      
-            kubectl-argo-rollouts get rollout ${{ matrix.app }}-rollout -n default --kubeconfig=kubeconfig.yml
+          DATE=$(date +%Y%m%d-%H%M)
+          COMMIT_SHA=$(echo $GITHUB_SHA | cut -c1-7)
+          RELEASE_NAME="minibank-release-${DATE}-${COMMIT_SHA}"
+          helm upgrade --install minibank-release ./.k8s/charts/ --set global.imageTag=${{ github.sha }} --namespace default --kubeconfig=kubeconfig.yml
 
-      - name: Check rollout status and get pod name
+      - name: Migrate and collectstatic account
+        uses: action/Django-k8s-M&C-Action@main
+        with:
+          apps: account
+          kubeconfig: kubeconfig.yml
+
+      - name: Migrate and collectstatic profile
+        uses: action/Django-k8s-M&C-Action@main
+        with:
+          apps: profile
+          kubeconfig: kubeconfig.yml
+
+      - name: Promote Rollout
         run: |
-            # Проверяем статус rollout до получения "Paused - BlueGreenPause"
-            STATUS=""
-            while [[ "$STATUS" != *"Paused - BlueGreenPause"* ]]; do
-              echo "Checking rollout status..."
-              STATUS=$(kubectl argo rollouts status ${{ matrix.app }}-rollout --watch=false --kubeconfig=kubeconfig.yml)
-              echo "$STATUS"
-              if [[ "$STATUS" == *"Paused - BlueGreenPause"* ]]; then
-                break
-              fi
-              sleep 5
-            done
-            
-            # Цикл для получения списка подов, пока их не станет больше одного
-            POD_COUNT=0
-            while [ $POD_COUNT -le 1 ]; do
-              PODS=$(kubectl get pods -l app=${{ matrix.app }} -o custom-columns=NAME:.metadata.name,CREATED:.metadata.creationTimestamp,STATUS:.status.phase -n default --sort-by=.metadata.creationTimestamp --kubeconfig=kubeconfig.yml)
-              echo "$PODS"
-              POD_COUNT=$(echo "$PODS" | wc -l)
-              POD_COUNT=$((POD_COUNT-1)) # Уменьшаем на 1 из-за строки заголовка
-              if [ $POD_COUNT -gt 1 ]; then
-                break
-              fi
-              echo "Waiting for more pods..."
-              sleep 5
-            done
-          
-          
-            while true; do
-             POD_NAME=$(kubectl get pods --sort-by=.metadata.creationTimestamp -o --kubeconfig=kubeconfig.yml jsonpath="{.items[-1:].metadata.name}")
-             POD_STATUS=$(kubectl get pod $POD_NAME -o --kubeconfig=kubeconfig.yml jsonpath="{.status.phase}")
-             POD_CREATED=$(kubectl get pod $POD_NAME -o --kubeconfig=kubeconfig.yml jsonpath="{.metadata.creationTimestamp}")
+          kubectl-argo-rollouts promote account-rollout -n default --kubeconfig=kubeconfig.yml
+          kubectl-argo-rollouts promote profile-rollout -n default --kubeconfig=kubeconfig.yml
 
-             if [[ "$POD_STATUS" == "Running" ]]; then
-              echo "::set-output name=pod_name::$POD_NAME"
-               break
-             else
-               sleep 3
-             fi
-            done
-        id: get_pod_name
-            
-
-      # Использование выходных данных
-      - name: Apply Django makemigrations, migrate and collectstatic (${{ matrix.app }} Service)
-        run: |
-          echo "The newest running pod is ${{ steps.get_pod_name.outputs.pod_name }}"
-          APP_POD=${{ steps.get_pod_name.outputs.pod_name }}
-          kubectl exec $APP_POD -n default --kubeconfig=kubeconfig.yml -- python ./app/manage.py makemigrations
-          kubectl exec $APP_POD -n default --kubeconfig=kubeconfig.yml -- python ./app/manage.py migrate
-          kubectl exec $APP_POD -n default --kubeconfig=kubeconfig.yml -- python ./app/manage.py collectstatic --noinput
-
-      - name: Promote Rollout (${{ matrix.app }} Service)
-        run: |
-          kubectl-argo-rollouts promote ${{ matrix.app }}-rollout -n default --kubeconfig=kubeconfig.yml
-
-
-      
-     
-      
       
       
 
