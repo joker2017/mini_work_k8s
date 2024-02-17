@@ -72,10 +72,10 @@ jobs:
       - name: Build and push
         uses: docker/build-push-action@v5
         with:
-          context: ./${{ app }}
-          file: ./${{ app }}/Dockerfile
+          context: ./${{ matrix.app }}
+          file: ./${{ matrix.app }}/Dockerfile
           push: true
-          tags: ${{ secrets.DOCKER_HUB_USERNAME }}/${{ app }}:${{ github.sha }}
+          tags: ${{ secrets.DOCKER_HUB_USERNAME }}/${{ matrix.app }}:${{ github.sha }}
 
 
   deploy-in-k8s:
@@ -122,7 +122,7 @@ jobs:
             # Обновление Helm чартов с новым образом
             helm upgrade --install minibank-release ./.k8s/charts/ --set global.imageTag=${{ github.sha }} --namespace default --kubeconfig=kubeconfig.yml
       
-            kubectl-argo-rollouts get rollout ${{ app }}-rollout -n default --kubeconfig=kubeconfig.yml
+            kubectl-argo-rollouts get rollout ${{ matrix.app }}-rollout -n default --kubeconfig=kubeconfig.yml
 
       - name: Check rollout status and get pod name
         run: |
@@ -141,7 +141,7 @@ jobs:
             # Цикл для получения списка подов, пока их не станет больше одного
             POD_COUNT=0
             while [ $POD_COUNT -le 1 ]; do
-              PODS=$(kubectl get pods -l app=${{ app }} -o custom-columns=NAME:.metadata.name,CREATED:.metadata.creationTimestamp,STATUS:.status.phase -n default --sort-by=.metadata.creationTimestamp --kubeconfig=kubeconfig.yml)
+              PODS=$(kubectl get pods -l app=${{ matrix.app }} -o custom-columns=NAME:.metadata.name,CREATED:.metadata.creationTimestamp,STATUS:.status.phase -n default --sort-by=.metadata.creationTimestamp --kubeconfig=kubeconfig.yml)
               echo "$PODS"
               POD_COUNT=$(echo "$PODS" | wc -l)
               POD_COUNT=$((POD_COUNT-1)) # Уменьшаем на 1 из-за строки заголовка
@@ -169,7 +169,7 @@ jobs:
             
 
       # Использование выходных данных
-      - name: Apply Django makemigrations, migrate and collectstatic (${{ app }} Service)
+      - name: Apply Django makemigrations, migrate and collectstatic (${{ matrix.app }} Service)
         run: |
           echo "The newest running pod is ${{ steps.get_pod_name.outputs.pod_name }}"
           APP_POD=${{ steps.get_pod_name.outputs.pod_name }}
@@ -177,9 +177,9 @@ jobs:
           kubectl exec $APP_POD -n default --kubeconfig=kubeconfig.yml -- python ./app/manage.py migrate
           kubectl exec $APP_POD -n default --kubeconfig=kubeconfig.yml -- python ./app/manage.py collectstatic --noinput
 
-      - name: Promote Rollout (${{ app }} Service)
+      - name: Promote Rollout (${{ matrix.app }} Service)
         run: |
-          kubectl-argo-rollouts promote ${{ app }}-rollout -n default --kubeconfig=kubeconfig.yml
+          kubectl-argo-rollouts promote ${{ matrix.app }}-rollout -n default --kubeconfig=kubeconfig.yml
 
 
       
