@@ -27,3 +27,4 @@ RUN rm -f /docker-entrypoint.d/*.json
 COPY unit.config.json /docker-entrypoint.d/config.json
 # Определяем порт, который будет прослушивать приложение
 EXPOSE 8300
+CMD ["unitd", "--no-daemon", "--control", "unix:/var/run/control.unit.sock"]

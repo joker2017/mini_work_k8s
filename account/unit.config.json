@@ -25,11 +25,12 @@
 
     "applications": {
         "django": {
-            "type": "python 3.11",
+            "type": "python 3",
+            "processes": 4,
+            "threads": 4,
             "path": "./app",
-            "module": "app.wsgi",
-            "environment": {
-                "DJANGO_SETTINGS_MODULE": "app.settings"
+            "module": "app.wsgi"
+
             }
         }
     }
