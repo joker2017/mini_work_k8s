@@ -2,7 +2,7 @@
 FROM unit:1.31.1-python3.11
 
 RUN ls -lah
-WORKDIR /app
+#WORKDIR /app
 # Установка зависимостей проекта
 COPY requirements.txt /tmp/
 RUN pip install --no-cache-dir -r /tmp/requirements.txt
