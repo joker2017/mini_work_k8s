@@ -172,3 +172,26 @@ STATIC_ROOT = os.path.join(BASE_DIR, "static")
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 print(f"BASE_DIR: {BASE_DIR}")
 print(f"STATIC_ROOT: {STATIC_ROOT}")
+import logging
+logger = logging.getLogger(__name__)
+
+logger.debug(f"BASE_DIR: {BASE_DIR}")
+logger.debug(f"STATIC_ROOT: {STATIC_ROOT}")
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'handlers': {
+        'file': {
+            'level': 'DEBUG',
+            'class': 'logging.FileHandler',
+            'filename': 'django_debug.log',
+        },
+    },
+    'loggers': {
+        'django': {
+            'handlers': ['file'],
+            'level': 'DEBUG',
+            'propagate': True,
+        },
+    },
+}
