@@ -13,6 +13,7 @@ runs:
     # Шаг 1: Проверка статуса развертывания и получение имени пода
     - name: Check rollout status and get pod name
       id: get_pod_name
+      shell:  bash
       run: |
         # Проверяем статус rollout до достижения состояния "Paused - BlueGreenPause"
         STATUS=""
@@ -39,24 +40,40 @@ runs:
           echo "Waiting for more pods..."
           sleep 5
         done
-      shell: bash
+
 
     # Шаг 2: Получение имени последнего пода
     - name: Get the name of the latest pod
+      id: get_latest_pod
+      shell:  bash
       run: |
-          LATEST_POD=$(kubectl get pods --sort-by=.metadata.creationTimestamp -o=custom-columns=NAME:.metadata.name,CREATED:.metadata.creationTimestamp --no-headers | tail -n 1 | awk '{print $1}') || { echo "Failed to get the latest pod"; exit 1; }
-          echo "The latest pod is: $LATEST_POD"
-          echo "LATEST_POD=$LATEST_POD" >> $GITHUB_ENV
-      shell: bash
+        LATEST_POD=$(kubectl get pods --sort-by=.metadata.creationTimestamp -o custom-columns=NAME:.metadata.name,CREATED:.metadata.creationTimestamp --no-headers | tail -n 1 | awk '{print $1}') || { echo "Failed to get the latest pod"; exit 1; }
+        echo "::set-output name=latest_pod::$LATEST_POD"
 
-    # Шаг 3: Применение миграций Django и сбор статических файлов
-    - name: Apply Django migrations and collect static files
+    # Шаг 3: Проверка статуса последнего пода
+    - name: Check pod status
+      id: check_pod_status
+      shell:  bash
       run: |
-        # Устанавливаем переменную с именем последнего пода
-        APP_POD=${{ env.LATEST_POD }}
+        LATEST_POD=${{ steps.get_latest_pod.outputs.latest_pod }}
+        POD_STATUS=""
+        while [[ "$POD_STATUS" != "Running" ]]; do
+          echo "Checking pod status..."
+          POD_STATUS=$(kubectl get pod $LATEST_POD -o=jsonpath='{.status.phase}' --kubeconfig=${{ secrets.KUBE_CONFIG }}) || { echo "Failed to get pod status"; exit 1; }
+          echo "Pod status: $POD_STATUS"
+          if [[ "$POD_STATUS" == "Running" ]]; then
+            break
+          fi
+          sleep 5
+        done
+
+    # Шаг 4: Применение миграций Django и сбор статических файлов
+    - name: Apply Django migrations and collect static files
+      shell: bash
+      run: |
+        APP_POD=${{ steps.get_latest_pod.outputs.latest_pod }}
         # Выполняем миграции внутри пода
-        kubectl exec $APP_POD -n default --kubeconfig=${{ inputs.kubeconfig }} -- bash -c "python ./app/manage.py makemigrations" || { echo "Failed to make migrations"; exit 1; }
-        kubectl exec $APP_POD -n default --kubeconfig=${{ inputs.kubeconfig }} -- bash -c "python ./app/manage.py migrate" || { echo "Failed to apply migrations"; exit 1; }
+        kubectl exec $APP_POD -n default --kubeconfig=${{ inputs.kubeconfig }} -- python ./app/manage.py makemigrations || { echo "Failed to make migrations"; exit 1; }
+        kubectl exec $APP_POD -n default --kubeconfig=${{ inputs.kubeconfig }} -- python ./app/manage.py migrate || { echo "Failed to apply migrations"; exit 1; }
         # Собираем статические файлы
         kubectl exec $APP_POD -n default --kubeconfig=${{ inputs.kubeconfig }} -- python ./app/manage.py collectstatic --noinput || { echo "Failed to collect static files"; exit 1; }
-      shell: bash
