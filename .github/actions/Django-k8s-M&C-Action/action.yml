@@ -47,7 +47,7 @@ runs:
       id: get_latest_pod
       shell:  bash
       run: |
-        LATEST_POD=$(kubectl get pods --sort-by=.metadata.creationTimestamp -o custom-columns=NAME:.metadata.name,CREATED:.metadata.creationTimestamp --no-headers | tail -n 1 | awk '{print $1}') || { echo "Failed to get the latest pod"; exit 1; }
+        LATEST_POD=$(kubectl get pods --sort-by=.metadata.creationTimestamp -o custom-columns=NAME:.metadata.name,CREATED:.metadata.creationTimestamp --no-headers --kubeconfig=${{ inputs.kubeconfig }} | tail -n 1 | awk '{print $1}') || { echo "Failed to get the latest pod"; exit 1; }
         echo "::set-output name=latest_pod::$LATEST_POD"
 
     # Шаг 3: Проверка статуса последнего пода
