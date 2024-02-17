@@ -161,7 +161,7 @@ USE_TZ = True
 STATIC_URL = '/static/'
 MEDIA_URL = '/media/'
 
-MEDIA_ROOT = './app/app/vol/web/media'
+MEDIA_ROOT = '/app/vol/web/media'
 STATIC_ROOT = '/app/app/vol/web/static'
 
 # Default primary key field type
