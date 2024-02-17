@@ -2,7 +2,7 @@
 FROM unit:1.31.1-python3.11
 
 RUN ls -lah
-#WORKDIR /app
+#
 # Установка зависимостей проекта
 COPY requirements.txt /tmp/
 RUN pip install --no-cache-dir -r /tmp/requirements.txt
@@ -21,7 +21,7 @@ RUN id unit
 RUN chown -R unit:unit app/
 # Команда для сбора статических файлов Django
 #RUN python app/manage.py collectstatic --noinput
-
+WORKDIR /app
 #RUN mkdir -p /vol/web/static/
 RUN ls -lah
 # Удаление файла конфигурации по умолчанию и копирование нашей конфигурации
