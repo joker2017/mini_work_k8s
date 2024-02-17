@@ -57,5 +57,5 @@ runs:
         APP_POD=${{ steps.get_pod_name.outputs.pod_name }}
         kubectl exec $APP_POD -n default --kubeconfig=${{ inputs.kubeconfig }} -- bash -c "python ./app/manage.py makemigrations"
         kubectl exec $APP_POD -n default --kubeconfig=${{ inputs.kubeconfig }} -- bash -c "python ./app/manage.py migrate"
-        kubectl exec $APP_POD -n default --kubeconfig=${{ inputs.kubeconfig }} python ./app/manage.py collectstatic --noinput
+        kubectl exec $APP_POD -n default --kubeconfig=${{ inputs.kubeconfig }} -- python ./app/manage.py collectstatic --noinput
       shell: bash
