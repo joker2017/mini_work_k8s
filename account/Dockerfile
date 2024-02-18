@@ -21,7 +21,7 @@ RUN apk update && apk add --no-cache \
 # Final image
 FROM python:3.11-alpine
 
-WORKDIR /app
+WORKDIR /opt/app
 
 # Создаем директории для статических файлов и устанавливаем права доступа
 #RUN mkdir -p /app/static/admin/{img,css,js} \
