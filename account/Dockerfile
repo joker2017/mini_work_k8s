@@ -4,7 +4,7 @@ FROM python:3.11-alpine
 # Устанавливаем переменные окружения для Python
 ENV PYTHONDONTWRITEBYTECODE=1
 ENV PYTHONUNBUFFERED=1
-WORKDIR /app
+
 # Установка зависимостей
 RUN apk update && apk add --no-cache \
     curl \
@@ -15,48 +15,35 @@ RUN apk update && apk add --no-cache \
     unit-python3
 
 
-# Добавление официального ключа NGINX и настройка репозитория для Alpine
-# Добавление официального ключа NGINX и настройка репозитория для Alpine
-#RUN curl -O https://nginx.org/keys/nginx_signing.rsa.pub \
-#    && mv nginx_signing.rsa.pub /etc/apk/keys/ \
-#    && printf "@nginx https://nginx.org/packages/mainline/alpine/v%s/main\n" $(egrep -o '^[0-9]+\.[0-9]+' /etc/alpine-release) | tee -a /etc/apk/repositories \
-#    && apk add unit@nginx unit-python3@nginx
-
-# Установка NGINX Unit и модуля для Python
-#RUN apk add unit unit-python3
-
 # Копируем файл с зависимостями проекта и устанавливаем зависимости
 COPY requirements.txt /tmp/
 RUN pip install --no-cache-dir -r /tmp/requirements.txt
 
+COPY docker-entrypoint.sh /tmp/
+# Установка скрипта точки входа как исполняемого файла
+RUN chmod +x /tmp/docker-entrypoint.sh
+
+# Удаляем файлы конфигурации по умолчанию и копируем наш файл конфигурации NGINX Unit
+RUN rm -f /docker-entrypoint.d/*.json
+COPY unit.config.json /docker-entrypoint.d/config.json
+
+# Устанавливаем рабочую директорию
+WORKDIR /app
+
 # Копируем проект в контейнер
 COPY . .
 
-
-
-# Создаем директории для статических файлов и устанавливаем права доступа
 # Создаем директории для статических файлов и устанавливаем права доступа
 RUN mkdir -p /app/static/admin/{img,css,js} \
     && mkdir -p /app/static/rest_framework/{img,css,js,fonts,docs} \
     && chown -R unit:unit /app/static \
     && chmod -R 777 /app/
 
-
-
-# Удаляем файлы конфигурации по умолчанию и копируем наш файл конфигурации NGINX Unit
-RUN rm -f /docker-entrypoint.d/*.json
-COPY unit.config.json /docker-entrypoint.d/config.json
-# Устанавливаем рабочую директорию
-
 # Определяем порт, который будет прослушивать приложение
-COPY docker-entrypoint.sh /docker-entrypoint.sh
 EXPOSE 8300
-# Установка скрипта точки входа как исполняемого файла
-RUN chmod +x /docker-entrypoint.sh
-ENTRYPOINT ["/docker-entrypoint.sh"]
-# Запускаем NGINX Unit
+
 # Настройка и запуск NGINX Unit при старте контейнера
-#CMD ["unitd", "--no-daemon", "--control", "unix:/var/run/control.unit.sock"]
+ENTRYPOINT ["/tmp/docker-entrypoint.sh"]
 
 # Переключаемся на пользователя 'user'
 #USER user
