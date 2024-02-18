@@ -45,4 +45,5 @@ COPY /unit.config.json /docker-entrypoint.d/config.json
 #RUN chown -R unit:unit app/static/
 # Определяем порт, который будет прослушивать приложение
 EXPOSE 8300
+USER user
 #CMD ["unitd", "--no-daemon", "--control", "unix:/var/run/control.unit.sock"]
