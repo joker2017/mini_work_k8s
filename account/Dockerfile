@@ -4,7 +4,7 @@ FROM python:3.11-alpine
 # Устанавливаем переменные окружения для Python
 ENV PYTHONDONTWRITEBYTECODE=1
 ENV PYTHONUNBUFFERED=1
-
+WORKDIR /app
 # Установка зависимостей
 RUN apk update && apk add --no-cache \
     curl \
@@ -23,7 +23,7 @@ RUN apk update && apk add --no-cache \
 #    && apk add unit@nginx unit-python3@nginx
 
 # Установка NGINX Unit и модуля для Python
-RUN apk add unit unit-python3
+#RUN apk add unit unit-python3
 
 # Копируем файл с зависимостями проекта и устанавливаем зависимости
 COPY requirements.txt /tmp/
@@ -57,7 +57,7 @@ ENTRYPOINT ["/docker-entrypoint.sh"]
 # Запускаем NGINX Unit
 # Настройка и запуск NGINX Unit при старте контейнера
 #CMD ["unitd", "--no-daemon", "--control", "unix:/var/run/control.unit.sock"]
-WORKDIR /app
+
 # Переключаемся на пользователя 'user'
 #USER user
 
