@@ -19,7 +19,7 @@ RUN apk update && apk add --no-cache \
 COPY requirements.txt /tmp/
 RUN pip install --no-cache-dir -r /tmp/requirements.txt
 
-COPY entrypoint.sh /tmp/
+COPY ./entrypoint.sh /tmp/
 # Установка скрипта точки входа как исполняемого файла
 RUN chmod +x /tmp/entrypoint.sh
 
