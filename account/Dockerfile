@@ -49,7 +49,7 @@ COPY unit.config.json /docker-entrypoint.d/config.json
 # Устанавливаем рабочую директорию
 
 # Определяем порт, который будет прослушивать приложение
-COPY docker-entrypoint.sh docker-entrypoint.sh
+COPY docker-entrypoint.sh /docker-entrypoint.sh
 EXPOSE 8300
 # Установка скрипта точки входа как исполняемого файла
 RUN chmod +x /docker-entrypoint.sh
