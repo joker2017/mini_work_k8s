@@ -8,6 +8,7 @@ WORKDIR /root
 
 # Копируем файл с зависимостями проекта и устанавливаем зависимости
 COPY requirements.txt .
+RUN pip install --no-cache-dir --user -r requirements.txt
 
 # Установка зависимостей
 RUN apk update && apk add --no-cache \
@@ -17,10 +18,10 @@ RUN apk update && apk add --no-cache \
     linux-headers \
     unit \
     unit-python3
-RUN pip install --no-cache-dir -r requirements.txt
+
 
 # Final image
-FROM python:3.10-alpine
+FROM python:3.11-alpine
 
 WORKDIR /app
 
@@ -32,7 +33,7 @@ WORKDIR /app
 
 COPY --chown=unit --from=builder /root/.local /opt/.local
 ENV PATH=/opt/.local/bin:$PATH
-ENV PYTHONPATH=/opt/.local/lib/python3.10/site-packages:$PYTHONPATH
+ENV PYTHONPATH=/opt/.local/lib/python3.11/site-packages:$PYTHONPATH
 
 COPY --chown=unit ./app .
 COPY ./django.unit.json ./django-entrypoint.sh /docker-entrypoint.d/
