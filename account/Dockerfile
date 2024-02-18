@@ -58,7 +58,8 @@ WORKDIR /app
 
 # Запускаем NGINX Unit
 # Настройка и запуск NGINX Unit при старте контейнера
-CMD ["unitd", "--no-daemon", "--control", "unix:/var/run/control.unit.sock"]
+CMD ["unitd", "--no-daemon", "--control", "unix:/var/run/control.unit.sock", "--config", "/docker-entrypoint.d/config.json"]
+
 # Переключаемся на пользователя 'user'
 #USER user
 EXPOSE 8300
