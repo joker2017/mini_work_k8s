@@ -11,10 +11,6 @@ RUN apk update && apk add --no-cache \
     gcc \
     libc-dev \
     linux-headers \
-    && adduser -D user \
-    && mkdir -p /var/lib/unit \
-    && chown -R user:user /var/lib/unit \
-    && chmod -R 755 /var/lib/unit
 
 
 
@@ -46,7 +42,7 @@ RUN mkdir -p /app/static/admin/img \
     && mkdir -p /app/static/rest_framework/js \
     && mkdir -p /app/static/rest_framework/fonts \
     && mkdir -p /app/static/rest_framework/docs \
-    && chown -R user:user /app/static \
+    && chown -R unit:unit /app/static \
     && chmod -R 777 /app/static
 
 
