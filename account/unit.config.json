@@ -28,7 +28,7 @@
             "processes": 4,
             "threads": 4,
             "path": "/app",
-            "module": "app.app.wsgi"
+            "module": "app.wsgi"
 
             }
         }
