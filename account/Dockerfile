@@ -10,7 +10,7 @@ RUN apk update && apk add --no-cache \
     curl \
     gcc \
     libc-dev \
-    linux-headers \
+    linux-headers
 
 
 
