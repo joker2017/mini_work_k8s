@@ -43,7 +43,8 @@ RUN mkdir -p /app/static/admin/img \
     && mkdir -p /app/static/rest_framework/fonts \
     && mkdir -p /app/static/rest_framework/docs \
     && chown -R unit:unit /app/static \
-    && chmod -R 777 /app/
+    && chmod -R 777 /app/ \
+    && chown -R unit:unit /app
 
 
 
