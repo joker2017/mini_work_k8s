@@ -38,7 +38,7 @@ COPY --chown=unit ./app .
 COPY ./django.unit.json ./django-entrypoint.sh /docker-entrypoint.d/
 COPY ./unit-docker-entrypoint.sh /usr/local/bin/
 RUN chmod +x /usr/local/bin/unit-docker-entrypoint.sh
-
+RUN chmod +x /docker-entrypoint.d/django-entrypoint.sh
 ENTRYPOINT ["/usr/local/bin/unit-docker-entrypoint.sh"]
 
 # Определяем порт, который будет прослушивать приложение
