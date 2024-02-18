@@ -25,7 +25,7 @@ spec:
             name: account-service
             port:
               number: 8300
-      - path: /account/static
+      - path: /static1
         pathType: Prefix
         backend:
           service:
@@ -39,7 +39,7 @@ spec:
             name: profile-service
             port:
               number: 8300
-      - path: /profile/static
+      - path: /static2
         pathType: Prefix
         backend:
           service:

@@ -42,7 +42,7 @@ INSTALLED_APPS = [
     'flags',
     'rest_framework',
     'django_filters',
-    'django.contrib.postgres', 
+    'django.contrib.postgres',
 
 ]
 
@@ -147,32 +147,11 @@ USE_I18N = True
 USE_TZ = True
 
 
-# Static files (CSS, JavaScript, Images)
-# https://docs.djangoproject.com/en/4.2/howto/static-files/
 
-# Static files (CSS, JavaScript, Images)
-# https://docs.djangoproject.com/en/2.2/howto/static-files/
+STATIC_URL = "/static2/"
+STATIC_ROOT = os.path.join(BASE_DIR, "static")
 
-#MEDIA_URL = "/media/"
-#MEDIA_ROOT = BASE_DIR / "mediafiles"
-
-#MEDIA_URL = "/media/"
-#STATIC_ROOT = BASE_DIR / "staticfiles"
-#STATIC_URL = '/static/'
-#MEDIA_URL = "/media/"
-#MEDIA_ROOT = os.path.join(BASE_DIR, 'vol', 'web', 'media')
-#print("hhhhhhhhhhhhhhhhhhhhhhhhhhhhhhh")
-#print(MEDIA_ROOT)
-
-#MEDIA_URL = "/media/"
-#STATIC_ROOT = os.path.join(BASE_DIR, 'vol', 'web', 'static') 
-#STATIC_URL = '/static/'
-STATIC_URL = '/static/'
-MEDIA_URL = '/media/'
-
-MEDIA_ROOT = '/vol/web/media'
-STATIC_ROOT = '/vol/web/static'
-# Default primary key field type
-# https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
+MEDIA_URL = "/media/"
+MEDIA_ROOT = os.path.join(BASE_DIR, "media")
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
