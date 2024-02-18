@@ -12,7 +12,7 @@
             },
 
             "action": {
-                "share": "/app$uri"
+                "share": "/opt/app$uri"
             }
         },
         {
@@ -27,7 +27,7 @@
             "type": "python 3",
             "processes": 4,
             "threads": 4,
-            "path": "/app",
+            "path": "/opt/app",
             "module": "app.wsgi"
 
             }
