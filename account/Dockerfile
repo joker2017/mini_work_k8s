@@ -16,6 +16,13 @@ RUN apk update && apk add --no-cache \
     && chown -R user:user /var/lib/unit \
     && chmod -R 755 /var/lib/unit
 
+
+# Изменение владельца папки на пользователя 'user'
+RUN chown -R user:user /app
+
+# Установка прав доступа (чтение, запись и выполнение для владельца и группы, чтение и выполнение для остальных)
+RUN chmod -R 755 /app
+
 # Добавление официального ключа NGINX и настройка репозитория для Alpine
 # Добавление официального ключа NGINX и настройка репозитория для Alpine
 RUN curl -O https://nginx.org/keys/nginx_signing.rsa.pub \
