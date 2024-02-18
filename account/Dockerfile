@@ -1,13 +1,30 @@
 #FROM nginx/unit:1.26.1-python3.9
-FROM unit:1.31.1-python3.11
-#
+#FROM unit:1.31.1-python3.11
+FROM python:3.11
+ENV PYTHONDONTWRITEBYTECODE=1
+ENV PYTHONUNBUFFERED=1
+RUN adduser -D user
+USER user
+# Add NGINX's official signing key
+RUN apt-get update && apt-get install -y gnupg && \
+    curl --output /usr/share/keyrings/nginx-keyring.gpg https://unit.nginx.org/keys/nginx-keyring.gpg
+
+# Configure the NGINX Unit repository for Debian
+RUN echo "deb [signed-by=/usr/share/keyrings/nginx-keyring.gpg] https://packages.nginx.org/unit/debian/ bullseye unit" > /etc/apt/sources.list.d/unit.list && \
+    echo "deb-src [signed-by=/usr/share/keyrings/nginx-keyring.gpg] https://packages.nginx.org/unit/debian/ bullseye unit" >> /etc/apt/sources.list.d/unit.list
+
+# Install NGINX Unit and the Python 3.11 module
+RUN apt-get update && \
+    apt-get install -y unit unit-python3.11
+
+
 # Установка зависимостей проекта
 COPY requirements.txt /tmp/
 RUN pip install --no-cache-dir -r /tmp/requirements.txt
 
 # Копирование проекта в контейнер
 COPY . .
-USER unit
+
 # Настройка рабочего каталога
 #WORKDIR /app
 # Выставление прав доступа
@@ -19,15 +36,13 @@ RUN mkdir -p /app/static/rest_framework/css
 RUN mkdir -p /app/static/rest_framework/js
 RUN mkdir -p /app/static/rest_framework/fonts
 RUN mkdir -p /app/static/rest_framework/docs
-#RUN apt-get update && apt-get install -y acl
-#RUN setfacl -R -m u:unit:rwx /app
-#RUN setfacl -R -m d:u:unit:rwx /app
-#RUN chown -R unit:unit /app && chmod -R 770 /app
 
 
-#RUN useradd --no-create-home --shell /bin/false user
-RUN chown -R unit:unit /app/static
-RUN chmod -R 777 app/static
+RUN adduser -D user
+RUN chown -R user:user /app/static
+RUN chmod -R 777 /app/static
+
+
 
 #RUN mkdir -p app/static/
 #RUN chown -R unit:unit ./
@@ -44,6 +59,10 @@ COPY /unit.config.json /docker-entrypoint.d/config.json
 
 #RUN chown -R unit:unit app/static/
 # Определяем порт, который будет прослушивать приложение
+
+# Expose default NGINX Unit port
 EXPOSE 8300
 
+# Start NGINX Unit
+CMD ["unitd", "--no-daemon"]
 #CMD ["unitd", "--no-daemon", "--control", "unix:/var/run/control.unit.sock"]
