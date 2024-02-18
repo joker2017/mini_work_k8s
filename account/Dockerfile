@@ -52,14 +52,20 @@ RUN mkdir -p /app/static/admin/img \
 RUN rm -f /docker-entrypoint.d/*.json
 COPY unit.config.json /docker-entrypoint.d/config.json
 # Устанавливаем рабочую директорию
-WORKDIR /app
+
 
 # Определяем порт, который будет прослушивать приложение
 
 # Запускаем NGINX Unit
 # Настройка и запуск NGINX Unit при старте контейнера
-CMD ["unitd", "--no-daemon", "--control", "unix:/var/run/control.unit.sock", "--config", "/docker-entrypoint.d/config.json"]
+#CMD ["unitd", "--no-daemon", "--control", "unix:/var/run/control.unit.sock", "--config", "/docker-entrypoint.d/config.json"]
+# Копирование скрипта точки входа и конфигурационного файла
+COPY docker-entrypoint.sh /docker-entrypoint.sh
 
+# Установка скрипта точки входа как исполняемого файла
+RUN chmod +x /docker-entrypoint.sh
+ENTRYPOINT ["/docker-entrypoint.sh"]
+WORKDIR /app
 # Переключаемся на пользователя 'user'
 #USER user
 EXPOSE 8300
