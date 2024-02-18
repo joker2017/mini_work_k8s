@@ -7,7 +7,7 @@ RUN pip install --no-cache-dir -r /tmp/requirements.txt
 
 # Копирование проекта в контейнер
 COPY . .
-
+USER unit
 # Настройка рабочего каталога
 #WORKDIR /app
 # Выставление прав доступа
@@ -25,8 +25,8 @@ RUN mkdir -p /app/static/rest_framework/docs
 #RUN chown -R unit:unit /app && chmod -R 770 /app
 
 
-RUN useradd --no-create-home --shell /bin/false user
-RUN chown -R user:user /app/static
+#RUN useradd --no-create-home --shell /bin/false user
+RUN chown -R unit:unit /app/static
 RUN chmod -R 777 app/static
 
 #RUN mkdir -p app/static/
@@ -45,5 +45,5 @@ COPY /unit.config.json /docker-entrypoint.d/config.json
 #RUN chown -R unit:unit app/static/
 # Определяем порт, который будет прослушивать приложение
 EXPOSE 8300
-USER user
+
 #CMD ["unitd", "--no-daemon", "--control", "unix:/var/run/control.unit.sock"]
