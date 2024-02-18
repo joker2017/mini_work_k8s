@@ -58,9 +58,11 @@ COPY unit.config.json /docker-entrypoint.d/config.json
 WORKDIR /app
 
 # Определяем порт, который будет прослушивать приложение
-EXPOSE 8300
+
 # Запускаем NGINX Unit
 # Настройка и запуск NGINX Unit при старте контейнера
 CMD ["unitd", "--no-daemon", "--control", "unix:/var/run/control.unit.sock"]
 # Переключаемся на пользователя 'user'
 #USER user
+EXPOSE 8300
+

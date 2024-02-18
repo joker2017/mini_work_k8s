@@ -27,8 +27,8 @@
             "type": "python 3",
             "processes": 4,
             "threads": 4,
-            "path": "./app",
-            "module": "app.wsgi"
+            "path": "/app",
+            "module": "app.app.wsgi"
 
             }
         }
