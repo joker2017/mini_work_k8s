@@ -5,13 +5,22 @@ FROM python:3.11-alpine
 ENV PYTHONDONTWRITEBYTECODE=1
 ENV PYTHONUNBUFFERED=1
 
-# Установка необходимых пакетов и добавление пользователя
-RUN apk add --no-cache \
-    # Добавляем необходимые пакеты для работы и компиляции зависимостей
+# Установка зависимостей
+RUN apk update && apk add --no-cache \
+    curl \
     gcc \
     libc-dev \
     linux-headers \
-    && adduser -D user
+    && adduser -D user \
+
+# Добавление официального ключа NGINX и настройка репозитория для Alpine
+RUN curl -O https://nginx.org/keys/nginx_signing.rsa.pub && \
+    mv nginx_signing.rsa.pub /etc/apk/keys/ && \
+    printf "@nginx https://nginx.org/packages/mainline/alpine/v%s/main\n" `egrep -o '^[0-9]+\.[0-9]+' /etc/alpine-release` | tee -a /etc/apk/repositories
+
+# Установка NGINX Unit и необходимых модулей
+RUN apk add unit@nginx unit-python3@nginx
+
 
 # Копируем файл с зависимостями проекта и устанавливаем зависимости
 COPY requirements.txt /tmp/
@@ -20,8 +29,7 @@ RUN pip install --no-cache-dir -r /tmp/requirements.txt
 # Копируем проект в контейнер
 COPY . .
 
-# Устанавливаем рабочую директорию
-WORKDIR /app
+
 
 # Создаем директории для статических файлов и устанавливаем права доступа
 RUN mkdir -p /app/static/admin/img \
@@ -41,9 +49,11 @@ USER user
 # Удаляем файлы конфигурации по умолчанию и копируем наш файл конфигурации NGINX Unit
 RUN rm -f /docker-entrypoint.d/*.json
 COPY unit.config.json /docker-entrypoint.d/config.json
-
+# Устанавливаем рабочую директорию
+WORKDIR /app
 # Определяем порт, который будет прослушивать приложение
 EXPOSE 8300
 
 # Запускаем NGINX Unit
-CMD ["unitd", "--no-daemon"]
+# Настройка и запуск NGINX Unit при старте контейнера
+CMD ["unitd", "--no-daemon", "--control", "unix:/var/run/control.unit.sock"]
