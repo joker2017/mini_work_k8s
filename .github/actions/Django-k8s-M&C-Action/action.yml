@@ -69,7 +69,7 @@ runs:
       run: |
         APP_POD=${{ steps.get_latest_pod.outputs.latest_pod }}
         # Выполняем миграции внутри пода
-        kubectl exec $APP_POD -n default --kubeconfig=${{ inputs.kubeconfig }} -- python ./app/manage.py makemigrations || { echo "Failed to make migrations"; exit 1; }
-        kubectl exec $APP_POD -n default --kubeconfig=${{ inputs.kubeconfig }} -- python ./app/manage.py migrate || { echo "Failed to apply migrations"; exit 1; }
+        kubectl exec $APP_POD -n default --kubeconfig=${{ inputs.kubeconfig }} -- python ./manage.py makemigrations || { echo "Failed to make migrations"; exit 1; }
+        kubectl exec $APP_POD -n default --kubeconfig=${{ inputs.kubeconfig }} -- python ./manage.py migrate || { echo "Failed to apply migrations"; exit 1; }
         # Собираем статические файлы
-        kubectl exec $APP_POD -n default --kubeconfig=${{ inputs.kubeconfig }} -- python ./app/manage.py collectstatic --noinput || { echo "Failed to collect static files"; exit 1; }
+        kubectl exec $APP_POD -n default --kubeconfig=${{ inputs.kubeconfig }} -- python ./manage.py collectstatic --noinput || { echo "Failed to collect static files"; exit 1; }
