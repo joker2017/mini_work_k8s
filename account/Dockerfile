@@ -25,7 +25,7 @@ RUN mkdir -p /app/static/rest_framework/docs
 #RUN chown -R unit:unit /app && chmod -R 770 /app
 
 
-RUN adduser -D user
+RUN useradd --no-create-home --shell /bin/false user
 RUN chown -R user:user /app/static
 RUN chmod -R 777 app/static
 
