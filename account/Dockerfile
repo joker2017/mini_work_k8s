@@ -15,9 +15,7 @@ RUN apk update && apk add --no-cache \
     curl \
     gcc \
     libc-dev \
-    linux-headers \
-    unit \
-    unit-python3
+    linux-headers
 
 
 # Final image
@@ -30,6 +28,7 @@ WORKDIR /app
 #    && mkdir -p /app/static/rest_framework/{img,css,js,fonts,docs} \
 #    && chown -R unit:unit /app/static \
 #    && chmod -R 777 /app/
+RUN apk add --no-cache unit-python3 curl
 
 COPY --chown=unit --from=builder /root/.local /opt/.local
 ENV PATH=/opt/.local/bin:$PATH
