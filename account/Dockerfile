@@ -25,7 +25,9 @@ RUN ls -lah
 # Удаление файла конфигурации по умолчанию и копирование нашей конфигурации
 RUN rm -f /docker-entrypoint.d/*.json
 COPY /unit.config.json /docker-entrypoint.d/config.json
-RUN chown -R unit:unit /app
+#RUN chown -R unit:unit /app
+RUN setfacl -R -m u:unit:rwx /app
+RUN setfacl -d -R -m u:unit:rwx /app
 #RUN chown -R unit:unit app/static/
 # Определяем порт, который будет прослушивать приложение
 EXPOSE 8300
