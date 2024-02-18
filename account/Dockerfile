@@ -48,4 +48,3 @@ ENTRYPOINT ["/tmp/docker-entrypoint.sh"]
 # Переключаемся на пользователя 'user'
 #USER user
 
-
