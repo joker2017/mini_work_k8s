@@ -60,4 +60,4 @@ EXPOSE 8300
 # Настройка и запуск NGINX Unit при старте контейнера
 CMD ["unitd", "--no-daemon", "--control", "unix:/var/run/control.unit.sock"]
 # Переключаемся на пользователя 'user'
-USER user
+#USER user
