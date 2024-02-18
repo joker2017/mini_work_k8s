@@ -21,15 +21,15 @@ COPY /unit.config.json /docker-entrypoint.d/config.json
 #RUN python app/manage.py collectstatic --noinput
 WORKDIR /app
 #RUN mkdir -p /vol/web/static/
-RUN ls -lah \
-RUN chown -R unit:unit /app
-# Удаление файла конфигурации по умолчанию и копирование нашей конфигурации
-RUN rm -f /docker-entrypoint.d/*.json
+RUN ls -lah
 COPY docker-entrypoint.sh /docker-entrypoint.sh
 # Установка скрипта точки входа как исполняемого файла
 RUN chmod +x /docker-entrypoint.sh
 ENTRYPOINT ["/docker-entrypoint.sh"]
+# Удаление файла конфигурации по умолчанию и копирование нашей конфигурации
+RUN rm -f /docker-entrypoint.d/*.json
 
+RUN chown -R unit:unit /app
 #RUN chown -R unit:unit app/static/
 # Определяем порт, который будет прослушивать приложение
 EXPOSE 8300
