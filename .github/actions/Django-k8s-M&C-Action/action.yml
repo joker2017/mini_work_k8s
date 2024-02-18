@@ -28,18 +28,14 @@ runs:
         done
 
         # Цикл для получения списка подов, ждем пока не будет больше одного пода
-        POD_COUNT=0
-        while [ $POD_COUNT -le 1 ]; do
-          PODS=$(kubectl get pods -l app=${{ inputs.apps }} -o custom-columns=NAME:.metadata.name,CREATED:.metadata.creationTimestamp,STATUS:.status.phase -n default --sort-by=.metadata.creationTimestamp --kubeconfig=${{ inputs.kubeconfig }}) || { echo "Failed to get pods"; exit 1; }
-          echo "$PODS"
-          POD_COUNT=$(echo "$PODS" | wc -l)
-          POD_COUNT=$((POD_COUNT-1))  # Уменьшаем на 1 из-за строки заголовка
-          if [ $POD_COUNT -gt 1 ]; then
+        while : ; do
+         POD_COUNT=$(kubectl get pods -l app=${{ inputs.apps }} -o jsonpath='{.items[*].metadata.name}' -n default --kubeconfig=${{ inputs.kubeconfig }} | wc -w)
+         if [ $POD_COUNT -gt 1 ]; then
             break
-          fi
-          echo "Waiting for more pods..."
-          sleep 5
-        done
+         fi
+         echo "Waiting for more pods..."
+         sleep 5
+          done
 
 
     # Шаг 2: Получение имени последнего пода
@@ -47,7 +43,7 @@ runs:
       id: get_latest_pod
       shell:  bash
       run: |
-        LATEST_POD=$(kubectl get pods --sort-by=.metadata.creationTimestamp -o custom-columns=NAME:.metadata.name,CREATED:.metadata.creationTimestamp --no-headers --kubeconfig=${{ inputs.kubeconfig }} | tail -n 1 | awk '{print $1}') || { echo "Failed to get the latest pod"; exit 1; }
+        LATEST_POD=$(kubectl get pods -l app=${{ inputs.apps }} --sort-by=.metadata.creationTimestamp -o custom-columns=NAME:.metadata.name,CREATED:.metadata.creationTimestamp --no-headers --kubeconfig=${{ inputs.kubeconfig }} | tail -n 1 | awk '{print $1}') || { echo "Failed to get the latest pod"; exit 1; }
         echo "::set-output name=latest_pod::$LATEST_POD"
 
     # Шаг 3: Проверка статуса последнего пода
