@@ -17,11 +17,6 @@ RUN apk update && apk add --no-cache \
     && chmod -R 755 /var/lib/unit
 
 
-# Изменение владельца папки на пользователя 'user'
-RUN chown -R user:user /app
-
-# Установка прав доступа (чтение, запись и выполнение для владельца и группы, чтение и выполнение для остальных)
-RUN chmod -R 755 /app
 
 # Добавление официального ключа NGINX и настройка репозитория для Alpine
 # Добавление официального ключа NGINX и настройка репозитория для Alpine
@@ -51,7 +46,7 @@ RUN mkdir -p /app/static/admin/img \
     && mkdir -p /app/static/rest_framework/fonts \
     && mkdir -p /app/static/rest_framework/docs \
     && chown -R user:user /app/static \
-    && chmod -R 755 /app/static
+    && chmod -R 777 /app/static
 
 
 
