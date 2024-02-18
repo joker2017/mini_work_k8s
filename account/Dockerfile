@@ -11,12 +11,12 @@ RUN apk update && apk add --no-cache \
     gcc \
     libc-dev \
     linux-headers \
-    && adduser -D user \
+    && adduser -D user
 
 # Добавление официального ключа NGINX и настройка репозитория для Alpine
-RUN curl -O https://nginx.org/keys/nginx_signing.rsa.pub && \
-    mv nginx_signing.rsa.pub /etc/apk/keys/ && \
-    printf "@nginx https://nginx.org/packages/mainline/alpine/v%s/main\n" `egrep -o '^[0-9]+\.[0-9]+' /etc/alpine-release` | tee -a /etc/apk/repositories
+RUN curl -O https://nginx.org/keys/nginx_signing.rsa.pub \
+    && mv nginx_signing.rsa.pub /etc/apk/keys/ \
+    && printf "@nginx https://nginx.org/packages/mainline/alpine/v%s/main\n" $(egrep -o '^[0-9]+\.[0-9]+' /etc/alpine-release) | tee -a /etc/apk/repositories \
 
 # Установка NGINX Unit и необходимых модулей
 RUN apk add unit@nginx unit-python3@nginx
