@@ -41,7 +41,9 @@ RUN mkdir -p /app/static/admin/img \
     && mkdir -p /app/static/rest_framework/fonts \
     && mkdir -p /app/static/rest_framework/docs \
     && chown -R user:user /app/static \
-    && chmod -R 755 /app/static
+    && chmod -R 755 /app/static \
+    && chown -R user:user /var/lib/unit \
+    && chmod -R 755 /var/lib/unit
 
 # Переключаемся на пользователя 'user'
 USER user
