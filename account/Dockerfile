@@ -1,7 +1,5 @@
 #FROM nginx/unit:1.26.1-python3.9
 FROM unit:1.31.1-python3.11
-
-RUN ls -lah
 #
 # Установка зависимостей проекта
 COPY requirements.txt /tmp/
@@ -13,7 +11,9 @@ COPY . .
 # Настройка рабочего каталога
 #WORKDIR /app
 # Выставление прав доступа
-
+RUN apt-get update && apt-get install -y acl
+RUN setfacl -R -m u:unit:rwx /app
+RUN setfacl -d -R -m u:unit:rwx /app
 RUN mkdir -p app/static/
 #RUN chown -R unit:unit ./
 
@@ -26,9 +26,7 @@ RUN ls -lah
 RUN rm -f /docker-entrypoint.d/*.json
 COPY /unit.config.json /docker-entrypoint.d/config.json
 #RUN chown -R unit:unit /app
-RUN apt-get update && apt-get install -y acl
-RUN setfacl -R -m u:unit:rwx /app
-RUN setfacl -d -R -m u:unit:rwx /app
+
 #RUN chown -R unit:unit app/static/
 # Определяем порт, который будет прослушивать приложение
 EXPOSE 8300
