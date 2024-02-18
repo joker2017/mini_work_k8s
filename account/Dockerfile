@@ -34,8 +34,8 @@ COPY --chown=unit --from=builder /root/.local /opt/.local
 ENV PATH=/opt/.local/bin:$PATH
 ENV PYTHONPATH=/opt/.local/lib/python3.10/site-packages:$PYTHONPATH
 
-COPY --chown=unit ./pdfsvc .
-COPY ./unit.config.json /docker-entrypoint.d/ /docker-entrypoint.d/
+COPY --chown=unit ./app .
+COPY ./django.unit.json ./django-entrypoint.sh /docker-entrypoint.d/
 COPY ./unit-docker-entrypoint.sh /usr/local/bin/
 
 ENTRYPOINT ["/usr/local/bin/unit-docker-entrypoint.sh"]
