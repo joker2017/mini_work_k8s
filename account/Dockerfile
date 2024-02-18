@@ -13,11 +13,12 @@ COPY . .
 # Выставление прав доступа
 RUN mkdir -p /app/static/admin
 RUN mkdir -p /app/static/rest_framework
-RUN apt-get update && apt-get install -y acl
-RUN setfacl -R -m u:unit:rwx /app
-RUN setfacl -R -m d:u:unit:rwx /app
+#RUN apt-get update && apt-get install -y acl
+#RUN setfacl -R -m u:unit:rwx /app
+#RUN setfacl -R -m d:u:unit:rwx /app
+RUN chown -R unit:unit /app && chmod -R 770 /app
 
-RUN mkdir -p app/static/
+#RUN mkdir -p app/static/
 #RUN chown -R unit:unit ./
 
 # Команда для сбора статических файлов Django
