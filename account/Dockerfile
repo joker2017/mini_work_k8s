@@ -1,5 +1,5 @@
 # Используем базовый образ Python 3.11 на Alpine Linux
-FROM python:3.11-alpine AS builder
+FROM python:3.10-alpine AS builder
 
 # Устанавливаем переменные окружения для Python
 ENV PYTHONDONTWRITEBYTECODE=1
@@ -19,7 +19,7 @@ RUN apk update && apk add --no-cache \
 
 
 # Final image
-FROM python:3.11-alpine
+FROM python:3.10-alpine
 
 WORKDIR /opt/app
 
