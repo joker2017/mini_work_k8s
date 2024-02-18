@@ -38,6 +38,7 @@ ENV PYTHONPATH=/opt/.local/lib/python3.11/site-packages:$PYTHONPATH
 COPY --chown=unit ./app .
 COPY ./django.unit.json ./django-entrypoint.sh /docker-entrypoint.d/
 COPY ./unit-docker-entrypoint.sh /usr/local/bin/
+RUN chmod +x /usr/local/bin/unit-docker-entrypoint.sh
 
 ENTRYPOINT ["/usr/local/bin/unit-docker-entrypoint.sh"]
 

@@ -1,4 +1,5 @@
-#!/usr/bin/env ash
+#!/bin/sh
+
 
 set -e
 
