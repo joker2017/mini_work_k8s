@@ -46,17 +46,18 @@ RUN mkdir -p /app/static/admin/img \
     && chown -R user:user /app/static \
     && chmod -R 755 /app/static
 
-# Переключаемся на пользователя 'user'
-USER user
+
 
 # Удаляем файлы конфигурации по умолчанию и копируем наш файл конфигурации NGINX Unit
 RUN rm -f /docker-entrypoint.d/*.json
 COPY unit.config.json /docker-entrypoint.d/config.json
 # Устанавливаем рабочую директорию
 WORKDIR /app
+
 # Определяем порт, который будет прослушивать приложение
 EXPOSE 8300
-
 # Запускаем NGINX Unit
 # Настройка и запуск NGINX Unit при старте контейнера
 CMD ["unitd", "--no-daemon", "--control", "unix:/var/run/control.unit.sock"]
+# Переключаемся на пользователя 'user'
+USER user
