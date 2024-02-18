@@ -14,13 +14,13 @@ RUN apk update && apk add --no-cache \
     && adduser -D user
 
 # Добавление официального ключа NGINX и настройка репозитория для Alpine
+# Добавление официального ключа NGINX и настройка репозитория для Alpine
 RUN curl -O https://nginx.org/keys/nginx_signing.rsa.pub \
     && mv nginx_signing.rsa.pub /etc/apk/keys/ \
     && printf "@nginx https://nginx.org/packages/mainline/alpine/v%s/main\n" $(egrep -o '^[0-9]+\.[0-9]+' /etc/alpine-release) | tee -a /etc/apk/repositories \
-# Важно: Закрывающий обратный слэш удален для корректности примера
+    && apk add unit@nginx unit-python3@nginx
 
-# Установка NGINX Unit и необходимых модулей
-RUN apk add unit@nginx unit-python3@nginx
+
 
 # Копируем файл с зависимостями проекта и устанавливаем зависимости
 COPY requirements.txt /tmp/
