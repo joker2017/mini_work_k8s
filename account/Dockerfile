@@ -10,7 +10,7 @@ RUN apk update && apk add --no-cache \
     curl \
     gcc \
     libc-dev \
-    linux-headers
+    linux-headers \
 
 
 
@@ -43,8 +43,7 @@ RUN mkdir -p /app/static/admin/img \
     && mkdir -p /app/static/rest_framework/fonts \
     && mkdir -p /app/static/rest_framework/docs \
     && chown -R unit:unit /app/static \
-    && chmod -R 777 /app/ \
-    && chown -R unit:unit /app
+    && chmod -R 777 /app/
 
 
 
@@ -52,20 +51,17 @@ RUN mkdir -p /app/static/admin/img \
 RUN rm -f /docker-entrypoint.d/*.json
 COPY unit.config.json /docker-entrypoint.d/config.json
 # Устанавливаем рабочую директорию
-
+WORKDIR /app
 
 # Определяем порт, который будет прослушивать приложение
-
-# Запускаем NGINX Unit
-# Настройка и запуск NGINX Unit при старте контейнера
-#CMD ["unitd", "--no-daemon", "--control", "unix:/var/run/control.unit.sock", "--config", "/docker-entrypoint.d/config.json"]
-# Копирование скрипта точки входа и конфигурационного файла
 COPY docker-entrypoint.sh /docker-entrypoint.sh
 
 # Установка скрипта точки входа как исполняемого файла
 RUN chmod +x /docker-entrypoint.sh
-ENTRYPOINT ["/docker-entrypoint.sh"]
-WORKDIR /app
+ENTRYPOINT ["/docker-entrypoint.sh"
+# Запускаем NGINX Unit
+# Настройка и запуск NGINX Unit при старте контейнера
+#CMD ["unitd", "--no-daemon", "--control", "unix:/var/run/control.unit.sock"]
 # Переключаемся на пользователя 'user'
 #USER user
 EXPOSE 8300
