@@ -11,12 +11,23 @@ COPY . .
 # Настройка рабочего каталога
 #WORKDIR /app
 # Выставление прав доступа
-RUN mkdir -p /app/static/admin
-RUN mkdir -p /app/static/rest_framework
+RUN mkdir -p /app/static/admin/img
+RUN mkdir -p /app/static/admin/css
+RUN mkdir -p /app/static/admin/js
+RUN mkdir -p /app/static/rest_framework/img
+RUN mkdir -p /app/static/rest_framework/css
+RUN mkdir -p /app/static/rest_framework/js
+RUN mkdir -p /app/static/rest_framework/fonts
+RUN mkdir -p /app/static/rest_framework/docs
 #RUN apt-get update && apt-get install -y acl
 #RUN setfacl -R -m u:unit:rwx /app
 #RUN setfacl -R -m d:u:unit:rwx /app
-RUN chown -R unit:unit /app && chmod -R 770 /app
+#RUN chown -R unit:unit /app && chmod -R 770 /app
+
+
+RUN adduser -D user
+RUN chown -R user:user /app/static
+RUN chmod -R 777 app/static
 
 #RUN mkdir -p app/static/
 #RUN chown -R unit:unit ./
