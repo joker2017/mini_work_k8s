@@ -4,7 +4,7 @@ FROM python:3.11-alpine
 # Устанавливаем переменные окружения для Python
 ENV PYTHONDONTWRITEBYTECODE=1
 ENV PYTHONUNBUFFERED=1
-
+WORKDIR /root
 # Установка зависимостей
 RUN apk update && apk add --no-cache \
     curl \
@@ -19,9 +19,9 @@ RUN apk update && apk add --no-cache \
 COPY requirements.txt /tmp/
 RUN pip install --no-cache-dir -r /tmp/requirements.txt
 
-COPY ./docker-entrypoint.sh /tmp/
+COPY docker-entrypoint.sh /tmp/
 # Установка скрипта точки входа как исполняемого файла
-RUN chmod +x /tmp/docker-entrypoint.sh
+#RUN chmod +x /tmp/docker-entrypoint.sh
 
 # Удаляем файлы конфигурации по умолчанию и копируем наш файл конфигурации NGINX Unit
 RUN rm -f /docker-entrypoint.d/*.json
