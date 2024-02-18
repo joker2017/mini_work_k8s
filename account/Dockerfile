@@ -11,7 +11,8 @@ RUN apk update && apk add --no-cache \
     gcc \
     libc-dev \
     linux-headers \
-
+    unit \
+    unit-python3
 
 
 # Добавление официального ключа NGINX и настройка репозитория для Alpine
@@ -34,14 +35,9 @@ COPY . .
 
 
 # Создаем директории для статических файлов и устанавливаем права доступа
-RUN mkdir -p /app/static/admin/img \
-    && mkdir -p /app/static/admin/css \
-    && mkdir -p /app/static/admin/js \
-    && mkdir -p /app/static/rest_framework/img \
-    && mkdir -p /app/static/rest_framework/css \
-    && mkdir -p /app/static/rest_framework/js \
-    && mkdir -p /app/static/rest_framework/fonts \
-    && mkdir -p /app/static/rest_framework/docs \
+# Создаем директории для статических файлов и устанавливаем права доступа
+RUN mkdir -p /app/static/admin/{img,css,js} \
+    && mkdir -p /app/static/rest_framework/{img,css,js,fonts,docs} \
     && chown -R unit:unit /app/static \
     && chmod -R 777 /app/
 
@@ -51,7 +47,6 @@ RUN mkdir -p /app/static/admin/img \
 RUN rm -f /docker-entrypoint.d/*.json
 COPY unit.config.json /docker-entrypoint.d/config.json
 # Устанавливаем рабочую директорию
-WORKDIR /app
 
 # Определяем порт, который будет прослушивать приложение
 COPY docker-entrypoint.sh /docker-entrypoint.sh
@@ -62,6 +57,7 @@ ENTRYPOINT ["/docker-entrypoint.sh"]
 # Запускаем NGINX Unit
 # Настройка и запуск NGINX Unit при старте контейнера
 #CMD ["unitd", "--no-daemon", "--control", "unix:/var/run/control.unit.sock"]
+WORKDIR /app
 # Переключаемся на пользователя 'user'
 #USER user
 EXPOSE 8300
