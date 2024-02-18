@@ -58,7 +58,7 @@ COPY docker-entrypoint.sh /docker-entrypoint.sh
 
 # Установка скрипта точки входа как исполняемого файла
 RUN chmod +x /docker-entrypoint.sh
-ENTRYPOINT ["/docker-entrypoint.sh"
+ENTRYPOINT ["/docker-entrypoint.sh"]
 # Запускаем NGINX Unit
 # Настройка и запуск NGINX Unit при старте контейнера
 #CMD ["unitd", "--no-daemon", "--control", "unix:/var/run/control.unit.sock"]

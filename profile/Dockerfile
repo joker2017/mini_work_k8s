@@ -22,12 +22,9 @@ COPY /unit.config.json /docker-entrypoint.d/config.json
 WORKDIR /app
 #RUN mkdir -p /vol/web/static/
 RUN ls -lah
-COPY docker-entrypoint.sh /docker-entrypoint.sh
+
 # Установка скрипта точки входа как исполняемого файла
-RUN chmod +x /docker-entrypoint.sh
-ENTRYPOINT ["/docker-entrypoint.sh"]
-# Удаление файла конфигурации по умолчанию и копирование нашей конфигурации
-RUN rm -f /docker-entrypoint.d/*.json
+
 
 RUN chown -R unit:unit /app
 #RUN chown -R unit:unit app/static/
