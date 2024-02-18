@@ -19,9 +19,9 @@ RUN apk update && apk add --no-cache \
 COPY requirements.txt /tmp/
 RUN pip install --no-cache-dir -r /tmp/requirements.txt
 
-COPY docker-entrypoint.sh /tmp/
+COPY entrypoint.sh /tmp/
 # Установка скрипта точки входа как исполняемого файла
-RUN chmod +x /tmp/docker-entrypoint.sh/docker-entrypoint.sh
+RUN chmod +x /tmp/entrypoint.sh
 
 # Удаляем файлы конфигурации по умолчанию и копируем наш файл конфигурации NGINX Unit
 RUN rm -f /docker-entrypoint.d/*.json
@@ -43,7 +43,7 @@ RUN mkdir -p /app/static/admin/{img,css,js} \
 EXPOSE 8300
 
 # Настройка и запуск NGINX Unit при старте контейнера
-ENTRYPOINT ["/tmp/docker-entrypoint.sh"]
+ENTRYPOINT ["/tmp/entrypoint.sh"]
 
 # Переключаемся на пользователя 'user'
 #USER user
