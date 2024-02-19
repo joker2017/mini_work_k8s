@@ -1,44 +1,40 @@
-name: Django CI
-
-on: [push]
-
+on:
 jobs:
   test:
-
     runs-on: ubuntu-latest
-
     steps:
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@v2
 
-    - name: Set up Python 3.11
-      uses: actions/setup-python@v5
+    - name: Set up Python
+      uses: actions/setup-python@v2
       with:
-        python-version: 3.11
+        python-version: '3.8'
 
     - name: Install dependencies
       run: |
-        ls /opt
-        cd account
         python -m pip install --upgrade pip
-        pip install -r ./requirements.txt
-        pip install coverage
-        pip install coveralls
+        pip install pytest pytest-cov
+
+    - name: Setup Test Directories
+      run: |
+        echo "SRC_DIR=./account" >> $GITHUB_ENV
+        echo "TESTS_DIR=./account/app/account/tests" >> $GITHUB_ENV
 
     - name: Run tests with coverage
       run: |
-        coverage run --source=app ./account/app/manage.py test
-        coverage report
+        pytest ${{ env.TESTS_DIR }} --cov=${{ env.SRC_DIR }} --cov-report=xml
 
-    - name: Coveralls
-      uses: coverallsapp/github-action@v2
-      with:
-        github-token: ${{ secrets.GITHUB_TOKEN }}
-        path-to-lcov: ./coverage.xml
-        # Опционально, если вы хотите загрузить форматированный lcov re
+    - name: Generate unique filename for test results
+      run: |
+        echo "TEST_RESULTS_FILENAME=test-results-$(date +%s).xml" >> $GITHUB_ENV
+
+    - name: Run tests and generate report
+      run: |
+        pytest ${{ env.TESTS_DIR }} --junitxml=${{ env.TEST_RESULTS_FILENAME }}
+
 
     - name: Publish Test Results
-      uses: EnricoMi/publish-unit-test-result-action/composite@v2
+      uses: EnricoMi/publish-unit-test-result-action@v2
       if: always()
       with:
-        files: coverage.json
-
+        files: ${{ env.TEST_RESULTS_FILENAME }}
