@@ -13,7 +13,7 @@ jobs:
 
     - name: Setup Test Directories
       run: |
-        echo "SRC_DIR=./account/" >> $GITHUB_ENV
+        echo "SRC_DIR=./account/app" >> $GITHUB_ENV
         echo "TESTS_DIR=./account/app/account/tests/tests_test.py" >> $GITHUB_ENV
 
 
@@ -35,7 +35,7 @@ jobs:
 
     - name: Run tests and generate report
       run: |
-        ls /
+        pwd
         pytest ${{ env.TESTS_DIR }} --junitxml=${{ env.TEST_RESULTS_FILENAME }}
 
 
