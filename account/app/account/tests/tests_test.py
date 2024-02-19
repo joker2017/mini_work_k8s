@@ -7,7 +7,7 @@ from rest_framework.test import APITestCase
 #from account.app.account.serializers import AccountSerializer, AccountSerializerRegistr
 from account.serializers import AccountSerializer, AccountSerializerRegistr
 # Предположим, что у вас есть такие модули
-from account.app.account.services import create_account_number
+from account.services import create_account_number
 
 # Имитация модели Account для тестов
 mock_account = MagicMock()
