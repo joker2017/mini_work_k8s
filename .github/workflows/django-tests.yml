@@ -1,0 +1,44 @@
+name: Django CI
+
+on: [push, pull_request]
+
+jobs:
+  test:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Set up Python 3.11
+      uses: actions/setup-python@v5
+      with:
+        python-version: 3.11
+
+    - name: Install dependencies
+      run: |
+        cd account
+        python -m pip install --upgrade pip
+        pip install -r account/requirements.txt
+        pip install coverage
+        pip install coveralls
+
+    - name: Run tests with coverage
+      run: |
+        coverage run --source=app app/manage.py test
+        coverage report
+
+    - name: Coveralls
+      uses: coverallsapp/github-action@v2
+      with:
+        github-token: ${{ secrets.GITHUB_TOKEN }}
+        path-to-lcov: ./coverage.xml
+        # Опционально, если вы хотите загрузить форматированный lcov report вместо стандартного.
+
+    - name: Publish Test Results
+      uses: EnricoMi/publish-unit-test-result-action/composite@v2
+      if: always()
+      with:
+        files: |
+          ./coverage.xml
+

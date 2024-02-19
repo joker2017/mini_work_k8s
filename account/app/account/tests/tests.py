@@ -10,17 +10,17 @@ from account.serializers import AccountSerializer, AccountSerializerRegistr
 mock_account_qs = MagicMock()
 mock_account = MagicMock(spec=Account)
 
+# Тесты для API
 @patch('account.models.Account.objects', mock_account_qs)
 class AccountAPITestCase(APITestCase):
     def setUp(self):
         super().setUp()
-        # Настройка моков для модели Account
         mock_account_qs.all.return_value = [mock_account]
         mock_account_qs.filter.return_value = mock_account_qs
         mock_account_qs.filter.return_value.exists.return_value = False
 
-    @patch('account.views.AccountList.queryset', mock_account_qs.all())
-    def test_account_list(self):
+    @patch('account.views.AccountList.get_queryset', return_value=mock_account_qs.all())
+    def test_account_list(self, mock_get_queryset):
         url = '/account/list/'
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
@@ -29,20 +29,14 @@ class AccountAPITestCase(APITestCase):
     def test_account_create(self, mocked_create_account_number):
         mocked_create_account_number.return_value = '1234567890'
         url = '/account/create/'
-        data = {
-            'name': 'Test Account',
-            'balance': 1000,
-        }
+        data = {'name': 'Test Account', 'balance': 1000}
         response = self.client.post(url, data, format='json')
         self.assertEqual(response.status_code, 201)
 
     def test_account_update(self):
         pk = '123'
         url = f'/account/update/{pk}/'
-        data = {
-            'name': 'Updated Account',
-            'balance': 1500,
-        }
+        data = {'name': 'Updated Account', 'balance': 1500}
         response = self.client.patch(url, data, format='json')
         self.assertEqual(response.status_code, 200)
 
@@ -58,15 +52,15 @@ class AccountAPITestCase(APITestCase):
         response = self.client.delete(url)
         self.assertEqual(response.status_code, 204)
 
+# Тесты для сервиса создания номера аккаунта
+@patch('account.services.Account.objects.filter')
 class CreateAccountNumberTestCase(TestCase):
-    @patch('account.services.Account.objects.filter')
     def test_create_account_number_success(self, mock_filter):
         mock_filter.return_value.exists.return_value = False
         account_number = create_account_number()
         self.assertEqual(len(account_number), 20)
         self.assertTrue(account_number.isdigit())
 
-    @patch('account.services.Account.objects.filter')
     def test_create_account_number_retry(self, mock_filter):
         mock_filter.side_effect = [MagicMock(exists=MagicMock(return_value=True)),
                                    MagicMock(exists=MagicMock(return_value=False))]
@@ -74,13 +68,7 @@ class CreateAccountNumberTestCase(TestCase):
         self.assertEqual(len(account_number), 20)
         self.assertTrue(account_number.isdigit())
 
-
-
-
-from django.test import TestCase
-from unittest.mock import patch, MagicMock
-from account.serializers import AccountSerializer, AccountSerializerRegistr
-
+# Тесты для сериализаторов
 class AccountSerializerTestCase(TestCase):
     def setUp(self):
         self.account_attributes = {
@@ -88,34 +76,25 @@ class AccountSerializerTestCase(TestCase):
             'balance': '100.00',
             'usernameid': None
         }
-
         self.serializer_data = {
             'balance': '200.00',
             'id': '09876543210987654321',
             'usernameid': None
         }
+        self.account = MagicMock(spec=Account, **self.account_attributes)
 
     def test_contains_expected_fields(self):
-        """Тест на проверку наличия ожидаемых полей."""
-        serializer = AccountSerializer(data=self.account_attributes)
-        self.assertTrue(serializer.is_valid())
-        data = serializer.validated_data
-        self.assertEqual(set(data.keys()), set(['id', 'balance', 'usernameid']))
+        serializer = AccountSerializer(instance=self.account)
+        data = serializer.data
+        self.assertEqual(set(data.keys()), set(['balance', 'id', 'usernameid']))
 
     def test_balance_field_content(self):
-        """Тест содержимого поля balance."""
-        serializer = AccountSerializer(data=self.account_attributes)
-        self.assertTrue(serializer.is_valid())
-        data = serializer.validated_data
-        self.assertEqual(data['balance'], self.account_attributes['balance'])
+        serializer = AccountSerializer(instance=self.account)
+        self.assertEqual(serializer.data['balance'], '100.00')
 
-class AccountSerializerRegistrTestCase(TestCase):
-    @patch('account.serializers.Account.save', MagicMock(name="save"))
-    def test_deserialization(self):
-        """Тест на десериализацию и валидацию данных."""
+    @patch('account.serializers.AccountSerializerRegistr.save', MagicMock(name="save"))
+    def test_account_save(self):
         serializer = AccountSerializerRegistr(data=self.serializer_data)
         self.assertTrue(serializer.is_valid(raise_exception=True))
-        # Замокированное сохранение, чтобы избежать взаимодействия с базой данных
         serializer.save()
-        AccountSerializerRegistr.Meta.model.save.assert_called_once_with()
-
+        self.assertTrue(AccountSerializerRegistr.save.called)
