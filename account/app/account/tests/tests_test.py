@@ -3,9 +3,9 @@ from rest_framework.test import APITestCase
 from unittest.mock import patch, MagicMock
 
 # Предположим, что у вас есть такие модули
-from account.app.account.services import create_account_number
-from account.app.account.serializers import AccountSerializer, AccountSerializerRegistr
-
+from app.account.services import create_account_number
+#from account.app.account.serializers import AccountSerializer, AccountSerializerRegistr
+from app.account.serializers import AccountSerializer, AccountSerializerRegistr
 # Имитация модели Account для тестов
 mock_account = MagicMock()
 
