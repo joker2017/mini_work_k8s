@@ -26,7 +26,7 @@ jobs:
 
     - name: Run tests with coverage
       run: |
-        coverage run --source=app ./manage.py test
+        coverage run --source=app ./account/app/manage.py test
         coverage report
 
     - name: Coveralls
@@ -34,7 +34,7 @@ jobs:
       with:
         github-token: ${{ secrets.GITHUB_TOKEN }}
         path-to-lcov: ./coverage.xml
-        # Опционально, если вы хотите загрузить форматированный lcov report вместо стандартного.
+        # Опционально, если вы хотите загрузить форматированный lcov report
 
     - name: Publish Test Results
       uses: EnricoMi/publish-unit-test-result-action/composite@v2
