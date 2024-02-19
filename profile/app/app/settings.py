@@ -150,7 +150,7 @@ USE_TZ = True
 
 #STATIC_URL = "/static2/"
 #STATIC_ROOT = os.path.join(BASE_DIR, "static")
-
+#https://stackoverflow.com/questions/50943665/django-static-files-changing-url
 STATIC_DIR = os.path.join(BASE_DIR, 'static2')
 STATIC_URL = '/static2/'
 STATICFILES_DIRS = [STATIC_DIR,]
