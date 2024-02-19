@@ -1,6 +1,9 @@
 # tests.py
 from account.tests.test_utils import BaseTestCase
 
+from rest_framework.test import APITestCase
+from django.test import SimpleTestCase
+
 from unittest.mock import patch, MagicMock
 from rest_framework.test import APIClient
 
