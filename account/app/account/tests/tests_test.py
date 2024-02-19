@@ -1,7 +1,8 @@
-# tests.py
 from django.test import SimpleTestCase
-from unittest.mock import patch, MagicMock
 from rest_framework.test import APITestCase
+from unittest.mock import patch, MagicMock
+
+# Предположим, что у вас есть такие модули
 from account.app.account.services import create_account_number
 from account.app.account.serializers import AccountSerializer, AccountSerializerRegistr
 
@@ -10,7 +11,7 @@ mock_account = MagicMock()
 
 # Тесты для API, использующие мокирование вместо реальной базы данных
 class AccountAPITestCase(APITestCase):
-    @patch('yourapp.models.Account.objects.all')
+    @patch('account.app.account.models.Account.objects.all')
     def test_account_list(self, mock_all):
         # Настройка мока
         mock_all.return_value = [mock_account]
@@ -22,8 +23,8 @@ class AccountAPITestCase(APITestCase):
         self.assertEqual(response.status_code, 200)
         mock_all.assert_called_once()
 
-    @patch('yourapp.views.create_account_number')
-    @patch('yourapp.serializers.AccountSerializerRegistr.save')
+    @patch('account.app.account.services.create_account_number')
+    @patch('account.app.account.serializers.AccountSerializerRegistr.save')
     def test_account_create(self, mock_save, mock_create_account_number):
         # Настройка моков
         mock_create_account_number.return_value = '1234567890'
@@ -40,7 +41,7 @@ class AccountAPITestCase(APITestCase):
 
 # Тесты для сервиса создания номера аккаунта
 class CreateAccountNumberTestCase(SimpleTestCase):
-    @patch('yourapp.models.Account.objects.filter')
+    @patch('account.app.account.models.Account.objects.filter')
     def test_create_account_number_success(self, mock_filter):
         # Настройка мока
         mock_filter.return_value.exists.return_value = False
@@ -60,7 +61,7 @@ class AccountSerializerTestCase(SimpleTestCase):
         account_data = {'name': 'Test Account', 'balance': 1000}
 
         # Создание сериализатора с данными
-        serializer = AccountSerializerTestCase(data=account_data)
+        serializer = AccountSerializer(data=account_data)
 
         # Проверка валидности сериализатора
         self.assertTrue(serializer.is_valid())
