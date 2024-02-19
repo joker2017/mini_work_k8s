@@ -34,7 +34,7 @@ jobs:
       with:
         github-token: ${{ secrets.GITHUB_TOKEN }}
         path-to-lcov: ./coverage.xml
-        # Опционально, если вы хотите загрузить форматированный lcov repo
+        # Опционально, если вы хотите загрузить форматированный lcov re
 
     - name: Publish Test Results
       uses: EnricoMi/publish-unit-test-result-action/composite@v2
