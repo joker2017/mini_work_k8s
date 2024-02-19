@@ -2,8 +2,8 @@
 from django.test import SimpleTestCase
 from unittest.mock import patch, MagicMock
 from rest_framework.test import APITestCase
-from .services import create_account_number
-from .serializers import AccountSerializer, AccountSerializerRegistr
+from account.app.account.services import create_account_number
+from account.app.account.serializers import AccountSerializer, AccountSerializerRegistr
 
 # Имитация модели Account для тестов
 mock_account = MagicMock()
@@ -60,7 +60,7 @@ class AccountSerializerTestCase(SimpleTestCase):
         account_data = {'name': 'Test Account', 'balance': 1000}
 
         # Создание сериализатора с данными
-        serializer = AccountSerializer(data=account_data)
+        serializer = AccountSerializerTestCase(data=account_data)
 
         # Проверка валидности сериализатора
         self.assertTrue(serializer.is_valid())
