@@ -1,4 +1,4 @@
-from django.test import TestCase
+from django.test import SimpleTestCase, override_settings
 from rest_framework.test import APITestCase
 from unittest.mock import patch, MagicMock
 from account.models import Account
@@ -52,9 +52,10 @@ class AccountAPITestCase(APITestCase):
         response = self.client.delete(url)
         self.assertEqual(response.status_code, 204)
 
-# Тесты для сервиса создания номера аккаунта
+# Тесты для сервиса создания номера аккаунта и сериализаторов не требуют доступа к БД и могут использовать SimpleTestCase
+
 @patch('account.services.Account.objects.filter')
-class CreateAccountNumberTestCase(TestCase):
+class CreateAccountNumberTestCase(SimpleTestCase):
     def test_create_account_number_success(self, mock_filter):
         mock_filter.return_value.exists.return_value = False
         account_number = create_account_number()
@@ -68,8 +69,7 @@ class CreateAccountNumberTestCase(TestCase):
         self.assertEqual(len(account_number), 20)
         self.assertTrue(account_number.isdigit())
 
-# Тесты для сериализаторов
-class AccountSerializerTestCase(TestCase):
+class AccountSerializerTestCase(SimpleTestCase):
     def setUp(self):
         self.account_attributes = {
             'id': '12345678901234567890',
