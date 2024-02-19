@@ -1,5 +1,5 @@
 # tests.py
-from account.app.account.tests.test_utils import BaseTestCase
+from account.tests.test_utils import BaseTestCase
 
 from unittest.mock import patch, MagicMock
 from rest_framework.test import APIClient
