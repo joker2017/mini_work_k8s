@@ -1,17 +1,10 @@
-# tests.py
-from account.tests.test_utils import BaseTestCase
-
-from rest_framework.test import APITestCase
-from django.test import SimpleTestCase
-
 from unittest.mock import patch, MagicMock
-from rest_framework.test import APIClient
-
+from django.test import SimpleTestCase
+from rest_framework.test import APITestCase
 from account.serializers import AccountSerializer, AccountSerializerRegistr
-# Предположим, что у вас есть такие модули
 from account.services import create_account_number
 
-# Мок модели Account
+# Мок модели Account для использования в тестах
 mock_account = MagicMock()
 
 class AccountAPITestCase(APITestCase):
@@ -22,7 +15,7 @@ class AccountAPITestCase(APITestCase):
         self.assertEqual(response.status_code, 200)
         mock_all.assert_called_once()
 
-    @patch('account.views.create_account_number')
+    @patch('account.services.create_account_number')
     @patch('account.serializers.AccountSerializerRegistr.save')
     def test_account_create(self, mock_save, mock_create_account_number):
         mock_create_account_number.return_value = '1234567890'
