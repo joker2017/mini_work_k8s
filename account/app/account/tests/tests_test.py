@@ -4,7 +4,8 @@ from django.test import SimpleTestCase
 from rest_framework.test import APITestCase
 
 # from account.app.account.serializers import AccountSerializer, AccountSerializerRegistr
-from account.app.account.serializers import AccountSerializer, AccountSerializerRegistr
+#from account.app.account.serializers import AccountSerializer, AccountSerializerRegistr
+from account.serializers import AccountSerializer, AccountSerializerRegistr
 # Предположим, что у вас есть такие модули
 from account.app.account.services import create_account_number
 
