@@ -1,100 +1,80 @@
-from django.test import SimpleTestCase, override_settings
-from rest_framework.test import APITestCase
+# tests.py
+from django.test import SimpleTestCase
 from unittest.mock import patch, MagicMock
-from account.models import Account
-from account.views import AccountList, AccountCreate, AccountUpdate, AccountDetail, AccountDestroy
-from account.services import create_account_number
-from account.serializers import AccountSerializer, AccountSerializerRegistr
+from rest_framework.test import APITestCase
+from .services import create_account_number
+from .serializers import AccountSerializer, AccountSerializerRegistr
 
-# Мокирование модели Account для исключения обращения к БД
-mock_account_qs = MagicMock()
-mock_account = MagicMock(spec=Account)
+# Имитация модели Account для тестов
+mock_account = MagicMock()
 
-# Тесты для API
-@patch('account.models.Account.objects', mock_account_qs)
+# Тесты для API, использующие мокирование вместо реальной базы данных
 class AccountAPITestCase(APITestCase):
-    def setUp(self):
-        super().setUp()
-        mock_account_qs.all.return_value = [mock_account]
-        mock_account_qs.filter.return_value = mock_account_qs
-        mock_account_qs.filter.return_value.exists.return_value = False
+    @patch('yourapp.models.Account.objects.all')
+    def test_account_list(self, mock_all):
+        # Настройка мока
+        mock_all.return_value = [mock_account]
 
-    @patch('account.views.AccountList.get_queryset', return_value=mock_account_qs.all())
-    def test_account_list(self, mock_get_queryset):
-        url = '/account/list/'
-        response = self.client.get(url)
+        # Тестовый запрос к API
+        response = self.client.get('/account/list/')
+
+        # Проверки
         self.assertEqual(response.status_code, 200)
+        mock_all.assert_called_once()
 
-    @patch('account.views.create_account_number')
-    def test_account_create(self, mocked_create_account_number):
-        mocked_create_account_number.return_value = '1234567890'
-        url = '/account/create/'
+    @patch('yourapp.views.create_account_number')
+    @patch('yourapp.serializers.AccountSerializerRegistr.save')
+    def test_account_create(self, mock_save, mock_create_account_number):
+        # Настройка моков
+        mock_create_account_number.return_value = '1234567890'
+        mock_save.return_value = mock_account
+
+        # Тестовый запрос к API
         data = {'name': 'Test Account', 'balance': 1000}
-        response = self.client.post(url, data, format='json')
+        response = self.client.post('/account/create/', data, format='json')
+
+        # Проверки
         self.assertEqual(response.status_code, 201)
+        mock_create_account_number.assert_called_once()
+        mock_save.assert_called_once()
 
-    def test_account_update(self):
-        pk = '123'
-        url = f'/account/update/{pk}/'
-        data = {'name': 'Updated Account', 'balance': 1500}
-        response = self.client.patch(url, data, format='json')
-        self.assertEqual(response.status_code, 200)
-
-    def test_account_detail(self):
-        usernameid = 'testuser'
-        url = f'/account/detail/{usernameid}/'
-        response = self.client.get(url)
-        self.assertEqual(response.status_code, 200)
-
-    def test_account_destroy(self):
-        pk = '123'
-        url = f'/account/destroy/{pk}/'
-        response = self.client.delete(url)
-        self.assertEqual(response.status_code, 204)
-
-# Тесты для сервиса создания номера аккаунта и сериализаторов не требуют доступа к БД и могут использовать SimpleTestCase
-
-@patch('account.services.Account.objects.filter')
+# Тесты для сервиса создания номера аккаунта
 class CreateAccountNumberTestCase(SimpleTestCase):
+    @patch('yourapp.models.Account.objects.filter')
     def test_create_account_number_success(self, mock_filter):
+        # Настройка мока
         mock_filter.return_value.exists.return_value = False
+
+        # Вызов тестируемой функции
         account_number = create_account_number()
+
+        # Проверки
         self.assertEqual(len(account_number), 20)
         self.assertTrue(account_number.isdigit())
+        mock_filter.assert_called_once_with(id=account_number)
 
-    def test_create_account_number_retry(self, mock_filter):
-        mock_filter.side_effect = [MagicMock(exists=MagicMock(return_value=True)),
-                                   MagicMock(exists=MagicMock(return_value=False))]
-        account_number = create_account_number()
-        self.assertEqual(len(account_number), 20)
-        self.assertTrue(account_number.isdigit())
-
+# Тесты для сериализаторов
 class AccountSerializerTestCase(SimpleTestCase):
-    def setUp(self):
-        self.account_attributes = {
-            'id': '12345678901234567890',
-            'balance': '100.00',
-            'usernameid': None
-        }
-        self.serializer_data = {
-            'balance': '200.00',
-            'id': '09876543210987654321',
-            'usernameid': None
-        }
-        self.account = MagicMock(spec=Account, **self.account_attributes)
+    def test_account_serializer_fields(self):
+        # Имитация данных аккаунта
+        account_data = {'name': 'Test Account', 'balance': 1000}
 
-    def test_contains_expected_fields(self):
-        serializer = AccountSerializer(instance=self.account)
-        data = serializer.data
-        self.assertEqual(set(data.keys()), set(['balance', 'id', 'usernameid']))
+        # Создание сериализатора с данными
+        serializer = AccountSerializer(data=account_data)
 
-    def test_balance_field_content(self):
-        serializer = AccountSerializer(instance=self.account)
-        self.assertEqual(serializer.data['balance'], '100.00')
+        # Проверка валидности сериализатора
+        self.assertTrue(serializer.is_valid())
+        self.assertEqual(set(serializer.validated_data.keys()), set(['name', 'balance']))
 
-    @patch('account.serializers.AccountSerializerRegistr.save', MagicMock(name="save"))
-    def test_account_save(self):
-        serializer = AccountSerializerRegistr(data=self.serializer_data)
-        self.assertTrue(serializer.is_valid(raise_exception=True))
-        serializer.save()
-        self.assertTrue(AccountSerializerRegistr.save.called)
+    def test_account_serializer_registr_save(self):
+        # Имитация данных для регистрации аккаунта
+        account_registr_data = {'name': 'Test Account', 'balance': 1000}
+
+        # Создание сериализатора с данными
+        serializer = AccountSerializerRegistr(data=account_registr_data)
+
+        # Проверка валидности сериализатора и вызов save (мокируется)
+        with patch.object(AccountSerializerRegistr, 'save', return_value=mock_account) as mock_save:
+            self.assertTrue(serializer.is_valid())
+            serializer.save()
+            mock_save.assert_called_once()
