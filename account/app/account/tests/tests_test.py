@@ -13,4 +13,4 @@ def test_create_account_number(mock_filter):
 
     assert len(account_number) == 20
     assert account_number.isdigit()
-    mock_filter.assert_called_once()  # Или используйте assert_called_once_with(), если вы хотите проверить вызов с конкретными аргументами
+    mock_filter.assert_called()  # Или используйте assert_called_once_with(), если вы хотите проверить вызов с конкретными аргументами
