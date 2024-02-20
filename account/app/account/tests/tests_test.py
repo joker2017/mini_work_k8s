@@ -25,10 +25,11 @@ from account.app.account.serializers import AccountSerializerRegistr
 
 
 @pytest.fixture
-def user_instance(db):
-    # Создаем экземпляр пользователя в базе данных для теста
-    return Users.objects.create(id='test_user_id', username='testuser', email='test@example.com',
-                                password='securepassword')
+def mock_user_instance():
+    # Создаем мок экземпляра пользователя
+    user_mock = Mock(spec=Users)
+    user_mock.id = 'test_user_id'
+    return user_mock
 
 
 @pytest.fixture
@@ -38,27 +39,26 @@ def mock_create_account_number(mocker):
 
 
 @pytest.fixture
-def account_data():
-    # Данные аккаунта для теста
-    return {
-        'balance': '100.00',
-        'usernameid': 'test_user_id'
-    }
-
-
-@pytest.fixture
-def mock_account_serializer(mocker, account_data):
+def mock_account_serializer(mocker, mock_user_instance):
     # Мокируем сериализатор для возвращения заданных данных
-    mock = mocker.Mock(spec=AccountSerializerRegistr)
-    mock.is_valid.return_value = True
-    mock.save.return_value = Account(**account_data)
-    mock.data = account_data
-    return mock
+    account_mock = Mock(spec=Account)
+    account_mock.id = '12345678901234567890'
+    account_mock.balance = 100.00
+    account_mock.usernameid = mock_user_instance
+    serializer_mock = Mock(spec=AccountSerializerRegistr)
+    serializer_mock.is_valid.return_value = True
+    serializer_mock.save.return_value = account_mock
+    serializer_mock.data = {
+        'id': account_mock.id,
+        'balance': '100.00',
+        'usernameid': account_mock.usernameid.id
+    }
+    return serializer_mock
 
 
-def test_account_create(mock_create_account_number, mock_account_serializer, user_instance, account_data, rf):
-    # rf - RequestFactory для создания запроса
-    request = rf.post('/fake-url/', data=account_data)
+def test_account_create(mock_create_account_number, mock_account_serializer, rf):
+    # Используем RequestFactory для создания запроса
+    request = rf.post('/fake-url/', data={'balance': '100.00', 'usernameid': 'test_user_id'})
     view = AccountCreate.as_view()
 
     with patch('account.app.account.views.AccountCreate.get_serializer', return_value=mock_account_serializer):
@@ -66,6 +66,6 @@ def test_account_create(mock_create_account_number, mock_account_serializer, use
 
     assert response.status_code == status.HTTP_201_CREATED
     mock_create_account_number.assert_called_once()
-    assert mock_account_serializer.is_valid.called is True
-    assert mock_account_serializer.save.called is True
-    assert response.data == account_data
+    mock_account_serializer.is_valid.assert_called_once_with(raise_exception=True)
+    mock_account_serializer.save.assert_called_once()
+    assert response.data == {'id': '12345678901234567890', 'balance': '100.00', 'usernameid': 'test_user_id'}
