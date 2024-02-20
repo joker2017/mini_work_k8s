@@ -26,7 +26,8 @@ jobs:
 
     - name: Display structure
       run: tree
-
+    - name: Set DJANGO_SETTINGS_MODULE
+      run: echo "DJANGO_SETTINGS_MODULE=account.app.app.settings" >> $GITHUB_ENV
     - name: Run tests with coverage
       run: |
         tree
