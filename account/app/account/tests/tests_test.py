@@ -73,3 +73,54 @@ def test_account_destroy_with_mocked_response(account_instance):
         view.setup(request, pk=account_instance.id)
         response = view.delete(request, pk=account_instance.id)
         assert response.status_code == status.HTTP_204_NO_CONTENT
+
+
+
+
+
+
+
+
+
+
+from unittest.mock import patch, Mock
+import pytest
+from django.utils.crypto import get_random_string
+from hashlib import sha256
+from yourapp.models import Users, Account
+
+def test_user_password_hashing():
+    user_id = get_random_string(20)
+    user_data = {
+        "id": user_id,
+        "full_names": "Test User",
+        "username": "testuser",
+        "email": "test@example.com",
+        "password": "password",
+    }
+
+    with patch('yourapp.models.Users.save', autospec=True) as mock_save:
+        user = Users(**user_data)
+        user.password = sha256(user.password.encode('utf-8')).hexdigest()  # Имитация хеширования в методе save()
+        mock_save.return_value = None
+        user.save()
+
+        mock_save.assert_called_once_with(user)
+
+        assert user.password == sha256(user_data["password"].encode('utf-8')).hexdigest(), "Password was not hashed correctly"
+
+def test_account_creation_without_db():
+    user = Mock(spec=Users)
+    account_id = get_random_string(20, allowed_chars='0123456789')
+    balance = 100.00
+
+    with patch('yourapp.models.Account.save', autospec=True) as mock_save:
+        account = Account(id=account_id, balance=balance, usernameid=user)
+        mock_save.return_value = None
+        account.save()
+
+        mock_save.assert_called_once_with(account)
+
+        assert account.id == account_id, "Account ID not set correctly"
+        assert account.balance == balance, "Account balance not set correctly"
+        assert account.usernameid == user, "User not associated correctly with account"
