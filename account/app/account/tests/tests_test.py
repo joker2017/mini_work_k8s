@@ -94,7 +94,7 @@ def test_account_destroy_with_mocked_response(account_instance):
 
 
 
-
+import hashlib
 from hashlib import sha256
 import pytest
 from unittest.mock import patch, MagicMock
@@ -161,15 +161,15 @@ def test_user_password_hashing(user_data):
         user.save()
         mock_save.assert_called_once()
 
-        # Получаем переданный в метод save пароль
-        saved_password = mock_save.call_args.kwargs['password']
+        # Получаем переданные аргументы методу save
+        call_args = mock_save.call_args
+        saved_password = call_args.kwargs.get('password')
 
         # Хешируем ожидаемый пароль
-        expected_hashed_password = sha256(user_data['password'].encode('utf-8')).hexdigest()
+        expected_hashed_password = hashlib.sha256(user_data['password'].encode('utf-8')).hexdigest()
 
         # Сравниваем хешированные пароли
         assert saved_password == expected_hashed_password
-
 
 
 
