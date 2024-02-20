@@ -36,11 +36,11 @@ jobs:
     #  run: echo "DJANGO_SETTINGS_MODULE=app.settings" >> $GITHUB_ENV
 
     #- name: Set PYTHONPATH
-    #  run: echo "PYTHONPATH=$GITHUB_WORKSPACE" >> $GITHUB_ENV ,,,,,,
+    #  run: echo "PYTHONPATH=$GITHUB_WORKSPACE" >> $GITHUB_ENV ,,,,,,#  --cov=${{ env.SRC_DIR }}
 
     - name: Run tests with coverage
       run: |
-    #  --cov=${{ env.SRC_DIR }}
+    
         tree
         pytest ${{ env.TESTS_DIR }} -vv --cov=api.calculator --cov-report=xml
 
