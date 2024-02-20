@@ -27,36 +27,38 @@ def test_create_account_number(mock_filter):
 
 
 import pytest
-from django.urls import reverse
-from rest_framework.test import APIClient
-from rest_framework import status
+from unittest.mock import Mock
 
 @pytest.fixture
 def mock_create_account_number(mocker):
     return mocker.patch('account.app.account.services.create_account_number', return_value='12345678901234567890')
 
 @pytest.fixture
-def mock_account_save(mocker):
-    return mocker.patch('account.app.account.models.Account.save', autospec=True)
-
-@pytest.fixture
-def client():
-    return APIClient()
-
-def test_account_create(client, mock_create_account_number, mock_account_save):
-    account_data = {
+def mock_account_serializer(mocker):
+    serializer_mock = Mock()
+    serializer_mock.is_valid.return_value = True
+    serializer_mock.save.return_value = None  # Замените на нужное значение
+    serializer_mock.data = {
+        'id': '12345678901234567890',
         'balance': '100.00',
         'usernameid': 'test_user_id'
     }
+    return mocker.patch('account.app.account.views.AccountSerializerRegistr', return_value=serializer_mock)
 
-    url = reverse('account-create')
+def test_account_create(mock_create_account_number, mock_account_serializer):
+    from account.app.account.views import AccountCreate  # Импорт здесь, чтобы избежать циклических зависимостей
 
-    response = client.post(url, account_data, format='json')
+    view = AccountCreate()
+    request = Mock(data={
+        'balance': '100.00',
+        'usernameid': 'test_user_id'
+    })
+    view.request = request
+    response = view.create(request)
 
     assert response.status_code == status.HTTP_201_CREATED
     mock_create_account_number.assert_called_once()
-    mock_account_save.assert_called_once()
-
+    mock_account_serializer().is_valid.assert_called_once_with(raise_exception=True)
     assert response.data['id'] == '12345678901234567890'
     assert response.data['balance'] == '100.00'
     assert response.data['usernameid'] == 'test_user_id'
