@@ -1,44 +1,37 @@
-from django.test import TestCase
+
 from unittest.mock import patch
 from account.models import Account
-from account.views import AccountCreate, AccountList
-from django.http import HttpRequest
-from django.test.utils import override_settings
-import pytest
 
-# Мок функции, которая будет использоваться для подмены вызовов к модели Account
-def mock_account_save(self, *args, **kwargs):
-    # Можете добавить логику для сохранения данных мока, если это необходимо
-    pass
+import unittest
+from unittest.mock import patch
+from myapp.models import Account  # Импорт модели Account из вашего приложения
+from myapp.functions import create_account_number  # Предполагается, что функция определена в myapp/functions.py
 
+class CreateAccountNumberTest(unittest.TestCase):
+    @patch('myapp.models.Account.objects.filter')
+    def test_create_account_number_unique(self, mock_filter):
+        # Настройка мока, чтобы возвращать пустой QuerySet, имитируя отсутствие совпадений в базе данных
+        mock_filter.return_value.exists.return_value = False
 
-def mock_account_objects_all(self, *args, **kwargs):
-    # Здесь возвращаем мокированный список аккаунтов, например:
-    return [Account(name="Test Account")]
+        account_number = create_account_number()
 
-@pytest.fixture(scope='session')
-def django_db_setup():
-    """Переопределение фикстуры для предотвращения создания тестовой БД."""
-    pass
+        # Проверяем, что функция возвращает строку длиной 20 символов
+        self.assertEqual(len(account_number), 20)
+        # Проверяем, что функция generate_id вызывалась хотя бы один раз
+        mock_filter.assert_called()
 
-class AccountTests(TestCase):
-    @override_settings(DATABASES={"default": {"ENGINE": "django.db.backends.dummy"}})
-    @patch('app.models.Account.save', mock_account_save)
-    def test_create_account(self):
-        # Здесь мы создаем тестовый запрос и вызываем нашу функцию создания аккаунта
-        request = HttpRequest()
-        request.method = 'POST'
-        request.POST['name'] = "Test Account"
+    @patch('myapp.models.Account.objects.filter')
+    def test_create_account_number_retry_on_duplicate(self, mock_filter):
+        # Настройка мока, чтобы сначала возвращать True, имитируя существующий номер счета,
+        # а затем False, имитируя успешное создание уникального номера счета
+        mock_filter.side_effect = [True, False]
 
-        response = create_account(request)
-        self.assertEqual(response.status_code, 200)
-        # Дополнительные проверки
+        account_number = create_account_number()
 
-    @patch('app.models.Account.objects.all', mock_account_objects_all)
-    def test_list_accounts(self):
-        # Здесь мы создаем тестовый запрос и вызываем нашу функцию списка аккаунтов
-        request = HttpRequest()
-        response = list_accounts(request)
-        self.assertEqual(response.status_code, 200)
-        # Проверяем, что в ответе содержится информация о мокированных аккаунтах
-        self.assertIn("Test Account", response.content.decode())
+        # Проверяем, что функция возвращает строку длиной 20 символов
+        self.assertEqual(len(account_number), 20)
+        # Проверяем, что функция generate_id была вызвана дважды: один раз для существующего номера счета и один раз для уникального
+        self.assertEqual(mock_filter.call_count, 2)
+
+if __name__ == '__main__':
+    unittest.main()
