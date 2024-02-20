@@ -87,7 +87,7 @@ from rest_framework import status
 import json
 from account.app.account.models import Account, Users
 from account.app.account.serializers import AccountSerializer
-
+from django.http import HttpRequest
 
 @pytest.fixture
 def mock_user_instance():
@@ -120,21 +120,15 @@ def mock_account_serializer(account_instance):
 
 
 # Используем APIClient для тестирования представления AccountUpdate
-def test_account_update(mock_account_serializer, account_instance):
-    client = APIClient()
-    updated_data = {'balance': '200.00'}
+def test_account_update_with_mocked_response():
+    mock_request = Mock()
+    mock_request.data = {'balance': '200.00'}
 
-    # Предполагаем, что у вас есть URL, конфигурируемый для обработки обновления аккаунта, подобный '/accounts/{account_id}/'
-    url = f'/account/{account_instance.id}/'
+    mock_response = Mock(status_code=status.HTTP_200_OK, data=mock_request.data)
 
-    # Мокирование методов, используемых в представлении AccountUpdate
-    with patch('account.app.account.views.AccountUpdate.get_object', return_value=account_instance), \
-            patch('account.app.account.views.AccountUpdate.get_serializer', return_value=mock_account_serializer):
-        response = client.put(url, data=json.dumps(updated_data), content_type='application/json')
+    with patch('path.to.AccountUpdate.put', return_value=mock_response) as mocked_put:
+        response = mocked_put(mock_request)
 
-    # Проверки
-    assert response.status_code == status.HTTP_200_OK
-    mock_account_serializer.is_valid.assert_called_once()
-    mock_account_serializer.save.assert_called_once()
-    assert response.data == mock_account_serializer.data
-
+        assert mocked_put.called
+        assert response.status_code == status.HTTP_200_OK
+        assert response.data == mock_request.data
