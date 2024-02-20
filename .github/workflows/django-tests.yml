@@ -36,7 +36,7 @@ jobs:
     #  run: echo "DJANGO_SETTINGS_MODULE=app.settings" >> $GITHUB_ENV
 
     #- name: Set PYTHONPATH
-    #  run: echo "PYTHONPATH=$GITHUB_WORKSPACE" >> $GITHUB_ENV ,,,,
+    #  run: echo "PYTHONPATH=$GITHUB_WORKSPACE" >> $GITHUB_ENV ,,,,,,
 
     - name: Run tests with coverage
       run: |
