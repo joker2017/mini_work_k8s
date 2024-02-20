@@ -4,7 +4,7 @@ from account.models import Account
 from account.views import AccountCreate, AccountList
 from django.http import HttpRequest
 from django.test.utils import override_settings
-
+import pytest
 
 # Мок функции, которая будет использоваться для подмены вызовов к модели Account
 def mock_account_save(self, *args, **kwargs):
@@ -16,6 +16,10 @@ def mock_account_objects_all(self, *args, **kwargs):
     # Здесь возвращаем мокированный список аккаунтов, например:
     return [Account(name="Test Account")]
 
+@pytest.fixture(scope='session')
+def django_db_setup():
+    """Переопределение фикстуры для предотвращения создания тестовой БД."""
+    pass
 
 class AccountTests(TestCase):
     @override_settings(DATABASES={"default": {"ENGINE": "django.db.backends.dummy"}})
