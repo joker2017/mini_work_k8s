@@ -104,13 +104,12 @@ from django.db import IntegrityError
 @pytest.fixture
 def user_data():
     return {
-        'id': 'test_id',
-        'full_names': 'Test User',
-        'username': 'test_user',
         'email': 'test@example.com',
-        'password': 'password123'
+        'full_names': 'Test User',
+        'id': 'test_id',
+        'password': 'password123',
+        'username': 'test_user'
     }
-
 @pytest.fixture
 def account_data():
     return {
