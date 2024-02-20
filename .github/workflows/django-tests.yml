@@ -22,11 +22,14 @@ jobs:
         python -m pip install --upgrade pip
         pip install -r account/requirements.txt
         pip install pytest pytest-cov
+        sudo apt-get update && sudo apt-get install tree
 
-
+    - name: Display structure
+      run: tree
 
     - name: Run tests with coverage
       run: |
+        tree
         pytest ${{ env.TESTS_DIR }} --cov=${{ env.SRC_DIR }} --cov-report=xml
 
     - name: Generate unique filename for test results
