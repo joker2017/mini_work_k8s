@@ -61,6 +61,11 @@ def test_account_create(mock_create_account_number, mock_account_serializer, rf)
     request = rf.post('/fake-url/', data={'balance': '100.00', 'usernameid': 'test_user_id'})
     view = AccountCreate.as_view({'post': 'create'})
 
+    # Создание мок-объекта response
+    mock_response = Mock()
+    mock_response.status_code = status.HTTP_201_CREATED
+    #mock_response.data = {'id': '12345678901234567890', 'balance': '100.00', 'usernameid': 'test_user_id'}
+
     # Замокировать вызов view(request) и вернуть mock_response
     with patch('account.app.account.services.create_account_number', return_value='12345678901234567890'):
         with patch('account.app.account.views.AccountCreate.get_serializer', return_value=mock_account_serializer):
