@@ -16,55 +16,49 @@ def test_create_account_number(mock_filter):
     mock_filter.assert_called()  # Или используйте assert_called_once_with(), если вы хотите проверить вызов с конкретными аргументами
 
 
+
+
+
+
+
+
 import pytest
-from unittest.mock import patch, MagicMock
-from rest_framework.test import APIRequestFactory
-from rest_framework import status
 from django.urls import reverse
-from account.app.account.views import AccountCreate
-from account.app.account.models import Account, Users
-from account.app.account.serializers import AccountSerializerRegistr
-
-
-@pytest.fixture
-def account_data():
-    return {
-        'balance': '100.00',
-        'id': '12345678901234567890',
-        'usernameid': MagicMock(spec=Users)  # Имитация экземпляра Users
-    }
-
+from unittest.mock import MagicMock
+from rest_framework.test import APIClient
+from rest_framework import status
 
 @pytest.fixture
-def account_serializer_data():
-    return {
+def mock_create_account_number(mocker):
+    return mocker.patch('account.app.account.services.create_account_number', return_value='12345678901234567890')
+
+@pytest.fixture
+def mock_account_save(mocker):
+    return mocker.patch('account.app.account.models.Account.save', autospec=True)
+
+@pytest.fixture
+def client():
+    return APIClient()
+
+def test_account_create(client, mock_create_account_number, mock_account_save):
+    # Подготовка данных для создания аккаунта
+    account_data = {
         'balance': '100.00',
-        'id': '12345678901234567890',
         'usernameid': 'test_user_id'
     }
 
+    # URL для создания аккаунта
+    url = reverse('account-create')  # Предполагается, что это имя вашего URL для создания аккаунта
 
-@pytest.mark.django_db
-@patch('account.app.account.serializers.AccountSerializerRegistr')
-@patch('account.app.account.services.create_account_number')
-@patch('account.app.account.models.Account.objects.create')
-def test_account_create(mock_account_create, mock_create_account_number, mock_serializer_class, account_data,
-                        account_serializer_data):
-    mock_create_account_number.return_value = '12345678901234567890'
-    mock_account_create.return_value = Account(**account_data)
-    mock_serializer_class.return_value = MagicMock(data=account_serializer_data)
-    mock_serializer_class.return_value.is_valid.return_value = True
-    mock_serializer_class.return_value.save.return_value = mock_account_create.return_value
-    mock_serializer_class.return_value.data = account_serializer_data
+    # Выполнение POST запроса
+    response = client.post(url, account_data, format='json')
 
-    factory = APIRequestFactory()
-    view = AccountCreate.as_view({'post': 'create'})
-
-    request = factory.post(reverse('account-create'), account_serializer_data, format='json')
-    response = view(request)
-
+    # Проверки
     assert response.status_code == status.HTTP_201_CREATED
     mock_create_account_number.assert_called_once()
-    mock_account_create.assert_called_once_with(id='12345678901234567890', balance='100.00',
-                                                usernameid=account_data['usernameid'])
-    mock_serializer_class.assert_called_once_with(data=account_serializer_data)
+    mock_account_save.assert_called_once()
+
+    # Проверка данных в ответе
+    assert response.data['id'] == '12345678901234567890'
+    assert response.data['balance'] == '100.00'
+    assert response.data['usernameid'] == 'test_user_id'
