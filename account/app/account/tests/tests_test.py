@@ -126,7 +126,7 @@ def test_account_update_with_mocked_response():
 
     mock_response = Mock(status_code=status.HTTP_200_OK, data=mock_request.data)
 
-    with patch('path.to.AccountUpdate.put', return_value=mock_response) as mocked_put:
+    with patch('account.app.account.views.AccountUpdate', return_value=mock_response) as mocked_put:
         response = mocked_put(mock_request)
 
         assert mocked_put.called
