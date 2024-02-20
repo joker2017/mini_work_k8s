@@ -28,9 +28,11 @@ def test_create_account_number(mock_filter):
 import pytest
 from unittest.mock import Mock, patch, create_autospec
 from rest_framework import status
-from account.app.account.models import Account, Users
+
+# Assuming these are the correct paths to your actual implementations
 from account.app.account.views import AccountCreate
-from account.app.account.serializers import AccountSerializerRegistr
+from account.app.account.models import Account, Users
+from account.app.account.services import create_account_number
 
 @pytest.fixture
 def user_instance():
@@ -38,6 +40,13 @@ def user_instance():
     user_mock = create_autospec(Users, instance=True)
     user_mock.id = 'test_user_id'
     return user_mock
+
+@pytest.fixture
+def mock_account_filter_exists(mocker):
+    """
+    Mock the Account.objects.filter(id=id).exists() call to prevent database access.
+    """
+    return mocker.patch('account.app.account.models.Account.objects.filter.exists', return_value=False)
 
 @pytest.fixture
 def mock_create_account_number(mocker):
@@ -49,13 +58,11 @@ def mock_account_save(mocker):
 
 @pytest.fixture
 def mock_serializer(mocker, user_instance):
-    # Mock the AccountSerializerRegistr to return a specific data structure
-    # Ensure it returns a mock account instance with a mock Users instance as usernameid
     account_mock = Mock(spec=Account)
     account_mock.id = '12345678901234567890'
     account_mock.balance = 100.00
     account_mock.usernameid = user_instance
-    serializer_mock = Mock(spec=AccountSerializerRegistr)
+    serializer_mock = Mock()
     serializer_mock.is_valid.return_value = True
     serializer_mock.save.return_value = account_mock
     serializer_mock.data = {
@@ -65,8 +72,7 @@ def mock_serializer(mocker, user_instance):
     }
     return mocker.patch('account.app.account.views.AccountCreate.get_serializer', return_value=serializer_mock)
 
-def test_account_create(mock_create_account_number, mock_account_save, mock_serializer, user_instance):
-    # Patch the AccountCreate view to use the mock serializer and bypass actual DB calls
+def test_account_create(mock_account_filter_exists, mock_create_account_number, mock_account_save, mock_serializer, user_instance):
     view = AccountCreate()
     request = Mock()
     request.data = {
