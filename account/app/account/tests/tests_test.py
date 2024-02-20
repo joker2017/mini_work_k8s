@@ -2,8 +2,8 @@ import pytest
 from unittest.mock import Mock, patch
 from rest_framework import status
 from rest_framework.response import Response
-from rest_framework.test import APIClient, RequestFactory
-
+from rest_framework.test import APIClient
+from django.test import RequestFactory
 from account.app.account.models import Account, Users
 from account.app.account.views import AccountCreate, AccountUpdate, AccountDestroy
 from account.app.account.serializers import AccountSerializerRegistr, AccountSerializer
