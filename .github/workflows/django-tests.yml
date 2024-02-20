@@ -50,10 +50,10 @@ jobs:
     #    pytest ${{ env.TESTS_DIR }} --junitxml=${{ env.TEST_RESULTS_FILENAME }}
 
     - name: Upload coverage reports to Codecov
-      uses: codecov/codecov-action@v4.0.1
+      uses: codecov/codecov-action@v4
       env:
         token: ${{ secrets.CODECOV_TOKEN }}
-        flags: unittests
+        #flags: unittests
         slug: joker2017/mini_work_k8s/account
 
     - name: Publish Test Results
