@@ -16,7 +16,7 @@ def create_account_number():
         print("номер аккаунта !!!!!!!!!!!!!!!!!!!", id)
         unique = False
         while not unique:
-           if not Account.objects.filter(id=id):
+           if not Account.objects.filter(id=id).exists():
                print(", не нашли такой же аккаунт")
                unique = True
            else:
