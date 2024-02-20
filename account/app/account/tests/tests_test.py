@@ -5,7 +5,7 @@ from ..services import create_account_number
 
 
 class TestCreateAccountNumber(unittest.TestCase):
-    @patch('..models.Account.objects.filter')
+    @patch('.models.Account.objects.filter')
     def test_create_account_number(self, mock_filter):
         # Настройка мока
         mock_filter.return_value.exists.return_value = False
