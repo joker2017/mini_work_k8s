@@ -1,11 +1,11 @@
 # test_services.py
 import unittest
 from unittest.mock import patch
-from app.account.services import create_account_number
+from account.services import create_account_number
 
 
 class TestCreateAccountNumber(unittest.TestCase):
-    @patch('account.app.account.models.Account.objects.filter')
+    @patch('account.models.Account.objects.filter')
     def test_create_account_number(self, mock_filter):
         # Настройка мока
         mock_filter.return_value.exists.return_value = False
