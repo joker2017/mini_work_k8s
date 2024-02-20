@@ -59,7 +59,7 @@ def mock_account_serializer(mocker, mock_user_instance):
 def test_account_create(mock_create_account_number, mock_account_serializer, rf):
     # Используем RequestFactory для создания запроса
     request = rf.post('/fake-url/', data={'balance': '100.00', 'usernameid': 'test_user_id'})
-    view = AccountCreate.as_view()
+    view = AccountCreate.as_view({'post': 'create'})
 
     with patch('account.app.account.views.AccountCreate.get_serializer', return_value=mock_account_serializer):
         response = view(request)
