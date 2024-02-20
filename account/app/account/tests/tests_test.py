@@ -26,44 +26,38 @@ def test_create_account_number(mock_filter):
 
 
 
-
 import pytest
 from django.urls import reverse
-from unittest.mock import MagicMock
 from rest_framework.test import APIClient
 from rest_framework import status
 
 @pytest.fixture
 def mock_create_account_number(mocker):
-    return mocker.patch('account.app.account.services.create_account_number', return_value='12345678901234567890')
+    return mocker.patch('account.services.create_account_number', return_value='12345678901234567890')
 
 @pytest.fixture
 def mock_account_save(mocker):
-    return mocker.patch('account.app.account.models.Account.save', autospec=True)
+    return mocker.patch('account.models.Account.save', autospec=True)
 
 @pytest.fixture
 def client():
     return APIClient()
 
 def test_account_create(client, mock_create_account_number, mock_account_save):
-    # Подготовка данных для создания аккаунта
     account_data = {
         'balance': '100.00',
         'usernameid': 'test_user_id'
     }
 
-    # URL для создания аккаунта
-    url = reverse('account-create')  # Предполагается, что это имя вашего URL для создания аккаунта
+    url = reverse('account-create')
 
-    # Выполнение POST запроса
     response = client.post(url, account_data, format='json')
 
-    # Проверки
     assert response.status_code == status.HTTP_201_CREATED
     mock_create_account_number.assert_called_once()
     mock_account_save.assert_called_once()
 
-    # Проверка данных в ответе
     assert response.data['id'] == '12345678901234567890'
     assert response.data['balance'] == '100.00'
     assert response.data['usernameid'] == 'test_user_id'
+
