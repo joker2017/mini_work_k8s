@@ -41,12 +41,18 @@ def user_instance():
     user_mock.id = 'test_user_id'
     return user_mock
 
+
 @pytest.fixture
 def mock_account_filter_exists(mocker):
     """
-    Mock the Account.objects.filter(id=id).exists() call to prevent database access.
+    Правильное мокирование вызова Account.objects.filter().exists().
     """
-    return mocker.patch('account.app.account.models.Account.objects.filter.exists', return_value=False)
+    # Мокируем QuerySet, который возвращается методом filter
+    mock_queryset = mocker.MagicMock()
+    mock_queryset.exists.return_value = False
+
+    # Мокируем метод filter, чтобы он возвращал мокированный QuerySet
+    mocker.patch('django.db.models.query.QuerySet.filter', return_value=mock_queryset)
 
 @pytest.fixture
 def mock_create_account_number(mocker):
