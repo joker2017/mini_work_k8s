@@ -88,6 +88,7 @@ def test_account_destroy_with_mocked_response(account_instance):
 from unittest.mock import Mock, patch, MagicMock
 from django.utils.crypto import get_random_string
 from django.db.models import Model
+from hashlib import sha256
 
 
 def test_user_password_hashing():
