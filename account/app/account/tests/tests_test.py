@@ -22,7 +22,7 @@ from rest_framework import status
 from account.app.account.models import Account, Users
 from account.app.account.views import AccountCreate
 from account.app.account.serializers import AccountSerializerRegistr
-
+from django.test import RequestFactory
 
 @pytest.fixture
 def mock_user_instance():
