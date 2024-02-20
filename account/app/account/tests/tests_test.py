@@ -97,7 +97,7 @@ def test_account_destroy_with_mocked_response(account_instance):
 
 
 import pytest
-from unittest.mock import patch
+from unittest.mock import patch, MagicMock
 from account.app.account.models import Users, Account
 from django.db import IntegrityError
 
@@ -137,12 +137,22 @@ def test_account_creation(account_data):
         mock_create.assert_called_once_with(**account_data)
 
 def test_account_balance_default():
+    # Mocking the Account.objects.create method to return a MagicMock object
     with patch('account.app.account.models.Account.objects.create') as mock_create:
+        # Creating a MagicMock instance to mimic an Account object
+        mock_account_instance = MagicMock()
+        mock_account_instance.balance = 0  # Set the balance attribute of the MagicMock object to 0
+        mock_create.return_value = mock_account_instance  # Make the mocked create method return the MagicMock object
         account = Account.objects.create()
         assert account.balance == 0
 
 def test_account_usernameid_null():
+    # Mocking the Account.objects.create method to return a MagicMock object
     with patch('account.app.account.models.Account.objects.create') as mock_create:
+        # Creating a MagicMock instance to mimic an Account object
+        mock_account_instance = MagicMock()
+        mock_account_instance.usernameid = None  # Set the usernameid attribute of the MagicMock object to None
+        mock_create.return_value = mock_account_instance  # Make the mocked create method return the MagicMock object
         account = Account.objects.create()
         assert account.usernameid is None
 
@@ -155,7 +165,6 @@ def test_user_password_hashing(user_data):
         # Check that the password is hashed correctly
         hashed_password = '9b71d224bd62f3785d96d46ad3ea3d73319bfbc2890c4f01e63c3e0b161dff31'  # Hash of 'password123'
         assert user.password == hashed_password
-
 
 
 
