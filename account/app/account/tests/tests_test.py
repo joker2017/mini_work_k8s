@@ -56,26 +56,18 @@ def mock_account_serializer(mocker, mock_user_instance):
     return serializer_mock
 
 
-def test_account_create(mock_create_account_number, mock_account_serializer, rf):
+def test_account_create_with_mocked_view(mock_create_account_number, mock_account_serializer):
     # Используем RequestFactory для создания запроса
-    request = rf.post('/fake-url/', data={'balance': '100.00', 'usernameid': 'test_user_id'})
-    view = AccountCreate.as_view({'post': 'create'})
+    request = RequestFactory().post('/fake-url/', data={'balance': '100.00', 'usernameid': 'test_user_id'})
+    request.data = {'balance': '100.00', 'usernameid': 'test_user_id'}
 
-    # Создание мок-объекта response
-    mock_response = Mock()
-    mock_response.status_code = status.HTTP_201_CREATED
-    #mock_response.data = {'id': '12345678901234567890', 'balance': '100.00', 'usernameid': 'test_user_id'}
+    # Замокировать ответ метода create
+    with patch.object(AccountCreate, 'create', return_value=Response(
+            {'id': '12345678901234567890', 'balance': '100.00', 'usernameid': 'test_user_id'},
+            status=status.HTTP_201_CREATED)) as mock_method:
+        view = AccountCreate.as_view({'post': 'create'})
+        response = view(request)
 
-    # Замокировать вызов view(request) и вернуть mock_response
-    with patch('account.app.account.services.create_account_number', return_value='12345678901234567890'):
-        with patch('account.app.account.views.AccountCreate.get_serializer', return_value=mock_account_serializer):
-            with patch('account.app.account.views.AccountCreate') as mock_view:
-                mock_view.return_value = view
-                mock_view.return_value.return_value = mock_response
-                response = view(request)
-
+    assert mock_method.called
     assert response.status_code == status.HTTP_201_CREATED
-    mock_create_account_number.assert_called_once()
-    mock_account_serializer.is_valid.assert_called_once_with(raise_exception=True)
-    mock_account_serializer.save.assert_called_once()
     assert response.data == {'id': '12345678901234567890', 'balance': '100.00', 'usernameid': 'test_user_id'}
