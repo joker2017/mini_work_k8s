@@ -36,17 +36,18 @@ jobs:
     - name: Run tests with coverage
       run: |
     
-        tree
-        pytest ${{ env.TESTS_DIR }} -vv --cov=api.calculator --cov-report=xml
+        #tree
+        pytest ${{ env.TESTS_DIR }} -vv --cov=api.calculator 
+        #--cov-report=xml
 
-    - name: Generate unique filename for test results
-      run: |
-        echo "TEST_RESULTS_FILENAME=test-results-$(date +%s).xml" >> $GITHUB_ENV
+    #- name: Generate unique filename for test results
+    #  run: |
+    #    echo "TEST_RESULTS_FILENAME=test-results-$(date +%s).xml" >> $GITHUB_ENV
 
-    - name: Run tests and generate report
-      run: |
-        pwd
-        pytest ${{ env.TESTS_DIR }} --junitxml=${{ env.TEST_RESULTS_FILENAME }}
+    #- name: Run tests and generate report
+    #  run: |
+    #    pwd
+    #    pytest ${{ env.TESTS_DIR }} --junitxml=${{ env.TEST_RESULTS_FILENAME }}
 
     - name: Upload coverage reports to Codecov
       uses: codecov/codecov-action@v4.0.1
