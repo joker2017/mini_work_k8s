@@ -98,7 +98,7 @@ def test_account_destroy_with_mocked_response(account_instance):
 
 import pytest
 from unittest.mock import patch
-from myapp.models import Users, Account
+from account.app.account.models import Users, Account
 from django.db import IntegrityError
 
 @pytest.fixture
