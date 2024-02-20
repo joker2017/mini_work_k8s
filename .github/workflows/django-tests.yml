@@ -26,11 +26,15 @@ jobs:
         pip install pytest pytest-cov pytest-django
         sudo apt-get update && sudo apt-get install tree
 
-    - name: Display structure
-      run: tree
+    - name: Set PYTHONPATH
+      run: echo "PYTHONPATH=$GITHUB_WORKSPACE" >> $GITHUB_ENV
 
     - name: Set DJANGO_SETTINGS_MODULE
       run: echo "DJANGO_SETTINGS_MODULE=app.app.settings" >> $GITHUB_ENV
+
+    - name: Set PYTHONPATH
+      run: echo "PYTHONPATH=$GITHUB_WORKSPACE" >> $GITHUB_ENV
+
     - name: Run tests with coverage
       run: |
         
