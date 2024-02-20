@@ -1,12 +1,12 @@
 
-from unittest.mock import patch
-from account.models import Account
-from account.views import AccountCreate, AccountList
+#from unittest.mock import patch
+#from account.models import Account
+#from account.views import AccountCreate, AccountList
 
 
 import unittest
 from unittest.mock import patch
-from myapp.models import Account  # Импорт модели Account из вашего приложения
+#from myapp.models import Account  # Импорт модели Account из вашего приложения
 from account.services import create_account_number  # Предполагается, что функция определена в myapp/functions.py
 
 class CreateAccountNumberTest(unittest.TestCase):
