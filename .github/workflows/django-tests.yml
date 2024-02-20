@@ -10,7 +10,8 @@ jobs:
       uses: actions/setup-python@v5
       with:
         python-version: '3.11'
-
+    - name: PYTHONPATH
+      run: export PYTHONPATH="/home/runner/work/mini_work_k8s/mini_work_k8s:$PYTHONPATH"
     - name: Setup Test Directories
       run: |
         echo "SRC_DIR=account/app/" >> $GITHUB_ENV
@@ -27,8 +28,7 @@ jobs:
 
     - name: Display structure
       run: tree
-    - name: PYTHONPATH
-      run: export PYTHONPATH="/home/runner/work/mini_work_k8s/mini_work_k8s:$PYTHONPATH"
+
     - name: Set DJANGO_SETTINGS_MODULE
       run: echo "DJANGO_SETTINGS_MODULE=app.app.settings" >> $GITHUB_ENV
     - name: Run tests with coverage
