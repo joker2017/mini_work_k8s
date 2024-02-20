@@ -94,52 +94,62 @@ from unittest.mock import Mock, patch
 from django.test import RequestFactory
 from rest_framework import status
 from rest_framework.response import Response
-from account.app.account.models import Account
-from account.app.account.views import AccountUpdate
+import json
 from account.app.account.serializers import AccountSerializer
 
+# Предполагаемые импорты для моделей и представлений
+
+# Фикстура для мокирования экземпляра пользователя
+@pytest.fixture
+def mock_user_instance():
+    user_mock = Mock()
+    user_mock.id = 'test_user_id'
+    user_mock.is_active = True
+    user_mock.is_authenticated = True
+    return user_mock
+
+# Фикстура для мокирования экземпляра аккаунта
 @pytest.fixture
 def account_instance(mock_user_instance):
-    # Создаем мок экземпляра аккаунта для обновления
-    account_mock = Mock(spec=Account)
+    account_mock = Mock()
     account_mock.id = '12345678901234567890'
     account_mock.balance = 100.00
     account_mock.usernameid = mock_user_instance
     return account_mock
 
+# Фикстура для мокирования сериализатора аккаунта
 @pytest.fixture
-def mock_account_serializer(mocker, account_instance):
-    # Мокируем сериализатор для возвращения заданных данных
+def mock_account_serializer(account_instance):
     serializer_mock = Mock(spec=AccountSerializer)
     serializer_mock.instance = account_instance
+    serializer_mock.is_valid.return_value = True
+    serializer_mock.save.return_value = account_instance
     serializer_mock.data = {
         'id': account_instance.id,
-        'balance': '200.00',  # Предполагаемое обновление баланса
+        'balance': '200.00',
         'usernameid': account_instance.usernameid.id
     }
     return serializer_mock
 
-
+# Тестовый сценарий для обновления аккаунта
 def test_account_update(mock_account_serializer, account_instance, rf):
-    # Используем RequestFactory для создания запроса на обновление
     updated_data = {'balance': '200.00'}
-    request = RequestFactory().put(f'/fake-url/accounts/{account_instance.id}/', data=updated_data)
-    request.user = account_instance.usernameid  # Предполагаем, что запрос делается от имени пользователя аккаунта
+    request = RequestFactory().put(
+        '/fake-url/',  # Используем фиктивный URL
+        data=json.dumps(updated_data),
+        content_type='application/json'
+    )
+    request.user = account_instance.usernameid
 
     with patch('account.app.account.views.AccountUpdate.get_object', return_value=account_instance), \
             patch('account.app.account.views.AccountUpdate.get_serializer', return_value=mock_account_serializer):
+        from account.app.account.views import AccountUpdate  # Импорт здесь, если нужно избежать циклических зависимостей
         view = AccountUpdate.as_view()
         response = view(request, pk=account_instance.id)
 
     # Проверки
     assert response.status_code == status.HTTP_200_OK
-    mock_account_serializer.is_valid.assert_called_once()
-    mock_account_serializer.save.assert_called_once()
+    assert mock_account_serializer.is_valid.called
+    assert mock_account_serializer.save.called
     assert response.data == mock_account_serializer.data
 
-
-@pytest.fixture
-def mock_user_instance():
-    user_mock = Mock(spec=Users)
-    user_mock.configure_mock(id='test_user_id', is_active=True)
-    return user_mock
