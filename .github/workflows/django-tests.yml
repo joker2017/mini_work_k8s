@@ -27,7 +27,7 @@ jobs:
 
     - name: Run tests with coverage
       run: |
-        pytest ${{ env.TESTS_DIR }} --cov=${{ env.SRC_DIR }}/app --cov-report=xml
+        pytest ${{ env.TESTS_DIR }} --cov=${{ env.SRC_DIR }} --cov-report=xml
 
     - name: Generate unique filename for test results
       run: |
