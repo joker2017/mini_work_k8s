@@ -39,7 +39,7 @@ jobs:
       run: |
         
         tree
-        pytest ${{ env.TESTS_DIR }} --cov=${{ env.SRC_DIR }} --cov-report=xml
+        pytest ${{ env.TESTS_DIR }} -vv --cov=${{ env.SRC_DIR }} --cov-report=xml
 
     - name: Generate unique filename for test results
       run: |

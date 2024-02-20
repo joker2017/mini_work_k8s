@@ -4,21 +4,20 @@ from unittest.mock import patch
 from ..services import create_account_number
 
 
-class TestCreateAccountNumber(unittest.TestCase):
-    @patch('account.app.account.models.Account.objects.filter')
-    def test_create_account_number(self, mock_filter):
-        # Настройка мока
+import pytest
+from unittest.mock import patch
+
+
+@pytest.mark.django_db
+def test_create_account_number():
+    with patch('account.app.account.models.Account.objects.filter') as mock_filter:
         mock_filter.return_value.exists.return_value = False
 
-        # Вызов функции
         account_number = create_account_number()
 
-        # Проверки
-        self.assertEqual(len(account_number), 20)
-        self.assertTrue(account_number.isdigit())
-
-        # Убедитесь, что мок был вызван
+        assert len(account_number) == 20
+        assert account_number.isdigit()
         mock_filter.assert_called()
 
-if __name__ == '__main__':
-    unittest.main()
+
+
