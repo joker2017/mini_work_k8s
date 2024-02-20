@@ -3,6 +3,8 @@ from unittest.mock import Mock, patch
 from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.test import RequestFactory, APIClient
+from django.test import RequestFactory
+
 
 from account.app.account.models import Account, Users
 from account.app.account.views import AccountCreate, AccountUpdate, AccountDestroy
