@@ -161,11 +161,14 @@ def test_user_password_hashing(user_data):
         user.save()
         mock_save.assert_called_once()
 
-        # Check that the password is hashed correctly using SHA-256 algorithm
+        # Получаем переданный в метод save пароль
+        saved_password = mock_save.call_args.kwargs['password']
+
+        # Хешируем ожидаемый пароль
         expected_hashed_password = sha256(user_data['password'].encode('utf-8')).hexdigest()
-        assert user.password == expected_hashed_password
 
-
+        # Сравниваем хешированные пароли
+        assert saved_password == expected_hashed_password
 
 
 
