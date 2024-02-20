@@ -1,22 +1,10 @@
-#from django.shortcuts import render
-from rest_framework import status
-from rest_framework import generics, viewsets, mixins
-#from rest_framework.viewsets import GenericViewSet
-from rest_framework.response import Response
 from .models import Account, Users
 from .serializers import AccountSerializer, AccountSerializerRegistr
-from django.utils.crypto import get_random_string
-from rest_framework.generics import get_object_or_404
-from .services import create_account_number  
-#from django.http.request import QueryDict
-#import uuid
+from .services import create_account_number
 from rest_framework import generics, viewsets, mixins, filters
-#from django.db import IntegrityError
-#from rest_framework.views import APIView
-
 from rest_framework.response import Response
 from rest_framework import status
-from django.db import IntegrityError
+
 
 
 class AccountList(viewsets.GenericViewSet, mixins.ListModelMixin):
@@ -73,15 +61,3 @@ class AccountDestroy(generics.DestroyAPIView, generics.RetrieveAPIView):
         return queryset
     
 
-'''
-    def destroy(self, request, *args, **kwargs):
-        instance = self.get_object()
-        try:
-            self.perform_destroy(instance)
-        except IntegrityError as e:
-            return Response("Нельзя удалить клиента с привязхаными счетами", status=status.HTTP_403_FORBIDDEN)
-        return Response(status=status.HTTP_204_NO_CONTENT)
-    
-    def perform_destroy(self, instance):
-        instance.delete()      
-'''
