@@ -58,6 +58,7 @@ jobs:
       env:
         token: ${{ secrets.CODECOV_TOKEN }}
         flags: unittests
+        slug: joker2017/mini_work_k8s
 
     - name: Publish Test Results
       uses: EnricoMi/publish-unit-test-result-action@v2
