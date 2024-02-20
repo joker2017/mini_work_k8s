@@ -2,6 +2,7 @@
 import unittest
 from unittest.mock import patch
 from account.app.account.services import create_account_number
+
 class TestCreateAccountNumber(unittest.TestCase):
     @patch('account.models.Account.objects.filter')
     def test_create_account_number(self, mock_filter):
