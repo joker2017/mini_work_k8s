@@ -86,14 +86,24 @@ def test_account_destroy_with_mocked_response(account_instance):
 
 
 
+
+
+
+
+
+
+
+
+
+
 import hashlib
 import pytest
 from unittest.mock import Mock, patch, MagicMock
 from django.utils.crypto import get_random_string
-from hashlib import sha256
+from django.test import RequestFactory
 from account.app.account.models import Users, Account
 from account.app.account.views import AccountCreate, AccountUpdate, AccountDestroy
-from account.app.account.serializers import AccountSerializerRegistr, AccountSerializer
+from account.app.account.serializers import AccountSerializer
 
 # Общая фикстура для мокирования экземпляра пользователя
 @pytest.fixture
@@ -101,7 +111,7 @@ def mock_user_instance():
     user_mock = Mock(spec=Users)
     user_mock.id = get_random_string(20)
     user_mock._state = MagicMock()  # Имитация _state для Django ORM
-    return Mock(spec=Users, id='mock_user_id')
+    return user_mock
 
 # Фикстура для мокирования сериализатора аккаунта
 @pytest.fixture
@@ -121,6 +131,10 @@ def mock_account_serializer(mock_user_instance):
     }
     return serializer_mock
 
+@pytest.fixture
+def request_factory():
+    return RequestFactory()
+
 # Тест для создания номера аккаунта
 def test_create_account_number():
     with patch('account.app.account.services.create_account_number', return_value='12345678901234567890') as mock_create_account_number:
@@ -129,30 +143,30 @@ def test_create_account_number():
         assert account_number.isdigit()
 
 # Тест для создания аккаунта с мокированным ответом
-def test_account_create_with_mocked_view(mock_account_serializer):
+@pytest.mark.django_db
+def test_account_create_with_mocked_view(request_factory, mock_account_serializer):
     with patch('account.app.account.views.AccountCreate.get_serializer', return_value=mock_account_serializer):
-        request = Mock()
-        request.data = {'balance': 100.00, 'usernameid': mock_user_instance.id}
+        request = request_factory.post('/path/to/view/', {'balance': 100.00, 'usernameid': 'mock_user_id'})
         response = AccountCreate.as_view()(request)
         assert response.status_code == 201
         assert response.data == mock_account_serializer.data
 
 # Тест для обновления аккаунта с мокированным ответом
-def test_account_update_with_mocked_response(mock_account_serializer):
+@pytest.mark.django_db
+def test_account_update_with_mocked_response(request_factory, mock_account_serializer):
     with patch('account.app.account.views.AccountUpdate.get_serializer', return_value=mock_account_serializer):
-        request = Mock()
-        request.data = {'balance': 200.00}
+        request = request_factory.put('/path/to/view/', {'balance': 200.00})
         response = AccountUpdate.as_view()(request, pk=mock_account_serializer.instance.id)
         assert response.status_code == 200
         assert response.data == mock_account_serializer.data
 
 # Тест для удаления аккаунта с мокированным ответом
-def test_account_destroy_with_mocked_response():
+@pytest.mark.django_db
+def test_account_destroy_with_mocked_response(request_factory, mock_user_instance):
     with patch('account.app.account.views.AccountDestroy.get_object', return_value=mock_user_instance):
-        request = Mock()
+        request = request_factory.delete('/path/to/view/')
         response = AccountDestroy.as_view()(request, pk=mock_user_instance.id)
         assert response.status_code == 204
-
 
 @pytest.fixture
 def user_data():
@@ -164,7 +178,7 @@ def user_data():
         "password": "password"
     }
 
-
+# Тест для хеширования пароля пользователя
 def test_user_password_hashing(user_data):
     # Create a user instance with unhashed password
     user = Users(**user_data)
@@ -182,14 +196,13 @@ def test_user_password_hashing(user_data):
         # Directly assert the hashed password or mock the hashing logic
         # For illustration, assuming password hashing occurs within `user.save()`
         assert user.password == expected_hash, "The password was not hashed correctly"
+
 # Тест для создания аккаунта без обращения к базе данных
 def test_account_creation_without_db(mock_user_instance):
     account = Account(id=get_random_string(20), balance=100.00, usernameid=mock_user_instance)
     assert account.id is not None
     assert account.balance == 100.00
     assert account.usernameid == mock_user_instance
-
-
 
 
 
