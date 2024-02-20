@@ -17,6 +17,7 @@ jobs:
         echo "TESTS_DIR=account/app/account/tests/tests_test.py" >> $GITHUB_ENV
 
 
+
     - name: Install dependencies
       run: |
         python -m pip install --upgrade pip
@@ -26,11 +27,13 @@ jobs:
 
     - name: Display structure
       run: tree
+    - name: PYTHONPATH
+      run: export PYTHONPATH="/home/runner/work/mini_work_k8s/mini_work_k8s:$PYTHONPATH"
     - name: Set DJANGO_SETTINGS_MODULE
-      run: echo "DJANGO_SETTINGS_MODULE=account.app.app.settings" >> $GITHUB_ENV
+      run: echo "DJANGO_SETTINGS_MODULE=app.app.settings" >> $GITHUB_ENV
     - name: Run tests with coverage
       run: |
-        export PYTHONPATH="/home/runner/work/mini_work_k8s/mini_work_k8s:$PYTHONPATH"
+        
         tree
         pytest ${{ env.TESTS_DIR }} --cov=${{ env.SRC_DIR }} --cov-report=xml
 
