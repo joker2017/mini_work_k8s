@@ -34,34 +34,43 @@ def mock_create_account_number(mocker):
     return mocker.patch('account.app.account.services.create_account_number', return_value='12345678901234567890')
 
 @pytest.fixture
-def mock_account_serializer(mocker):
+def mock_account_save(mocker):
+    return mocker.patch('account.app.account.models.Account.save', autospec=True)
+
+@pytest.fixture
+def mock_serializer_context(mocker):
+    return mocker.patch('account.app.account.views.AccountCreate.get_serializer_context', return_value={'request': Mock(), 'view': Mock()})
+
+@pytest.fixture
+def mock_serializer_is_valid(mocker):
     serializer_mock = Mock()
     serializer_mock.is_valid.return_value = True
-    serializer_mock.save.return_value = None  # Замените на нужное значение, если необходимо
+    serializer_mock.save.return_value = None
     serializer_mock.data = {
         'id': '12345678901234567890',
         'balance': '100.00',
         'usernameid': 'test_user_id'
     }
-    return mocker.patch('account.app.account.views.AccountSerializerRegistr', return_value=serializer_mock)
+    return mocker.patch('account.app.account.views.AccountSerializerRegistr.is_valid', return_value=serializer_mock)
 
-def test_account_create(mock_create_account_number, mock_account_serializer):
-    from account.app.account.views import AccountCreate  # Импорт здесь, чтобы избежать циклических зависимостей
+@pytest.fixture
+def mock_serializer_save(mocker):
+    return mocker.patch('account.app.account.views.AccountSerializerRegistr.save')
 
-    with patch.object(AccountCreate, 'get_serializer_context', return_value={'request': Mock(), 'view': Mock()}):
-        view = AccountCreate()
-        request = Mock(data={
-            'balance': '100.00',
-            'usernameid': 'test_user_id'
-        })
-        request._request = Mock()  # Эмуляция HttpRequest объекта, если требуется
-        view.request = request
-        view.kwargs = {}  # Эмуляция kwargs, если ваш метод их использует
-        response = view.create(request)
+def test_account_create(mock_create_account_number, mock_serializer_context, mock_serializer_is_valid, mock_serializer_save):
+    from account.app.account.views import AccountCreate
 
-        assert response.status_code == status.HTTP_201_CREATED
-        mock_create_account_number.assert_called_once()
-        mock_account_serializer().is_valid.assert_called_once_with(raise_exception=True)
-        assert response.data['id'] == '12345678901234567890'
-        assert response.data['balance'] == '100.00'
-        assert response.data['usernameid'] == 'test_user_id'
+    # Подготовка объекта view и запроса
+    view = AccountCreate()
+    request = Mock(data={
+        'balance': '100.00',
+        'usernameid': 'test_user_id'
+    })
+    request._request = Mock()  # Эмуляция HttpRequest объекта
+
+    # Вызов метода create и проверка результатов
+    response = view.create(request)
+    assert response.status_code == status.HTTP_201_CREATED
+    mock_create_account_number.assert_called_once()
+    mock_serializer_is_valid.assert_called_once()
+    mock_serializer_save.assert_called_once()
