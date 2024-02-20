@@ -61,8 +61,9 @@ def test_account_create(mock_create_account_number, mock_account_serializer, rf)
     request = rf.post('/fake-url/', data={'balance': '100.00', 'usernameid': 'test_user_id'})
     view = AccountCreate.as_view({'post': 'create'})
 
-    with patch('account.app.account.views.AccountCreate.get_serializer', return_value=mock_account_serializer):
-        response = view(request)
+    with patch('account.app.account.services.create_account_number', return_value='12345678901234567890'):
+        with patch('account.app.account.views.AccountCreate.get_serializer', return_value=mock_account_serializer):
+            response = view(request)
 
     assert response.status_code == status.HTTP_201_CREATED
     mock_create_account_number.assert_called_once()
