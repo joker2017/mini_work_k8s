@@ -147,7 +147,7 @@ def test_account_update(mock_account_serializer, account_instance, rf):
         view = AccountUpdate.as_view()
         response = view(request, pk=account_instance.id)
 
-    # Проверки
+    # Проверки ппп
     assert response.status_code == status.HTTP_200_OK
     assert mock_account_serializer.is_valid.called
     assert mock_account_serializer.save.called
