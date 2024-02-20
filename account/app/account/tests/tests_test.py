@@ -162,9 +162,9 @@ def test_user_password_hashing(user_data):
         user.save()
         mock_save.assert_called_once()
 
-        # Check that the password is hashed correctly
-        hashed_password = '9b71d224bd62f3785d96d46ad3ea3d73319bfbc2890c4f01e63c3e0b161dff31'  # Hash of 'password123'
-        assert user.password == hashed_password
+        # Check that the password is hashed correctly using SHA-256 algorithm
+        expected_hashed_password = sha256(user_data['password'].encode('utf-8')).hexdigest()
+        assert user.password == expected_hashed_password
 
 
 
