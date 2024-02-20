@@ -25,9 +25,14 @@ def test_create_account_number(mock_filter):
 
 
 
-from rest_framework import status
 import pytest
 from unittest.mock import Mock, patch
+from rest_framework import status
+
+# Assuming these are the correct paths to your actual implementations
+from account.app.account.views import AccountCreate
+from account.app.account.models import Account
+from account.app.account.serializers import AccountSerializerRegistr
 
 @pytest.fixture
 def mock_create_account_number(mocker):
@@ -35,42 +40,41 @@ def mock_create_account_number(mocker):
 
 @pytest.fixture
 def mock_account_save(mocker):
-    return mocker.patch('account.app.account.models.Account.save', autospec=True)
+    return mocker.patch.object(Account, 'save', autospec=True)
 
 @pytest.fixture
-def mock_serializer_context(mocker):
-    return mocker.patch('account.app.account.views.AccountCreate.get_serializer_context', return_value={'request': Mock(), 'view': Mock()})
-
-@pytest.fixture
-def mock_serializer_is_valid(mocker):
-    serializer_mock = Mock()
+def mock_serializer(mocker):
+    # This mock setup assumes the serializer's save method is used and it returns an Account instance
+    account_instance = Account(id='12345678901234567890', balance=100.00, usernameid='test_user_id')
+    serializer_mock = Mock(spec=AccountSerializerRegistr)
     serializer_mock.is_valid.return_value = True
-    serializer_mock.save.return_value = None
+    serializer_mock.save.return_value = account_instance
     serializer_mock.data = {
-        'id': '12345678901234567890',
+        'id': account_instance.id,
+        'balance': str(account_instance.balance),
+        'usernameid': account_instance.usernameid
+    }
+    return mocker.patch('account.app.account.views.AccountSerializerRegistr', return_value=serializer_mock)
+
+def test_account_create(mock_create_account_number, mock_account_save, mock_serializer):
+    view = AccountCreate()
+    request = Mock()
+    request.data = {
         'balance': '100.00',
         'usernameid': 'test_user_id'
     }
-    return mocker.patch('account.app.account.views.AccountSerializerRegistr.is_valid', return_value=serializer_mock)
+    # Setup request object as DRF does
+    request._request = Mock()
+    request.user = None
 
-@pytest.fixture
-def mock_serializer_save(mocker):
-    return mocker.patch('account.app.account.views.AccountSerializerRegistr.save')
+    # Patch the get_serializer method to use the mock serializer
+    with patch.object(AccountCreate, 'get_serializer', return_value=mock_serializer):
+        response = view.create(request)
 
-def test_account_create(mock_create_account_number, mock_serializer_context, mock_serializer_is_valid, mock_serializer_save):
-    from account.app.account.views import AccountCreate
-
-    # Подготовка объекта view и запроса
-    view = AccountCreate()
-    request = Mock(data={
-        'balance': '100.00',
-        'usernameid': 'test_user_id'
-    })
-    request._request = Mock()  # Эмуляция HttpRequest объекта
-
-    # Вызов метода create и проверка результатов
-    response = view.create(request)
     assert response.status_code == status.HTTP_201_CREATED
     mock_create_account_number.assert_called_once()
-    mock_serializer_is_valid.assert_called_once()
-    mock_serializer_save.assert_called_once()
+    mock_serializer.is_valid.assert_called_once_with(raise_exception=True)
+    mock_serializer.save.assert_called_once()
+    assert response.data['id'] == '12345678901234567890'
+    assert response.data['balance'] == '100.00'
+    assert response.data['usernameid'] == 'test_user_id'
