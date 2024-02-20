@@ -53,6 +53,11 @@ jobs:
         pwd
         pytest ${{ env.TESTS_DIR }} --junitxml=${{ env.TEST_RESULTS_FILENAME }}
 
+    - name: Upload coverage reports to Codecov
+      uses: codecov/codecov-action@v4.0.1
+      env:
+        token: ${{ secrets.CODECOV_TOKEN }}
+        flags: unittests
 
     - name: Publish Test Results
       uses: EnricoMi/publish-unit-test-result-action@v2
