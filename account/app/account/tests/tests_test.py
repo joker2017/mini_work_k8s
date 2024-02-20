@@ -8,7 +8,7 @@ import pytest
 from unittest.mock import patch
 
 
-@pytest.mark.django_db
+
 def test_create_account_number():
     with patch('account.app.account.models.Account.objects.filter') as mock_filter:
         mock_filter.return_value.exists.return_value = False
