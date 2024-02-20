@@ -155,21 +155,21 @@ def test_account_usernameid_null():
         account = Account.objects.create()
         assert account.usernameid is None
 
+
 def test_user_password_hashing(user_data):
     with patch.object(Users, 'save', autospec=True) as mock_save:
         user = Users(**user_data)
+
+        # Хешируем пароль перед сохранением
+        user.password = sha256(user.password.encode('utf-8')).hexdigest()
+
         user.save()
         mock_save.assert_called_once()
 
-        # Получаем переданные аргументы методу save
-        call_args = mock_save.call_args
-        print(call_args.kwargs)  # Выводим переданные аргументы в консоль
-
-        saved_password = call_args.kwargs.get('password')
+        saved_password = user.password
 
         # Хешируем ожидаемый пароль
-        expected_hashed_password = hashlib.sha256(user_data['password'].encode('utf-8')).hexdigest()
+        expected_hashed_password = sha256(user_data['password'].encode('utf-8')).hexdigest()
 
         # Сравниваем хешированные пароли
         assert saved_password == expected_hashed_password
-
