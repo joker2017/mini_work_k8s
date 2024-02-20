@@ -30,7 +30,7 @@ jobs:
       run: echo "PYTHONPATH=$GITHUB_WORKSPACE" >> $GITHUB_ENV
 
     - name: Set DJANGO_SETTINGS_MODULE
-      run: echo "DJANGO_SETTINGS_MODULE=app.app.settings" >> $GITHUB_ENV
+      run: echo "DJANGO_SETTINGS_MODULE=app.settings" >> $GITHUB_ENV
 
     - name: Set PYTHONPATH
       run: echo "PYTHONPATH=$GITHUB_WORKSPACE" >> $GITHUB_ENV
