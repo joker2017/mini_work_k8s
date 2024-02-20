@@ -135,7 +135,7 @@ def mock_account_serializer(account_instance):
 def test_account_update(mock_account_serializer, account_instance, rf):
     updated_data = {'balance': '200.00'}
     request = RequestFactory().put(
-        '/fake-url/',  # Используем фиктивный URL
+        '/account/',  # Используем фиктивный URL
         data=json.dumps(updated_data),
         content_type='application/json'
     )
