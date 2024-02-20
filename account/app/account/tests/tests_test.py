@@ -79,22 +79,17 @@ def test_account_create_with_mocked_view(mock_create_account_number, mock_accoun
 
 
 
-
 import pytest
 from unittest.mock import Mock, patch
 from rest_framework.test import APIClient
 from rest_framework import status
-import json
-from account.app.account.models import Account, Users
-from account.app.account.serializers import AccountSerializer
-from django.http import HttpRequest
+from account.app.account.views import AccountUpdate
 
 @pytest.fixture
 def mock_user_instance():
     user_mock = Mock(spec=Users)
     user_mock.id = 'test_user_id'
     return user_mock
-
 
 @pytest.fixture
 def account_instance(mock_user_instance):
@@ -103,7 +98,6 @@ def account_instance(mock_user_instance):
     account_mock.balance = 100.00
     account_mock.usernameid = mock_user_instance
     return account_mock
-
 
 @pytest.fixture
 def mock_account_serializer(account_instance):
@@ -118,17 +112,16 @@ def mock_account_serializer(account_instance):
     }
     return serializer_mock
 
+# Используем APIClient для тестирования представления AccountUpdate без @pytest.mark.django_db
+def test_account_update_with_mocked_response(mock_account_serializer, account_instance):
+    client = APIClient()
+    updated_data = {'balance': '200.00'}
+    url = f'/account/{account_instance.id}/'  # Предполагаем, что такой URL существует в вашем проекте
 
-# Используем APIClient для тестирования представления AccountUpdate
-def test_account_update_with_mocked_response():
-    mock_request = Mock()
-    mock_request.data = {'balance': '200.00'}
+    # Мокируем ответ представления
+    with patch('account.app.account.views.AccountUpdate.as_view', return_value=Mock(return_value=Response(mock_account_serializer.data, status=status.HTTP_200_OK))) as mocked_view:
+        response = client.put(url, updated_data, format='json')
 
-    mock_response = Mock(status_code=status.HTTP_200_OK, data=mock_request.data)
-
-    with patch('account.app.account.views.AccountUpdate', return_value=mock_response) as mocked_put:
-        response = mocked_put(mock_request)
-
-        assert mocked_put.called
+        assert mocked_view.called
         assert response.status_code == status.HTTP_200_OK
-        assert response.data == mock_request.data
+        assert response.data == mock_account_serializer.data
