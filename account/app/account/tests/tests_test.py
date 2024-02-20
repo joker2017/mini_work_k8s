@@ -132,3 +132,38 @@ def test_account_update_with_mocked_response():
         assert mocked_put.called
         assert response.status_code == status.HTTP_200_OK
         assert response.data == mock_request.data
+
+
+
+import pytest
+from unittest.mock import Mock, patch
+from django.http import Http404
+from rest_framework import status
+from rest_framework.response import Response
+from account.app.account.models import Account
+from account.app.account.views import AccountDestroy
+
+@pytest.fixture
+def account_instance():
+    # Создаем мок экземпляра аккаунта
+    account_mock = Mock(spec=Account)
+    account_mock.id = '12345678901234567890'
+    return account_mock
+
+# Тест для проверки удаления аккаунта
+def test_account_destroy_with_mocked_response(account_instance):
+    # Мокируем get_object, чтобы он возвращал экземпляр account, когда ищет по id
+    with patch('account.app.account.views.AccountDestroy.get_object', return_value=account_instance) as mocked_get_object:
+        # Мокируем метод perform_destroy класса AccountDestroy для имитации удаления
+        with patch('account.app.account.views.AccountDestroy.perform_destroy', return_value=None) as mocked_perform_destroy:
+            view = AccountDestroy()
+            request = Mock()
+
+            # Мокируем метод setup для инициализации запроса и ключей доступа
+            view.setup(request, pk=account_instance.id)
+            response = view.delete(request, pk=account_instance.id)
+
+            mocked_get_object.assert_called_once()
+            mocked_perform_destroy.assert_called_once_with(account_instance)
+
+            assert response.status_code == status.HTTP_204_NO_CONTENT
