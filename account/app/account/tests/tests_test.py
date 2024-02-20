@@ -19,7 +19,7 @@ def test_create_account_number(mock_filter):
 import pytest
 from unittest.mock import Mock, patch
 from rest_framework import status
-from account.app.account.models import Account
+from account.app.account.models import Account, Users
 from account.app.account.views import AccountCreate
 from account.app.account.serializers import AccountSerializerRegistr
 
