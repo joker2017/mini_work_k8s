@@ -136,3 +136,10 @@ def test_account_update(mock_account_serializer, account_instance, rf):
     mock_account_serializer.is_valid.assert_called_once()
     mock_account_serializer.save.assert_called_once()
     assert response.data == mock_account_serializer.data
+
+
+@pytest.fixture
+def mock_user_instance():
+    user_mock = Mock(spec=Users)
+    user_mock.configure_mock(id='test_user_id', is_active=True)
+    return user_mock
