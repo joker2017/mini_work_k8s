@@ -163,6 +163,8 @@ def test_user_password_hashing(user_data):
 
         # Получаем переданные аргументы методу save
         call_args = mock_save.call_args
+        print(call_args.kwargs)  # Выводим переданные аргументы в консоль
+
         saved_password = call_args.kwargs.get('password')
 
         # Хешируем ожидаемый пароль
@@ -170,6 +172,4 @@ def test_user_password_hashing(user_data):
 
         # Сравниваем хешированные пароли
         assert saved_password == expected_hashed_password
-
-
 
