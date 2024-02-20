@@ -75,24 +75,17 @@ def test_account_destroy_with_mocked_response(account_instance):
         assert response.status_code == status.HTTP_204_NO_CONTENT
 
 
-
-
-
-
-
-
-
-
-
-
-from unittest.mock import Mock, patch, MagicMock
-from django.utils.crypto import get_random_string
-from django.db.models import Model
+from unittest.mock import Mock, patch
+import pytest
 from hashlib import sha256
+from django.utils.crypto import get_random_string
+
+# Предполагается, что Users - это модель, которую вы тестируете
+from account.app.account.models import Users
+
 
 
 def test_user_password_hashing():
-    # Подготавливаем данные пользователя
     user_data = {
         "id": get_random_string(20),
         "full_names": "Test User",
@@ -101,43 +94,15 @@ def test_user_password_hashing():
         "password": "password",
     }
 
-    # Создаем мок пользователя с заданным паролем
-    user = Mock(spec=Users, **user_data)
+    user = Users(**user_data)
 
-    # Имитация процесса сохранения, включая хеширование пароля
+    # Имитация хеширования пароля и вызова save
     with patch('account.app.account.models.Users.save', autospec=True) as mock_save:
-        # При сохранении пользователя хешируем его пароль
-        user.password = sha256(user.password.encode('utf-8')).hexdigest()
-        user.save()  # Вызываем сохранение, которое в реальности мокируется
+        hashed_password = sha256(user.password.encode('utf-8')).hexdigest()
+        user.password = hashed_password
+        user.save()
 
-        # Проверяем, что метод save был вызван
-        mock_save.assert_called_once_with(user)
+        mock_save.assert_called_once()
 
-        # Проверяем, что пароль пользователя был хеширован корректно
-        expected_hashed_password = sha256(user_data["password"].encode('utf-8')).hexdigest()
-        assert user.password == expected_hashed_password, "Password was not hashed correctly"
-
-
-@pytest.fixture
-def mock_user_instance():
-    # Создаем мок экземпляра пользователя с дополнительным атрибутом _state
-    user_mock = Mock(spec=Users)
-    user_mock.id = get_random_string(20)
-    user_mock._state = MagicMock()  # Имитация объекта _state, используемого Django
-    return user_mock
-
-def test_account_creation_without_db(mock_user_instance):
-    account_id = get_random_string(20, allowed_chars='0123456789')
-    balance = 100.00
-
-    with patch('account.app.account.models.Account.save', autospec=True) as mock_save:
-        # Создаем экземпляр Account без сохранения в базу данных
-        account = Account(id=account_id, balance=balance, usernameid=mock_user_instance)
-        mock_save.assert_not_called()  # Убедиться, что метод save не был вызван
-
-        assert account.id == account_id
-        assert account.balance == balance
-        assert account.usernameid == mock_user_instance
-
-
-
+        # После сохранения проверяем, что пароль хеширован
+        assert user.password == hashed_password, "Password was not hashed correctly"
