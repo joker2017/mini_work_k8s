@@ -49,7 +49,7 @@ def test_account_create(client, mock_create_account_number, mock_account_save):
         'usernameid': 'test_user_id'
     }
 
-    url = reverse('account-create')
+    url = reverse('test_account-create')
 
     response = client.post(url, account_data, format='json')
 
