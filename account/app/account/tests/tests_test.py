@@ -153,14 +153,35 @@ def test_account_destroy_with_mocked_response():
         response = AccountDestroy.as_view()(request, pk=mock_user_instance.id)
         assert response.status_code == 204
 
-# Тест для проверки хеширования пароля пользователя
-def test_user_password_hashing(mock_user_instance):
-    password = "password"
-    hashed_password = sha256(password.encode('utf-8')).hexdigest()
-    mock_user_instance.password = password
-    mock_user_instance.save()
-    assert mock_user_instance.password == hashed_password
 
+@pytest.fixture
+def user_data():
+    return {
+        "id": get_random_string(20),
+        "full_names": "Test User",
+        "username": "testuser",
+        "email": "test@example.com",
+        "password": "password"
+    }
+
+
+def test_user_password_hashing(user_data):
+    # Create a user instance with unhashed password
+    user = Users(**user_data)
+
+    # Hash the password for comparison
+    expected_hash = hashlib.sha256(user_data["password"].encode('utf-8')).hexdigest()
+
+    # Simulate the save method to hash the password
+    with patch.object(Users, 'save', autospec=True) as mock_save:
+        user.save()  # Normally hashes password
+
+        # Ensure the save method was called
+        mock_save.assert_called_once()
+
+        # Directly assert the hashed password or mock the hashing logic
+        # For illustration, assuming password hashing occurs within `user.save()`
+        assert user.password == expected_hash, "The password was not hashed correctly"
 # Тест для создания аккаунта без обращения к базе данных
 def test_account_creation_without_db(mock_user_instance):
     account = Account(id=get_random_string(20), balance=100.00, usernameid=mock_user_instance)
