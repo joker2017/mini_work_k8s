@@ -3,6 +3,7 @@ from unittest.mock import patch
 from account.models import Account
 from account.views import AccountCreate, AccountList
 from django.http import HttpRequest
+from django.test.utils import override_settings
 
 
 # Мок функции, которая будет использоваться для подмены вызовов к модели Account
@@ -17,6 +18,7 @@ def mock_account_objects_all(self, *args, **kwargs):
 
 
 class AccountTests(TestCase):
+    @override_settings(DATABASES={"default": {"ENGINE": "django.db.backends.dummy"}})
     @patch('app.models.Account.save', mock_account_save)
     def test_create_account(self):
         # Здесь мы создаем тестовый запрос и вызываем нашу функцию создания аккаунта
