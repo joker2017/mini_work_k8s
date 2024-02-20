@@ -143,7 +143,7 @@ def test_create_account_number():
         assert account_number.isdigit()
 
 # Тест для создания аккаунта с мокированным ответом
-@pytest.mark.django_db
+
 def test_account_create_with_mocked_view(request_factory, mock_account_serializer):
     with patch('account.app.account.views.AccountCreate.get_serializer', return_value=mock_account_serializer):
         request = request_factory.post('/path/to/view/', {'balance': 100.00, 'usernameid': 'mock_user_id'})
@@ -152,7 +152,7 @@ def test_account_create_with_mocked_view(request_factory, mock_account_serialize
         assert response.data == mock_account_serializer.data
 
 # Тест для обновления аккаунта с мокированным ответом
-@pytest.mark.django_db
+
 def test_account_update_with_mocked_response(request_factory, mock_account_serializer):
     with patch('account.app.account.views.AccountUpdate.get_serializer', return_value=mock_account_serializer):
         request = request_factory.put('/path/to/view/', {'balance': 200.00})
@@ -161,7 +161,7 @@ def test_account_update_with_mocked_response(request_factory, mock_account_seria
         assert response.data == mock_account_serializer.data
 
 # Тест для удаления аккаунта с мокированным ответом
-@pytest.mark.django_db
+
 def test_account_destroy_with_mocked_response(request_factory, mock_user_instance):
     with patch('account.app.account.views.AccountDestroy.get_object', return_value=mock_user_instance):
         request = request_factory.delete('/path/to/view/')
