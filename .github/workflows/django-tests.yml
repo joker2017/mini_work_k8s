@@ -30,6 +30,7 @@ jobs:
       run: echo "DJANGO_SETTINGS_MODULE=account.app.app.settings" >> $GITHUB_ENV
     - name: Run tests with coverage
       run: |
+        export PYTHONPATH="/home/runner/work/mini_work_k8s/mini_work_k8s:$PYTHONPATH"
         tree
         pytest ${{ env.TESTS_DIR }} --cov=${{ env.SRC_DIR }} --cov-report=xml
 
