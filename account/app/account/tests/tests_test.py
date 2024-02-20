@@ -84,6 +84,7 @@ from unittest.mock import Mock, patch
 from rest_framework.test import APIClient
 from rest_framework import status
 from account.app.account.views import AccountUpdate
+from account.app.account.serializers import AccountSerializer
 
 @pytest.fixture
 def mock_user_instance():
