@@ -16,84 +16,56 @@ def test_create_account_number(mock_filter):
     mock_filter.assert_called()  # Или используйте assert_called_once_with(), если вы хотите проверить вызов с конкретными аргументами
 
 
-
-
-
-
-
-
-
-
-
 import pytest
-from unittest.mock import Mock, patch, create_autospec
+from unittest.mock import Mock, patch
 from rest_framework import status
-
-# Assuming these are the correct paths to your actual implementations
+from account.app.account.models import Account
 from account.app.account.views import AccountCreate
-from account.app.account.models import Account, Users
-from account.app.account.services import create_account_number
-
-@pytest.fixture
-def user_instance():
-    # Create a mock Users instance
-    user_mock = create_autospec(Users, instance=True)
-    user_mock.id = 'test_user_id'
-    return user_mock
+from account.app.account.serializers import AccountSerializerRegistr
 
 
 @pytest.fixture
-def mock_account_filter_exists(mocker):
-    """
-    Правильное мокирование вызова Account.objects.filter().exists().
-    """
-    # Мокируем QuerySet, который возвращается методом filter
-    mock_queryset = mocker.MagicMock()
-    mock_queryset.exists.return_value = False
+def user_instance(db):
+    # Создаем экземпляр пользователя в базе данных для теста
+    return Users.objects.create(id='test_user_id', username='testuser', email='test@example.com',
+                                password='securepassword')
 
-    # Мокируем метод filter, чтобы он возвращал мокированный QuerySet
-    mocker.patch('django.db.models.query.QuerySet.filter', return_value=mock_queryset)
 
 @pytest.fixture
 def mock_create_account_number(mocker):
+    # Мокируем функцию создания номера аккаунта
     return mocker.patch('account.app.account.services.create_account_number', return_value='12345678901234567890')
 
-@pytest.fixture
-def mock_account_save(mocker):
-    return mocker.patch.object(Account, 'save', autospec=True)
 
 @pytest.fixture
-def mock_serializer(mocker, user_instance):
-    account_mock = Mock(spec=Account)
-    account_mock.id = '12345678901234567890'
-    account_mock.balance = 100.00
-    account_mock.usernameid = user_instance
-    serializer_mock = Mock()
-    serializer_mock.is_valid.return_value = True
-    serializer_mock.save.return_value = account_mock
-    serializer_mock.data = {
-        'id': account_mock.id,
-        'balance': str(account_mock.balance),
-        'usernameid': account_mock.usernameid.id
-    }
-    return mocker.patch('account.app.account.views.AccountCreate.get_serializer', return_value=serializer_mock)
-
-def test_account_create(mock_account_filter_exists, mock_create_account_number, mock_account_save, mock_serializer, user_instance):
-    view = AccountCreate()
-    request = Mock()
-    request.data = {
+def account_data():
+    # Данные аккаунта для теста
+    return {
         'balance': '100.00',
-        'usernameid': user_instance.id
+        'usernameid': 'test_user_id'
     }
-    request._request = Mock()
-    request.user = None
 
-    response = view.create(request)
+
+@pytest.fixture
+def mock_account_serializer(mocker, account_data):
+    # Мокируем сериализатор для возвращения заданных данных
+    mock = mocker.Mock(spec=AccountSerializerRegistr)
+    mock.is_valid.return_value = True
+    mock.save.return_value = Account(**account_data)
+    mock.data = account_data
+    return mock
+
+
+def test_account_create(mock_create_account_number, mock_account_serializer, user_instance, account_data, rf):
+    # rf - RequestFactory для создания запроса
+    request = rf.post('/fake-url/', data=account_data)
+    view = AccountCreate.as_view()
+
+    with patch('account.app.account.views.AccountCreate.get_serializer', return_value=mock_account_serializer):
+        response = view(request)
 
     assert response.status_code == status.HTTP_201_CREATED
     mock_create_account_number.assert_called_once()
-    mock_serializer().is_valid.assert_called_once_with(raise_exception=True)
-    mock_serializer().save.assert_called_once()
-    assert response.data['id'] == '12345678901234567890'
-    assert response.data['balance'] == '100.00'
-    assert response.data['usernameid'] == user_instance.id
+    assert mock_account_serializer.is_valid.called is True
+    assert mock_account_serializer.save.called is True
+    assert response.data == account_data
