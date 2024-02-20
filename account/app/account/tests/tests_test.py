@@ -86,7 +86,7 @@ def test_account_destroy_with_mocked_response(account_instance):
 
 
 
-
+import hashlib
 import pytest
 from unittest.mock import Mock, patch, MagicMock
 from django.utils.crypto import get_random_string
@@ -101,7 +101,7 @@ def mock_user_instance():
     user_mock = Mock(spec=Users)
     user_mock.id = get_random_string(20)
     user_mock._state = MagicMock()  # Имитация _state для Django ORM
-    return user_mock
+    return Mock(spec=Users, id='mock_user_id')
 
 # Фикстура для мокирования сериализатора аккаунта
 @pytest.fixture
