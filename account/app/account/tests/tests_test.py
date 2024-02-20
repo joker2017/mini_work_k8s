@@ -7,8 +7,8 @@
 import unittest
 from unittest.mock import patch
 #from myapp.models import Account  # Импорт модели Account из вашего приложения
-from account.services import create_account_number  # Предполагается, что функция определена в myapp/functions.py
-
+#from account.app.app.services import create_account_number  # Предполагается, что функция определена в myapp/functions.py
+from .services import create_account_number
 class CreateAccountNumberTest(unittest.TestCase):
     @patch('Account.objects.filter')
     def test_create_account_number_unique(self, mock_filter):
