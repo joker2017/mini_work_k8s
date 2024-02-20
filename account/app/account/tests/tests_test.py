@@ -87,7 +87,7 @@ from unittest.mock import patch, Mock
 import pytest
 from django.utils.crypto import get_random_string
 from hashlib import sha256
-from yourapp.models import Users, Account
+from account.app.account.models import Users, Account
 
 def test_user_password_hashing():
     user_id = get_random_string(20)
@@ -99,7 +99,7 @@ def test_user_password_hashing():
         "password": "password",
     }
 
-    with patch('yourapp.models.Users.save', autospec=True) as mock_save:
+    with patch('account.app.account.models.Users.save', autospec=True) as mock_save:
         user = Users(**user_data)
         user.password = sha256(user.password.encode('utf-8')).hexdigest()  # Имитация хеширования в методе save()
         mock_save.return_value = None
@@ -114,7 +114,7 @@ def test_account_creation_without_db():
     account_id = get_random_string(20, allowed_chars='0123456789')
     balance = 100.00
 
-    with patch('yourapp.models.Account.save', autospec=True) as mock_save:
+    with patch('account.app.account.models.Account.save', autospec=True) as mock_save:
         account = Account(id=account_id, balance=balance, usernameid=user)
         mock_save.return_value = None
         account.save()
