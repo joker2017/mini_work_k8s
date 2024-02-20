@@ -80,44 +80,31 @@ def test_account_create_with_mocked_view(mock_create_account_number, mock_accoun
 
 
 
-
-
-
-
-
-
-
-
-
 import pytest
 from unittest.mock import Mock, patch
-from django.test import RequestFactory
+from rest_framework.test import APIClient
 from rest_framework import status
-from rest_framework.response import Response
 import json
+from account.app.account.models import Account, Users
 from account.app.account.serializers import AccountSerializer
 
-# Предполагаемые импорты для моделей и представлений
 
-# Фикстура для мокирования экземпляра пользователя
 @pytest.fixture
 def mock_user_instance():
-    user_mock = Mock()
+    user_mock = Mock(spec=Users)
     user_mock.id = 'test_user_id'
-    user_mock.is_active = True
-    user_mock.is_authenticated = True
     return user_mock
 
-# Фикстура для мокирования экземпляра аккаунта
+
 @pytest.fixture
 def account_instance(mock_user_instance):
-    account_mock = Mock()
+    account_mock = Mock(spec=Account)
     account_mock.id = '12345678901234567890'
     account_mock.balance = 100.00
     account_mock.usernameid = mock_user_instance
     return account_mock
 
-# Фикстура для мокирования сериализатора аккаунта
+
 @pytest.fixture
 def mock_account_serializer(account_instance):
     serializer_mock = Mock(spec=AccountSerializer)
@@ -131,25 +118,23 @@ def mock_account_serializer(account_instance):
     }
     return serializer_mock
 
-# Тестовый сценарий для обновления аккаунта
-def test_account_update(mock_account_serializer, account_instance, rf):
-    updated_data = {'balance': '200.00'}
-    request = RequestFactory().put(
-        '/account/',  # Используем фиктивный URL
-        data=json.dumps(updated_data),
-        content_type='application/json'
-    )
-    request.user = account_instance.usernameid
 
+# Используем APIClient для тестирования представления AccountUpdate
+def test_account_update(mock_account_serializer, account_instance):
+    client = APIClient()
+    updated_data = {'balance': '200.00'}
+
+    # Предполагаем, что у вас есть URL, конфигурируемый для обработки обновления аккаунта, подобный '/accounts/{account_id}/'
+    url = f'/account/{account_instance.id}/'
+
+    # Мокирование методов, используемых в представлении AccountUpdate
     with patch('account.app.account.views.AccountUpdate.get_object', return_value=account_instance), \
             patch('account.app.account.views.AccountUpdate.get_serializer', return_value=mock_account_serializer):
-        from account.app.account.views import AccountUpdate  # Импорт здесь, если нужно избежать циклических зависимостей
-        view = AccountUpdate.as_view()
-        response = view(request, pk=account_instance.id)
+        response = client.put(url, data=json.dumps(updated_data), content_type='application/json')
 
-    # Проверки ппп
+    # Проверки
     assert response.status_code == status.HTTP_200_OK
-    assert mock_account_serializer.is_valid.called
-    assert mock_account_serializer.save.called
+    mock_account_serializer.is_valid.assert_called_once()
+    mock_account_serializer.save.assert_called_once()
     assert response.data == mock_account_serializer.data
 
