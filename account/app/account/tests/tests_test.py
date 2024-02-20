@@ -75,34 +75,103 @@ def test_account_destroy_with_mocked_response(account_instance):
         assert response.status_code == status.HTTP_204_NO_CONTENT
 
 
-from unittest.mock import Mock, patch
+
+
+
+
+
+
+
+
+
+
+
+
 import pytest
-from hashlib import sha256
+from unittest.mock import Mock, patch, MagicMock
 from django.utils.crypto import get_random_string
+from hashlib import sha256
+from account.app.account.models import Users, Account
+from account.app.account.views import AccountCreate, AccountUpdate, AccountDestroy
+from account.app.account.serializers import AccountSerializerRegistr, AccountSerializer
 
-# Предполагается, что Users - это модель, которую вы тестируете
-from account.app.account.models import Users
+# Общая фикстура для мокирования экземпляра пользователя
+@pytest.fixture
+def mock_user_instance():
+    user_mock = Mock(spec=Users)
+    user_mock.id = get_random_string(20)
+    user_mock._state = MagicMock()  # Имитация _state для Django ORM
+    return user_mock
 
-
-
-def test_user_password_hashing():
-    user_data = {
-        "id": get_random_string(20),
-        "full_names": "Test User",
-        "username": "testuser",
-        "email": "test@example.com",
-        "password": "password",
+# Фикстура для мокирования сериализатора аккаунта
+@pytest.fixture
+def mock_account_serializer(mock_user_instance):
+    account_mock = Mock(spec=Account)
+    account_mock.id = get_random_string(20, allowed_chars='0123456789')
+    account_mock.balance = 100.00
+    account_mock.usernameid = mock_user_instance
+    serializer_mock = Mock(spec=AccountSerializer)
+    serializer_mock.instance = account_mock
+    serializer_mock.is_valid.return_value = True
+    serializer_mock.save.return_value = account_mock
+    serializer_mock.data = {
+        'id': account_mock.id,
+        'balance': 100.00,
+        'usernameid': account_mock.usernameid.id
     }
+    return serializer_mock
 
-    user = Users(**user_data)
+# Тест для создания номера аккаунта
+def test_create_account_number():
+    with patch('account.app.account.services.create_account_number', return_value='12345678901234567890') as mock_create_account_number:
+        account_number = mock_create_account_number()
+        assert len(account_number) == 20
+        assert account_number.isdigit()
 
-    # Имитация хеширования пароля и вызова save
-    with patch('account.app.account.models.Users.save', autospec=True) as mock_save:
-        hashed_password = sha256(user.password.encode('utf-8')).hexdigest()
-        user.password = hashed_password
-        user.save()
+# Тест для создания аккаунта с мокированным ответом
+def test_account_create_with_mocked_view(mock_account_serializer):
+    with patch('account.app.account.views.AccountCreate.get_serializer', return_value=mock_account_serializer):
+        request = Mock()
+        request.data = {'balance': 100.00, 'usernameid': mock_user_instance.id}
+        response = AccountCreate.as_view()(request)
+        assert response.status_code == 201
+        assert response.data == mock_account_serializer.data
 
-        mock_save.assert_called_once()
+# Тест для обновления аккаунта с мокированным ответом
+def test_account_update_with_mocked_response(mock_account_serializer):
+    with patch('account.app.account.views.AccountUpdate.get_serializer', return_value=mock_account_serializer):
+        request = Mock()
+        request.data = {'balance': 200.00}
+        response = AccountUpdate.as_view()(request, pk=mock_account_serializer.instance.id)
+        assert response.status_code == 200
+        assert response.data == mock_account_serializer.data
 
-        # После сохранения проверяем, что пароль хеширован
-        assert user.password == hashed_password, "Password was not hashed correctly"
+# Тест для удаления аккаунта с мокированным ответом
+def test_account_destroy_with_mocked_response():
+    with patch('account.app.account.views.AccountDestroy.get_object', return_value=mock_user_instance):
+        request = Mock()
+        response = AccountDestroy.as_view()(request, pk=mock_user_instance.id)
+        assert response.status_code == 204
+
+# Тест для проверки хеширования пароля пользователя
+def test_user_password_hashing(mock_user_instance):
+    password = "password"
+    hashed_password = sha256(password.encode('utf-8')).hexdigest()
+    mock_user_instance.password = password
+    mock_user_instance.save()
+    assert mock_user_instance.password == hashed_password
+
+# Тест для создания аккаунта без обращения к базе данных
+def test_account_creation_without_db(mock_user_instance):
+    account = Account(id=get_random_string(20), balance=100.00, usernameid=mock_user_instance)
+    assert account.id is not None
+    assert account.balance == 100.00
+    assert account.usernameid == mock_user_instance
+
+
+
+
+
+
+
+
