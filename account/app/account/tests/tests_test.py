@@ -1,7 +1,7 @@
 from django.test import TestCase
 from unittest.mock import patch
 from account.models import Account
-from account.views import create_account, list_accounts
+from account.views import AccountCreate, AccountList
 from django.http import HttpRequest
 
 
