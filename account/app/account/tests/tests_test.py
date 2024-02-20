@@ -33,11 +33,11 @@ from rest_framework import status
 
 @pytest.fixture
 def mock_create_account_number(mocker):
-    return mocker.patch('account.services.create_account_number', return_value='12345678901234567890')
+    return mocker.patch('account.app.account.services.create_account_number', return_value='12345678901234567890')
 
 @pytest.fixture
 def mock_account_save(mocker):
-    return mocker.patch('account.models.Account.save', autospec=True)
+    return mocker.patch('account.app.account.models.Account.save', autospec=True)
 
 @pytest.fixture
 def client():
