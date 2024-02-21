@@ -160,3 +160,29 @@ MEDIA_URL = "/media/"
 MEDIA_ROOT = os.path.join(BASE_DIR, "media")
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+
+
+
+print(f"BASE_DIR: {BASE_DIR}")
+print(f"STATIC_ROOT: {STATIC_ROOT}")
+import logging
+logger = logging.getLogger(__name__)
+
+logger.debug(f"BASE_DIR: {BASE_DIR}")
+logger.debug(f"STATIC_ROOT: {STATIC_ROOT}")
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'handlers': {
+        'console': {
+            'class': 'logging.StreamHandler',
+        },
+    },
+    'loggers': {
+        'django': {
+            'handlers': ['console'],
+            'level': 'DEBUG',  # Измените уровень логирования здесь
+        },
+    },
+}
