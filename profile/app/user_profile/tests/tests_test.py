@@ -2,11 +2,11 @@ import pytest
 from unittest.mock import Mock, patch
 from rest_framework import status
 from rest_framework.response import Response
-
+from profile.app.user_profile.models import Users
 # Предполагаем, что ваши импорты настроены корректно
 from profile.app.user_profile.models import Users
 from profile.app.user_profile.services import create_account_number
-
+from unittest.mock import patch, Mock
 
 @pytest.fixture
 def mock_user_data():
@@ -57,24 +57,7 @@ def test_user_create_invalid_data():
 #    assert not id  # Предположим, что функция create_account_number возвращает None или вызывает исключение
 
 
-import pytest
-from django.db.models.deletion import ProtectedError
-from profile.app.user_profile.models import Users
 
-from unittest.mock import patch, Mock
-from django.http import Http404
-from rest_framework.exceptions import PermissionDenied
-from profile.app.user_profile.views import UsersDestroy
-from django.db.models.deletion import ProtectedError
-import pytest
-
-
-import pytest
-from unittest.mock import patch, MagicMock
-from django.db.models.deletion import ProtectedError
-from rest_framework import status
-from profile.app.user_profile.models import Users
-from profile.app.user_profile.views import UsersDestroy
 
 @pytest.fixture
 def user_instance():
@@ -83,25 +66,8 @@ def user_instance():
     return user
 
 
-from unittest.mock import patch, MagicMock
-import pytest
-from django.db.models.deletion import ProtectedError
-
-from unittest.mock import patch, create_autospec
-import pytest
-from rest_framework.exceptions import ValidationError
-from django.db.models.deletion import ProtectedError
-from rest_framework.response import Response
-from rest_framework import status
-from profile.app.user_profile.views import UsersDestroy
-from profile.app.user_profile.models import Users
 
 
-
-
-
-
-import hashlib
 from hashlib import sha256
 import pytest
 from unittest.mock import patch, MagicMock
@@ -125,10 +91,39 @@ def account_data():
         'usernameid': None  # You can replace None with a Users instance if needed
     }
 
-def test_user_creation(user_data):
-    with patch('profile.app.user_profile.models.Users.objects.create') as mock_create:
-        Users.objects.create(**user_data)
-        mock_create.assert_called_once_with(**user_data)
+import pytest
+from unittest.mock import Mock, patch
+from some_module import UsersCreate, UsersUpdate, UsersDestroy
+
+# Предположим, что это ваши тестовые данные
+@pytest.fixture
+def mock_user_data():
+    return {'full_names': 'Test User', 'username': 'testuser', 'email': 'test@example.com', 'password': 'password123'}
+
+# Фикстура для мокирования экземпляра пользователя
+@pytest.fixture
+def mock_user_instance(mock_user_data):
+    user_instance = Mock()
+    user_instance.full_names = mock_user_data['full_names']
+    user_instance.username = mock_user_data['username']
+    user_instance.email = mock_user_data['email']
+    user_instance.password = mock_user_data['password']
+    return user_instance
+
+# Пример теста с использованием мокирования
+@patch('some_module.UsersCreate')
+def test_users_create_with_mock(mock_users_create, mock_user_data):
+    mock_users_create.return_value = Mock(spec=UsersCreate)
+    # Тут ваша логика теста, например, создание пользователя
+    result = mock_users_create.create_user(**mock_user_data)
+    # Проверка вызова метода
+    mock_users_create.create_user.assert_called_once_with(**mock_user_data)
+    # И другие проверки, которые необходимо выполнить
+
+
+
+
+
 
 def test_unique_username_constraint(user_data):
     with patch('profile.app.user_profile.models.Users.objects.create') as mock_create:
