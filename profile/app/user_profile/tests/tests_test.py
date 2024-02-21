@@ -93,8 +93,8 @@ from rest_framework.exceptions import ValidationError
 from django.db.models.deletion import ProtectedError
 from rest_framework.response import Response
 from rest_framework import status
-from your_app.views import UsersDestroy
-from your_app.models import Users
+from profile.app.user_profile.views import UsersDestroy
+from profile.app.user_profile.models import Users
 
 
 
