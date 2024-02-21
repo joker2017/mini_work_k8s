@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+
 <html>
 <head>
     <title>MiniBank Project Description</title>
@@ -30,4 +30,4 @@
     </section>
 
 </body>
-</html>
+
