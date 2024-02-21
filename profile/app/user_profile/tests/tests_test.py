@@ -87,19 +87,34 @@ from unittest.mock import patch, MagicMock
 import pytest
 from django.db.models.deletion import ProtectedError
 
+from unittest.mock import patch, create_autospec
+import pytest
+from rest_framework.exceptions import ValidationError
+from django.db.models.deletion import ProtectedError
+from rest_framework.response import Response
+from rest_framework import status
+from your_app.views import UsersDestroy
+from your_app.models import Users
 
-@patch('profile.app.user_profile.models.Users.delete')
-def test_user_delete_protected_error(mock_delete):
-    # Создаем мок исключения с необходимым сообщением
-    mock_delete.side_effect = ProtectedError("Нельзя удалить пользователя с привязанными счетами", MagicMock())
 
-    user = MagicMock()
 
-    with pytest.raises(ProtectedError) as exc_info:
-        user.delete()
+def test_users_destroy_protected_error():
+    user_id = 'test_user_id'
+    user_instance = create_autospec(Users, instance=True, id=user_id)
 
-    assert "Нельзя удалить пользователя с привязанными счетами" in str(exc_info.value)
-    mock_delete.assert_called_once()
+    with patch.object(UsersDestroy, 'get_object', return_value=user_instance) as mock_get_object, \
+            patch.object(UsersDestroy, 'perform_destroy', side_effect=ProtectedError(
+                "Нельзя удалить клиента с привязанными счетами")) as mock_perform_destroy:
+        view = UsersDestroy()
+        view.kwargs = {'pk': user_id}  # Имитация получения пользователя по pk
+
+        response = view.destroy(request=None)
+
+        mock_get_object.assert_called_once()
+        mock_perform_destroy.assert_called_once_with(user_instance)
+
+        assert response.status_code == status.HTTP_403_FORBIDDEN
+        assert str(response.data) == "Нельзя удалить клиента с привязанными счетами"
 
 
 import hashlib
