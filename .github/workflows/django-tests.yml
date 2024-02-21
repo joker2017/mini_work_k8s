@@ -6,8 +6,8 @@ jobs:
     strategy:
       matrix:
         include:
-          #- app: account
-          #  TESTS_DIR: "account/app/account/tests/tests_test.py"
+          - app: account
+            TESTS_DIR: "account/app/account/tests/tests_test.py"
           - app: profile
             TESTS_DIR: "profile/app/user_profile/tests/tests_test.py"
     permissions:
