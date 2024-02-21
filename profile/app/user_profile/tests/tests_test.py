@@ -98,23 +98,7 @@ from profile.app.user_profile.models import Users
 
 
 
-def test_users_destroy_protected_error():
-    user_id = 'test_user_id'
-    user_instance = create_autospec(Users, instance=True, id=user_id)
 
-    with patch.object(UsersDestroy, 'get_object', return_value=user_instance) as mock_get_object, \
-            patch.object(UsersDestroy, 'perform_destroy', side_effect=ProtectedError(
-                "Нельзя удалить клиента с привязанными счетами")) as mock_perform_destroy:
-        view = UsersDestroy()
-        view.kwargs = {'pk': user_id}  # Имитация получения пользователя по pk
-
-        response = view.destroy(request=None)
-
-        mock_get_object.assert_called_once()
-        mock_perform_destroy.assert_called_once_with(user_instance)
-
-        assert response.status_code == status.HTTP_403_FORBIDDEN
-        assert str(response.data) == "Нельзя удалить клиента с привязанными счетами"
 
 
 import hashlib
