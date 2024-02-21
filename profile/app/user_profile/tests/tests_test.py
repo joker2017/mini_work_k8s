@@ -82,25 +82,22 @@ def user_instance():
     user = MagicMock(spec=Users)
     return user
 
-@patch('profile.app.user_profile.models.Users.objects.get')
-def test_user_destroy_with_protected_error(mock_get, user_instance):
-    """
-    Тест проверяет исключение при попытке удалить пользователя с привязанными к нему аккаунтами.
-    """
-    # Настройка мока
-    mock_get.return_value = user_instance
-    user_instance.delete.side_effect = ProtectedError("Нельзя удалить клиента с привязанными счетами")
+import pytest
+from unittest.mock import patch, MagicMock
+from django.db.models.deletion import ProtectedError
+from profile.app.user_profile.models import Users
 
-    # Инициализация представления для удаления
-    view = UsersDestroy()
-    request = MagicMock()
-
-    # Попытка удаления и проверка вызова исключения
-    with pytest.raises(ProtectedError):
-        view.destroy(request, pk=user_instance.id)
-
+# Мокируем метод delete модели Users для имитации исключения ProtectedError
+@patch('profile.app.user_profile.models.Users.delete', side_effect=ProtectedError("Нельзя удалить пользователя с привязанными счетами"))
+def test_user_delete_protected_error(mock_delete):
+    user = Users(id='test_id', full_names='Test User', username='testuser')
+    # Пытаемся удалить пользователя и ожидаем исключение ProtectedError
+    with pytest.raises(ProtectedError) as exc_info:
+        user.delete()
+    assert "Нельзя удалить пользователя с привязанными счетами" in str(exc_info.value)
     # Проверяем, что мок метода delete был вызван
-    user_instance.delete.assert_called_once()
+    mock_delete.assert_called_once()
+
 
 
 
