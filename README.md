@@ -1,33 +1,20 @@
+# MiniBank Test Project
 
-<html>
-<head>
-    <title>MiniBank Project Description</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.7.2/styles/default.min.css">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.7.2/highlight.min.js"></script>
-    <script>hljs.initHighlightingOnLoad();</script>
-</head>
-<body>
+This project is a test REST API application called MiniBank, built using Django. It consists of two microservices that interact with a single PostgreSQL database. Nginx Unit serves as the application server. 
 
-    <h2>MiniBank Project</h2>
+CI/CD is implemented using GitHub Actions for automated testing, building, storing Docker images on Docker Hub, and deployment to Kubernetes in Yandex Cloud. Both microservices are thoroughly tested with mocks to avoid dependencies on the database. This project addresses several Django-related issues, such as testing without a database, foreign key challenges with one database and two applications, deployment scripts for Yandex Cloud Kubernetes, and more.
 
-    <!-- Badges -->
-    <div>
-        <span>Account: <img src="your-badge-url-here" alt="Account Badge"></span>
-        <span>Profile: <img src="your-badge-url-here" alt="Profile Badge"></span>
-    </div>
 
-    <!-- Project Description -->
-    <section>
-        <p>The "MiniBank" project is a REST API application developed using the Django framework. It embodies two microservices that interact with a single PostgreSQL database. To ensure high-performance operation of applications, Nginx Unit is used as the server.</p>
+**Account Service:**  
+[![Account Badge](https://codecov.io/gh/joker2017/mini_work_k8s/graph/badge.svg?token=88NZMRH8CR&flag=account)](https://codecov.io/gh/joker2017/mini_work_k8s)
 
-        <p>During development, a continuous integration and delivery (CI/CD) infrastructure was implemented using GitHub Actions. This includes automatic code testing, building and hosting images in Docker Hub, and deploying applications in Kubernetes on Yandex Cloud. Special attention is paid to testing: both microservices are covered with mock tests, avoiding database dependencies during testing.</p>
+**Profile Service:**  
+[![Profile Badge](https://codecov.io/gh/joker2017/mini_work_k8s/graph/badge.svg?token=88NZMRH8CR&flag=profile)](https://codecov.io/gh/joker2017/mini_work_k8s)
 
-        <p>The project utilizes a blue-green deployment strategy in Kubernetes, ensuring seamless transitions between versions with minimal downtime. Moreover, it features an advanced feature flags system that allows for dynamic management of application features directly from the Django admin interface without the need for application restarts. This flexibility ensures that new features can be tested and rolled out with greater control and minimal impact on the current users' experience.</p>
+## Blue-Green Deployment
+The application employs a blue-green deployment strategy, facilitated by GitHub Actions, Helm, and Argo Rollouts. This approach ensures zero downtime during updates and allows for quick rollback if issues are detected post-deployment.
 
-        <p>The "MiniBank" project focuses on solving a number of specific issues related to Django development. In particular, attention is paid to handling foreign keys in a single database for two applications, which is a non-trivial task in Django. Moreover, the project has implemented scripts for easy deployment in Yandex Cloud using Kubernetes, allowing for effective application scaling.</p>
+## Feature Flags
+Feature flags are implemented to manage and roll out new features without needing to restart the application. This functionality is controlled through the admin panel, providing a flexible and dynamic way to test new features in a live environment.
 
-        <p>Although the project is a test, it addresses many current issues of web application development and deployment, offering practical solutions for working with Django, databases, containerization, and orchestration. "MiniBank" can serve as an excellent example for studying and applying modern approaches in application development and deployment.</p>
-    </section>
-
-</body>
-
+For more details on how to set up and manage feature flags or to contribute to the project, please refer to the [documentation](https://github.com/joker2017/mini_work_k8s/wiki).
