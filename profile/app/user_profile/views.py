@@ -3,7 +3,9 @@ from rest_framework import status
 # Create your views here.
 from rest_framework import generics, viewsets, mixins, filters
 from rest_framework.viewsets import GenericViewSet
-from .models import Users
+#from .models import Users
+from profile.app.user_profile.models import Users
+
 from .serializers import UsersSerializer
 from .services import create_account_number
 from rest_framework.response import Response

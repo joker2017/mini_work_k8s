@@ -1,7 +1,8 @@
 #import io
 
 from rest_framework import serializers
-from .models import Users
+#from .models import Users
+from profile.app.user_profile.models import Users
 
 
 class UsersSerializer(serializers.ModelSerializer):
