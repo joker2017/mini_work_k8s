@@ -31,6 +31,9 @@ jobs:
     - name: Set PYTHONPATH
       run: echo "PYTHONPATH=$GITHUB_WORKSPACE" >> $GITHUB_ENV
 
+    - name: tree
+      run: |
+        tree
 
     - name: Run tests with coverage
       run: |
