@@ -9,7 +9,7 @@ jobs:
           #- app: account
           #  TESTS_DIR: "account/app/account/tests/tests_test.py"
           - app: profile
-            TESTS_DIR: "profile/app/user_profile/tests/tests_test.py"
+            TESTS_DIR: "/profile/app/user_profile/tests/tests_test.py"
     permissions:
       checks: write
       contents: read
