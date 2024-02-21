@@ -3,7 +3,6 @@ Django==4.2.5
 sqlparse==0.4.4
 djangorestframework>=3.14.0
 django-filter>=23.3
-#psycopg2-binary>=2.9.9  # or 
 psycopg[binary,pool]
 gunicorn>=21.2.0
 shortuuid>=1.0.11

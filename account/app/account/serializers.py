@@ -1,18 +1,29 @@
-#import io
-
 from rest_framework import serializers
-from .models import Account 
-
+from .models import Account
 
 class AccountSerializer(serializers.ModelSerializer):
+    """
+    Serializer for Account model.
+
+    This serializer is used to convert Account model instances into a JSON format
+    and vice versa, making it easier to serialize and deserialize data for API requests
+    and responses. It includes all model fields but sets 'usernameid' as read-only
+    to prevent it from being modified through API operations.
+    """
     class Meta:
         model = Account
-        fields = "__all__"
-        read_only_fields = ('usernameid',)
-        fields = ('balance', 'id', 'usernameid')
+        fields = ('balance', 'id', 'usernameid')  # Explicitly specify fields to include
+        read_only_fields = ('usernameid',)  # 'usernameid' field should not be editable
 
 class AccountSerializerRegistr(serializers.ModelSerializer):
+    """
+    Registration Serializer for Account model.
+
+    Similar to AccountSerializer but tailored for account registration scenarios.
+    It specifies which fields should be included when creating a new account
+    through the API. This might be used in different API endpoints where the
+    account creation process requires specific fields.
+    """
     class Meta:
         model = Account
-        fields = "__all__"
-        fields = ('balance', 'id', 'usernameid')
+        fields = ('balance', 'id', 'usernameid')  # Define fields to be included in the serialization
