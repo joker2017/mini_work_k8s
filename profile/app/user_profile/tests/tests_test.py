@@ -2,78 +2,105 @@ import pytest
 from unittest.mock import Mock, patch
 from rest_framework import status
 from rest_framework.response import Response
-from profile.app.user_profile.models import Users
-# Предполагаем, что ваши импорты настроены корректно
-from profile.app.user_profile.models import Users
+from rest_framework.test import APIClient
+from django.test import RequestFactory
+from account.app.account.models import Account, Users
+from profile.app.user_profile.views import UsersCreate, UsersUpdate, UsersDestroy
+from profile.app.user_profile.serializers import UsersSerializer
 from profile.app.user_profile.services import create_account_number
-from unittest.mock import patch, Mock
-
-@pytest.fixture
-def mock_user_data():
-    """Фикстура для предоставления тестовых данных пользователя."""
-    return {'full_names': 'Test User', 'username': 'testuser'}
 
 
 @pytest.fixture
 def mock_user_instance():
     """Фикстура для создания мок экземпляра пользователя."""
-    user = Mock(spec=Users)
-    user.id = '1234567890'
-    user.full_names = 'Test User'
-    user.username = 'testuser'
-    return user
-
-
-@patch('profile.app.user_profile.services.create_account_number')
-@patch('profile.app.user_profile.models.Users.objects.create')
-def test_users_create_with_mocked_service(mock_create, mock_create_account_number, mock_user_data):
-    """Тест проверяет создание пользователя с мокированным сервисом создания номера."""
-    mock_create_account_number.return_value = '12345678901234567890'
-    mock_create.return_value = mock_user_instance()
-
-    # Здесь мы мокируем сервис создания пользователя, вместо отправки запроса через APIClient
-    user_created = mock_create(full_names=mock_user_data['full_names'], username=mock_user_data['username'])
-
-    assert user_created.id == mock_create_account_number.return_value
-    mock_create_account_number.assert_called_once()
-    mock_create.assert_called_once_with(full_names='Test User', username='testuser')
-
-
-def test_user_create_invalid_data():
-    """Тест проверяет отклонение создания пользователя при невалидных данных."""
-    # Мокирование APIClient не требуется, так как мы проверяем валидацию данных на уровне сервиса
-    user_data = {'full_names': '', 'username': ''}
-    # Предположим, что функция валидации возвращает False или вызывает исключение при невалидных данных
-    is_valid = False  # Результат вызова функции валидации
-    assert not is_valid
-
-
-#@patch('profile.app.user_profile.models.Users.objects.filter')
-#def test_user_create_existing_id(mock_filter):
-#    """Тест проверяет исключение при попытке создать пользователя с существующим уникальным номером."""
-#    mock_filter.return_value.exists.return_value = True
-#    id = create_account_number()
-#    assert mock_filter.called
-#    assert not id  # Предположим, что функция create_account_number возвращает None или вызывает исключение
-
-
+    return Mock(spec=Users, id='test_user_id')
 
 
 @pytest.fixture
-def user_instance():
-    # Создаем мок инстанс пользователя
-    user = MagicMock(spec=Users)
-    return user
+def account_instance(mock_user_instance):
+    """Фикстура для создания мок экземпляра аккаунта."""
+    return Mock(spec=Account, id='12345678901234567890', balance=100.00, usernameid=mock_user_instance)
+
+
+@pytest.fixture
+def mock_account_serializer(account_instance):
+    """Фикстура для создания мок сериализатора."""
+    serializer_mock = Mock(spec=AccountSerializer)
+    serializer_mock.instance = account_instance
+    serializer_mock.is_valid.return_value = True
+    serializer_mock.save.return_value = account_instance
+    serializer_mock.data = {'id': account_instance.id, 'balance': '200.00', 'usernameid': account_instance.usernameid.id}
+    return serializer_mock
+
+
+@patch('profile.app.user_profile.models.Users.objects.filter')
+def test_create_account_number(mock_filter):
+    """Тест проверяет создание номера аккаунта."""
+    mock_filter.return_value.exists.return_value = False
+    account_number = create_account_number()
+    assert len(account_number) == 20 and account_number.isdigit()
+    mock_filter.assert_called()
+
+
+def test_account_create_with_mocked_view(mock_account_serializer):
+    """Тест проверяет создание аккаунта с мокированным представлением."""
+    request = RequestFactory().post('/fake-url/', data={'balance': '100.00', 'usernameid': 'test_user_id'})
+    with patch.object(AccountCreate, 'create', return_value=Response(
+            mock_account_serializer.data, status=status.HTTP_201_CREATED)) as mock_method:
+        response = UsersCreate.as_view({'post': 'create'})(request)
+        assert mock_method.called
+        assert response.status_code == status.HTTP_201_CREATED
+        assert response.data == mock_account_serializer.data
+
+
+def test_account_update_with_mocked_response(mock_account_serializer):
+    """Тест проверяет обновление аккаунта с мокированным ответом."""
+    client = APIClient()
+    with patch('profile.app.user_profile.views.ProfileUpdate', return_value=Response(
+            mock_account_serializer.data, status=status.HTTP_200_OK)) as mocked_put:
+        response = mocked_put(Mock(data={'balance': '200.00'}))
+        assert mocked_put.called
+        assert response.status_code == status.HTTP_200_OK
+        assert response.data == mock_account_serializer.data
+
+
+def test_account_destroy_with_mocked_response(account_instance):
+    """Тест проверяет удаление аккаунта с мокированным ответом."""
+    with patch('profile.app.user_profile.views.ProfileDestroy.get_object', return_value=account_instance), \
+         patch('profile.app.user_profile.views.ProfileDestroy.perform_destroy', return_value=None):
+        view = UsersDestroy()
+        request = Mock()
+        view.setup(request, pk=account_instance.id)
+        response = view.delete(request, pk=account_instance.id)
+        assert response.status_code == status.HTTP_204_NO_CONTENT
 
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+import hashlib
 from hashlib import sha256
 import pytest
 from unittest.mock import patch, MagicMock
-from account.app.account.models import Users, Account
+from profile.app.user_profile.models import Users, Account
 from django.db import IntegrityError
-#ggg
+
 @pytest.fixture
 def user_data():
     return {
@@ -91,39 +118,10 @@ def account_data():
         'usernameid': None  # You can replace None with a Users instance if needed
     }
 
-import pytest
-from unittest.mock import Mock, patch
-from some_module import UsersCreate, UsersUpdate, UsersDestroy
-
-# Предположим, что это ваши тестовые данные
-@pytest.fixture
-def mock_user_data():
-    return {'full_names': 'Test User', 'username': 'testuser', 'email': 'test@example.com', 'password': 'password123'}
-
-# Фикстура для мокирования экземпляра пользователя
-@pytest.fixture
-def mock_user_instance(mock_user_data):
-    user_instance = Mock()
-    user_instance.full_names = mock_user_data['full_names']
-    user_instance.username = mock_user_data['username']
-    user_instance.email = mock_user_data['email']
-    user_instance.password = mock_user_data['password']
-    return user_instance
-
-# Пример теста с использованием мокирования
-@patch('some_module.UsersCreate')
-def test_users_create_with_mock(mock_users_create, mock_user_data):
-    mock_users_create.return_value = Mock(spec=UsersCreate)
-    # Тут ваша логика теста, например, создание пользователя
-    result = mock_users_create.create_user(**mock_user_data)
-    # Проверка вызова метода
-    mock_users_create.create_user.assert_called_once_with(**mock_user_data)
-    # И другие проверки, которые необходимо выполнить
-
-
-
-
-
+def test_profile_creation(user_data):
+    with patch('account.app.account.models.Users.objects.create') as mock_create:
+        Users.objects.create(**user_data)
+        mock_create.assert_called_once_with(**user_data)
 
 def test_unique_username_constraint(user_data):
     with patch('profile.app.user_profile.models.Users.objects.create') as mock_create:
@@ -133,13 +131,13 @@ def test_unique_username_constraint(user_data):
             Users.objects.create(**user_data)  # Attempt to create a user with the same username
 
 def test_account_creation(account_data):
-    with patch('profile.app.user_profile.models.Users.objects.create') as mock_create:
+    with patch('profile.app.user_profile.models.Account.objects.create') as mock_create:
         Account.objects.create(**account_data)
         mock_create.assert_called_once_with(**account_data)
 
 def test_account_balance_default():
     # Mocking the Account.objects.create method to return a MagicMock object
-    with patch('profile.app.user_profile.models.Users.objects.create') as mock_create:
+    with patch('profile.app.user_profile.models.Account.objects.create') as mock_create:
         # Creating a MagicMock instance to mimic an Account object
         mock_account_instance = MagicMock()
         mock_account_instance.balance = 0  # Set the balance attribute of the MagicMock object to 0
@@ -149,7 +147,7 @@ def test_account_balance_default():
 
 def test_account_usernameid_null():
     # Mocking the Account.objects.create method to return a MagicMock object
-    with patch('profile.app.user_profile.models.Users.objects.create') as mock_create:
+    with patch('profile.app.user_profile.models.Account.objects.create') as mock_create:
         # Creating a MagicMock instance to mimic an Account object
         mock_account_instance = MagicMock()
         mock_account_instance.usernameid = None  # Set the usernameid attribute of the MagicMock object to None
