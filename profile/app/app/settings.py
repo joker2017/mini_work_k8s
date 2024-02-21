@@ -40,7 +40,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'user_profile',
     'profile',
-    'account',
+    #'account',
     'flags',
     'rest_framework',
     'django_filters',
