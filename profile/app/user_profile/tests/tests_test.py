@@ -58,15 +58,17 @@ def test_user_create_existing_id(mock_filter):
 
 
 @patch('profile.app.user_profile.models.Users.objects.get')
-@patch('profile.app.user_profile.models.Users.delete')
-def test_user_destroy_with_protected_error(mock_get, mock_delete):
+def test_user_destroy_with_protected_error(mock_get, mock_user_instance):
     """Тест проверяет исключение при попытке удалить пользователя с привязанными к нему аккаунтами."""
-    mock_user = mock_user_instance()
-    mock_get.return_value = mock_user
-    mock_delete.side_effect = ProtectedError("Нельзя удалить клиента привязаными счетами")
+    # Настраиваем мок, чтобы он возвращал наш мокированный экземпляр пользователя
+    mock_get.return_value = mock_user_instance
 
+    # Настраиваем мокированный экземпляр пользователя, чтобы вызов метода delete выбрасывал исключение ProtectedError
+    mock_user_instance.delete.side_effect = ProtectedError("Нельзя удалить клиента привязаными счетами")
+
+    # Проверяем, что при попытке удаления пользователя действительно возникает исключение ProtectedError
     with pytest.raises(ProtectedError) as exc_info:
-        mock_user.delete()
+        mock_user_instance.delete()
     assert "Нельзя удалить клиента привязаными счетами" in str(exc_info.value)
 
 
