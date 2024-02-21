@@ -82,23 +82,24 @@ def user_instance():
     user = MagicMock(spec=Users)
     return user
 
-import pytest
-from unittest.mock import patch, MagicMock
-from django.db.models.deletion import ProtectedError
-from profile.app.user_profile.models import Users
 
-# Мокируем метод delete модели Users для имитации исключения ProtectedError
-@patch('profile.app.user_profile.models.Users.delete', side_effect=ProtectedError("Нельзя удалить пользователя с привязанными счетами"))
+from unittest.mock import patch, MagicMock
+import pytest
+from django.db.models.deletion import ProtectedError
+
+
+@patch('profile.app.user_profile.models.Users.delete')
 def test_user_delete_protected_error(mock_delete):
-    user = Users(id='test_id', full_names='Test User', username='testuser')
-    # Пытаемся удалить пользователя и ожидаем исключение ProtectedError
+    # Создаем мок исключения с необходимым сообщением
+    mock_delete.side_effect = ProtectedError("Нельзя удалить пользователя с привязанными счетами", MagicMock())
+
+    user = MagicMock()
+
     with pytest.raises(ProtectedError) as exc_info:
         user.delete()
+
     assert "Нельзя удалить пользователя с привязанными счетами" in str(exc_info.value)
-    # Проверяем, что мок метода delete был вызван
     mock_delete.assert_called_once()
-
-
 
 
 import hashlib
