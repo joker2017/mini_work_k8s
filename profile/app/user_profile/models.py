@@ -32,8 +32,7 @@ class Users(models.Model):
     def __str__(self):
         return f'{self.full_names} {self.username}'
 
-    class Meta:
-        app_label = 'user_profile'
+
 
 
 
