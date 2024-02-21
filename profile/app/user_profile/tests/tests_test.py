@@ -45,13 +45,6 @@ def test_create_profile_number(mock_filter):
     mock_filter.assert_called()
 
 
-
-    full_names = models.CharField(max_length=255)  #Full_names
-    username = models.CharField(max_length=255)  #username
-    email = models.EmailField(max_length=255)   #email
-    password = models.CharField(max_length=255)  # password
-
-
 def test_profile_create_with_mocked_view(mock_users_serializer):
     """Тест проверяет создание аккаунта с мокированным представлением."""
     request = RequestFactory().post('/fake-url/', data={'full_names': 'ivan', 'username': 'test_user_id', 'email': 'ivan@ya.ru', 'password': '1234567890', 'id': '12345678901234567890'})
@@ -66,7 +59,7 @@ def test_profile_create_with_mocked_view(mock_users_serializer):
 def test_users_update_with_mocked_response(mock_users_serializer):
     """Тест проверяет обновление аккаунта с мокированным ответом."""
     client = APIClient()
-    with patch('profile.app.user_profile.views.ProfileUpdate', return_value=Response(
+    with patch('profile.app.user_profile.views.UsersUpdate', return_value=Response(
             mock_users_serializer.data, status=status.HTTP_200_OK)) as mocked_put:
         response = mocked_put(Mock(data={'balance': '200.00'}))
         assert mocked_put.called
@@ -76,8 +69,8 @@ def test_users_update_with_mocked_response(mock_users_serializer):
 
 def test_users_destroy_with_mocked_response(users_instance):
     """Тест проверяет удаление аккаунта с мокированным ответом."""
-    with patch('profile.app.user_profile.views.ProfileDestroy.get_object', return_value=users_instance), \
-         patch('profile.app.user_profile.views.ProfileDestroy.perform_destroy', return_value=None):
+    with patch('profile.app.user_profile.views.UsersDestroy.get_object', return_value=users_instance), \
+         patch('profile.app.user_profile.views.UsersDestroy.perform_destroy', return_value=None):
         view = UsersDestroy()
         request = Mock()
         view.setup(request, pk=users_instance.id)
