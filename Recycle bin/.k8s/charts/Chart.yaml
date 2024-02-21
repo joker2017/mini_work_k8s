@@ -1,5 +1,0 @@
-apiVersion: v2
-name: my-applications
-description: A Helm chart for deploying applications with blue-green strategy
-version: 0.1.0
-
