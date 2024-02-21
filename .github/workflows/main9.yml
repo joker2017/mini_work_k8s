@@ -1,10 +1,7 @@
 name: CI/CD with Blue-Green Deployment NEW
 
 on:
-#  push:
-#    branches:
-      - main
-      - develop
+  workflow_dispatch:
 
 jobs:
   lint-test:
