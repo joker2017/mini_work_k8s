@@ -1,80 +1,70 @@
 import pytest
 from unittest.mock import Mock, patch
 from rest_framework import status
-from rest_framework.response import Response
 from rest_framework.test import APIClient
 from django.test import RequestFactory
-from account.app.account.models import Account, Users
-from account.app.account.views import AccountCreate, AccountUpdate, AccountDestroy
-from account.app.account.serializers import AccountSerializerRegistr, AccountSerializer
-from account.app.account.services import create_account_number
+from django.db import IntegrityError
+from django.db.models.deletion import ProtectedError
+from profile.app.profile.models import Users
+from profile.app.profile.views import UsersCreate, UsersUpdate, UsersDestroy
+from profile.app.profile.services import create_account_number
 
+@pytest.fixture
+def mock_user_data():
+    """Фикстура для предоставления тестовых данных пользователя."""
+    return {'full_names': 'Test User', 'username': 'testuser'}
 
 @pytest.fixture
 def mock_user_instance():
     """Фикстура для создания мок экземпляра пользователя."""
-    return Mock(spec=Users, id='test_user_id')
+    return Mock(spec=Users, id=create_account_number(), full_names='Test User', username='testuser')
 
-
-@pytest.fixture
-def account_instance(mock_user_instance):
-    """Фикстура для создания мок экземпляра аккаунта."""
-    return Mock(spec=Account, id='12345678901234567890', balance=100.00, usernameid=mock_user_instance)
-
-
-@pytest.fixture
-def mock_account_serializer(account_instance):
-    """Фикстура для создания мок сериализатора."""
-    serializer_mock = Mock(spec=AccountSerializer)
-    serializer_mock.instance = account_instance
-    serializer_mock.is_valid.return_value = True
-    serializer_mock.save.return_value = account_instance
-    serializer_mock.data = {'id': account_instance.id, 'balance': '200.00', 'usernameid': account_instance.usernameid.id}
-    return serializer_mock
-
-
-@patch('account.app.account.models.Account.objects.filter')
-def test_create_account_number(mock_filter):
-    """Тест проверяет создание номера аккаунта."""
-    mock_filter.return_value.exists.return_value = False
-    account_number = create_account_number()
-    assert len(account_number) == 20 and account_number.isdigit()
-    mock_filter.assert_called()
-
-
-def test_account_create_with_mocked_view(mock_account_serializer):
-    """Тест проверяет создание аккаунта с мокированным представлением."""
-    request = RequestFactory().post('/fake-url/', data={'balance': '100.00', 'usernameid': 'test_user_id'})
-    with patch.object(AccountCreate, 'create', return_value=Response(
-            mock_account_serializer.data, status=status.HTTP_201_CREATED)) as mock_method:
-        response = AccountCreate.as_view({'post': 'create'})(request)
-        assert mock_method.called
-        assert response.status_code == status.HTTP_201_CREATED
-        assert response.data == mock_account_serializer.data
-
-
-def test_account_update_with_mocked_response(mock_account_serializer):
-    """Тест проверяет обновление аккаунта с мокированным ответом."""
+@patch('profile.app.user_profile.services.create_account_number')
+def test_users_create_with_mocked_service(mock_create_account_number, mock_user_data):
+    """Тест проверяет создание пользователя с мокированным сервисом создания номера."""
+    mock_create_account_number.return_value = '12345678901234567890'
     client = APIClient()
-    with patch('account.app.account.views.AccountUpdate', return_value=Response(
-            mock_account_serializer.data, status=status.HTTP_200_OK)) as mocked_put:
-        response = mocked_put(Mock(data={'balance': '200.00'}))
-        assert mocked_put.called
-        assert response.status_code == status.HTTP_200_OK
-        assert response.data == mock_account_serializer.data
+    response = client.post('/users/', data=mock_user_data, format='json')
+    assert response.status_code == status.HTTP_201_CREATED
+    assert 'id' in response.data
+    assert response.data['id'] == '12345678901234567890'
+    mock_create_account_number.assert_called_once()
 
+def test_user_create_invalid_data():
+    """Тест проверяет отклонение создания пользователя при невалидных данных."""
+    client = APIClient()
+    response = client.post('/users/', data={'full_names': '', 'username': ''}, format='json')
+    assert response.status_code == status.HTTP_400_BAD_REQUEST
+    assert 'full_names' in response.data
+    assert 'username' in response.data
 
-def test_account_destroy_with_mocked_response(account_instance):
-    """Тест проверяет удаление аккаунта с мокированным ответом."""
-    with patch('account.app.account.views.AccountDestroy.get_object', return_value=account_instance), \
-         patch('account.app.account.views.AccountDestroy.perform_destroy', return_value=None):
-        view = AccountDestroy()
-        request = Mock()
-        view.setup(request, pk=account_instance.id)
-        response = view.delete(request, pk=account_instance.id)
-        assert response.status_code == status.HTTP_204_NO_CONTENT
+@patch('profile.app.user_profile.models.Users.objects.create')
+def test_user_create_existing_id(mock_create, mock_user_data):
+    """Тест проверяет исключение при попытке создать пользователя с существующим уникальным номером."""
+    mock_create.side_effect = IntegrityError("unique constraint failed")
+    client = APIClient()
+    response = client.post('/users/', data=mock_user_data, format='json')
+    assert response.status_code == status.HTTP_400_BAD_REQUEST
+    assert "unique constraint failed" in str(response.data)
 
+def test_user_update_invalid_data(mock_user_instance):
+    """Тест проверяет отклонение обновления пользователя при невалидных данных."""
+    client = APIClient()
+    updated_data = {'full_names': '', 'username': ''}
+    with patch.object(UsersUpdate, 'get_object', return_value=mock_user_instance):
+        response = client.put(f'/users/{mock_user_instance.id}/', data=updated_data, format='json')
+        assert response.status_code == status.HTTP_400_BAD_REQUEST
+        assert 'full_names' in response.data
+        assert 'username' in response.data
 
+def test_user_destroy_with_protected_error(mock_user_instance):
+    """Тест проверяет исключение при попытке удалить пользователя с привязанными к нему аккаунтами."""
+    with patch.object(UsersDestroy, 'get_object', return_value=mock_user_instance), \
+         patch.object(UsersDestroy, 'perform_destroy', side_effect=ProtectedError("Нельзя удалить клиента привязаными счетами")):
+        client = APIClient()
+        response = client.delete(f'/users/{mock_user_instance.id}/')
+        assert response.status_code == status.HTTP_403_FORBIDDEN
+        assert "Нельзя удалить клиента привязаными счетами" in str(response.data)
 
 
 
