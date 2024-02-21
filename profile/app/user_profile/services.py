@@ -15,7 +15,7 @@ def create_account_number():
         id = get_random_string(20, allowed_chars='0123456789')
         unique = False
         while not unique:
-           if not Users.objects.filter(id=id):
+           if not Users.objects.filter(id=id).exists():
                unique = True
            else:
                id = get_random_string(20, allowed_chars='0123456789')   
