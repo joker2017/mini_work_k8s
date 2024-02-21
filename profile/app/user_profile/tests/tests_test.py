@@ -57,31 +57,19 @@ def test_user_create_existing_id(mock_filter):
     assert not id  # Предположим, что функция create_account_number возвращает None или вызывает исключение
 
 
-@patch('profile.app.user_profile.models.Users.objects.get')
-def test_user_destroy_with_protected_error(mock_get, mock_user_instance):
-    """Тест проверяет исключение при попытке удалить пользователя с привязанными к нему аккаунтами."""
-    # Настраиваем мок, чтобы он возвращал наш мокированный экземпляр пользователя
-    mock_get.return_value = mock_user_instance
-
-    # Настраиваем мокированный экземпляр пользователя, чтобы вызов метода delete выбрасывал исключение ProtectedError
-    mock_user_instance.delete.side_effect = ProtectedError("Нельзя удалить клиента привязаными счетами")
-
-    # Проверяем, что при попытке удаления пользователя действительно возникает исключение ProtectedError
-    with pytest.raises(ProtectedError) as exc_info:
-        mock_user_instance.delete()
-    assert "Нельзя удалить клиента привязаными счетами" in str(exc_info.value)
+import pytest
+from django.db.models.deletion import ProtectedError
+from profile.app.user_profile.models import Users
 
 
+# Пример тестовой функции без непосредственного мокирования метода delete.
+def test_user_destroy_with_protected_error():
+    # Создаем экземпляр пользователя (в контексте теста это будет мок или фикстура)
+    user = Users(id='test_user_id', full_names='Test User', username='testuser')
 
-
-
-
-
-
-
-
-
-
+    # Предполагаем, что попытка удаления приведет к ProtectedError
+    with pytest.raises(ProtectedError):
+        user.delete()  # В реальном тесте, этот вызов должен привести к ProtectedError из-за связанных записей.
 
 
 import hashlib
