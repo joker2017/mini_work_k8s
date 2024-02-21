@@ -61,28 +61,29 @@ import pytest
 from django.db.models.deletion import ProtectedError
 from profile.app.user_profile.models import Users
 
+from unittest.mock import patch, Mock
+from django.http import Http404
+from rest_framework.exceptions import PermissionDenied
+from profile.app.user_profile.views import UsersDestroy
+from django.db.models.deletion import ProtectedError
+import pytest
 
-@pytest.fixture
-def user_instance():
-    """Фикстура для создания экземпляра пользователя."""
-    return Users(id='test_user_id', full_names='Test User', username='testuser')
 
-@patch('profile.app.user_profile.services.delete_user')
-def test_user_destroy_with_protected_error(mock_delete_user, user_instance):
-    """
-    Тест проверяет логику обработки исключения при попытке удаления пользователя с привязанными к нему аккаунтами.
-    """
-    # Настройка мока, чтобы при вызове delete_user выбрасывалось исключение UserDeleteError
-    mock_delete_user.side_effect = UserDeleteError("Нельзя удалить пользователя с привязанными счетами")
+def test_users_destroy_protected_error():
+    # Создаем мок экземпляра пользователя
+    user_instance_mock = Mock()
 
-    # Выполнение теста
-    with pytest.raises(UserDeleteError) as exc_info:
-        delete_user(user_instance.id)
+    # Мокируем метод get_object класса UsersDestroy для возврата мок экземпляра пользователя
+    with patch.object(UsersDestroy, 'get_object', return_value=user_instance_mock):
+        # Мокируем метод perform_destroy класса UsersDestroy для имитации исключения ProtectedError
+        with patch.object(UsersDestroy, 'perform_destroy', side_effect=ProtectedError):
+            users_destroy_view = UsersDestroy()
+            # Имитация запроса
+            request_mock = Mock()
 
-    # Проверка, что текст исключения содержит ожидаемое сообщение
-    assert "Нельзя удалить пользователя с привязанными счетами" in str(exc_info.value)
-    # Проверка, что мок delete_user был вызван с правильным ID пользователя
-    mock_delete_user.assert_called_once_with(user_instance.id)
+            # Вызов метода destroy и проверка, что было вызвано исключение PermissionDenied
+            with pytest.raises(PermissionDenied):
+                users_destroy_view.destroy(request_mock)
 
 
 import hashlib
