@@ -120,9 +120,8 @@ def account_data():
         'balance': 100.00,
         'usernameid': None  # You can replace None with a Users instance if needed
     }
-
-def test_profile_creation(user_data):
-    with patch('account.app.account.models.Users.objects.create') as mock_create:
+def test_user_creation(user_data):
+    with patch('profile.app.user_profile.models.Users.objects.create') as mock_create:
         Users.objects.create(**user_data)
         mock_create.assert_called_once_with(**user_data)
 
@@ -162,17 +161,12 @@ def test_account_usernameid_null():
 def test_user_password_hashing(user_data):
     with patch.object(Users, 'save', autospec=True) as mock_save:
         user = Users(**user_data)
-
         # Хешируем пароль перед сохранением
         user.password = sha256(user.password.encode('utf-8')).hexdigest()
-
         user.save()
         mock_save.assert_called_once()
-
         saved_password = user.password
-
         # Хешируем ожидаемый пароль
         expected_hashed_password = sha256(user_data['password'].encode('utf-8')).hexdigest()
-
         # Сравниваем хешированные пароли
         assert saved_password == expected_hashed_password
