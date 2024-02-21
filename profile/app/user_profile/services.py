@@ -5,8 +5,8 @@ from django.db import transaction
 from django.core.exceptions import ValidationError
 from django.utils.crypto import get_random_string
 #from .models import Users
-from profile.app.user_profile.models import Users
-
+#from profile.app.user_profile.models import Users
+from .models import Users
 
 
 

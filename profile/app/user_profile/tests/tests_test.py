@@ -4,7 +4,7 @@ from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.test import APIClient
 from django.test import RequestFactory
-from account.app.account.models import Account, Users
+from ..models import Account, Users
 from profile.app.user_profile.views import UsersCreate, UsersUpdate, UsersDestroy
 from profile.app.user_profile.serializers import UsersSerializer
 from profile.app.user_profile.services import create_account_number
@@ -101,7 +101,8 @@ import hashlib
 from hashlib import sha256
 import pytest
 from unittest.mock import patch, MagicMock
-from profile.app.user_profile.models import Users, Account
+#from profile.app.user_profile.models import Users, Account
+from ..models import Users, Account
 from django.db import IntegrityError
 
 @pytest.fixture
@@ -121,25 +122,25 @@ def account_data():
         'usernameid': None  # You can replace None with a Users instance if needed
     }
 def test_user_creation(user_data):
-    with patch('profile.app.user_profile.models.Users.objects.create') as mock_create:
+    with patch('..models.Users.objects.create') as mock_create:
         Users.objects.create(**user_data)
         mock_create.assert_called_once_with(**user_data)
 
 def test_unique_username_constraint(user_data):
-    with patch('profile.app.user_profile.models.Users.objects.create') as mock_create:
+    with patch('..models.Users.objects.create') as mock_create:
         mock_create.side_effect = [None, IntegrityError()]
         Users.objects.create(**user_data)  # Creating the first user
         with pytest.raises(IntegrityError):
             Users.objects.create(**user_data)  # Attempt to create a user with the same username
 
 def test_account_creation(account_data):
-    with patch('profile.app.user_profile.models.Account.objects.create') as mock_create:
+    with patch('..models.Account.objects.create') as mock_create:
         Account.objects.create(**account_data)
         mock_create.assert_called_once_with(**account_data)
 
 def test_account_balance_default():
     # Mocking the Account.objects.create method to return a MagicMock object
-    with patch('profile.app.user_profile.models.Account.objects.create') as mock_create:
+    with patch('..models.Account.objects.create') as mock_create:
         # Creating a MagicMock instance to mimic an Account object
         mock_account_instance = MagicMock()
         mock_account_instance.balance = 0  # Set the balance attribute of the MagicMock object to 0
@@ -149,7 +150,7 @@ def test_account_balance_default():
 
 def test_account_usernameid_null():
     # Mocking the Account.objects.create method to return a MagicMock object
-    with patch('profile.app.user_profile.models.Account.objects.create') as mock_create:
+    with patch('..models.Account.objects.create') as mock_create:
         # Creating a MagicMock instance to mimic an Account object
         mock_account_instance = MagicMock()
         mock_account_instance.usernameid = None  # Set the usernameid attribute of the MagicMock object to None
