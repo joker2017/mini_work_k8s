@@ -30,8 +30,12 @@ class Users(models.Model):
 
 
     def __str__(self):
-        return f'{self.full_names} {self.username}'  
-    
+        return f'{self.full_names} {self.username}'
+
+    class Meta:
+        app_label = 'user_profile'
+
+#class Meta: app_label = 'user_profile' добавлен так как не определялась модельь притестировании
 
 class Account(models.Model):
     id = models.CharField(
