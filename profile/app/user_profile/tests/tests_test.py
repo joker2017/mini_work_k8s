@@ -9,18 +9,15 @@ from profile.app.user_profile.views import UsersCreate, UsersUpdate, UsersDestro
 from profile.app.user_profile.serializers import UsersSerializer
 from profile.app.user_profile.services import create_account_number
 
-
 @pytest.fixture
-def mock_user_instance():
+def mock_users_instance():
     """Фикстура для создания мок экземпляра пользователя."""
-    return Mock(spec=Users, id='test_user_id')
-
+    return Mock(spec=Users, full_names='boris efimovich', username='boris', email='boris@ya.ru', password='123abc', id='12345678901234567890')
 
 @pytest.fixture
-def users_instance(mock_user_instance):
-    """Фикстура для создания мок экземпляра аккаунта."""
-    return Mock(full_names=ivan, username=test_user_id, email=ivan@ya.ru, password=1234567890)
-
+def users_instance():
+    """Фикстура для создания мок экземпляра пользователя."""
+    return Mock(spec=Users, full_names='Ivan Petrov', username='ivan', email='ivan@ya.ru', password='1234567890', id='98765432109876543210')
 
 @pytest.fixture
 def mock_users_serializer(users_instance):
@@ -29,7 +26,13 @@ def mock_users_serializer(users_instance):
     serializer_mock.instance = users_instance
     serializer_mock.is_valid.return_value = True
     serializer_mock.save.return_value = users_instance
-    serializer_mock.data = {'full_names': 'ivan', 'username': 'test_user_id', 'email': 'ivan@ya.ru', 'password': '1234567890'}
+    serializer_mock.data = {
+        'full_names': users_instance.full_names,
+        'username': users_instance.username,
+        'email': users_instance.email,
+        'password': users_instance.password,
+        'id': users_instance.id
+    }
     return serializer_mock
 
 
@@ -51,7 +54,7 @@ def test_create_profile_number(mock_filter):
 
 def test_profile_create_with_mocked_view(mock_users_serializer):
     """Тест проверяет создание аккаунта с мокированным представлением."""
-    request = RequestFactory().post('/fake-url/', data={'full_names': 'ivan', 'username': 'test_user_id', 'email': 'ivan@ya.ru', 'password': '1234567890'})
+    request = RequestFactory().post('/fake-url/', data={'full_names': 'ivan', 'username': 'test_user_id', 'email': 'ivan@ya.ru', 'password': '1234567890', 'id': '12345678901234567890'})
     with patch.object(UsersCreate, 'create', return_value=Response(
             mock_users_serializer.data, status=status.HTTP_201_CREATED)) as mock_method:
         response = UsersCreate.as_view({'post': 'create'})(request)
