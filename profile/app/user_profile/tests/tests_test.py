@@ -23,7 +23,7 @@ def users_instance(mock_user_instance):
 
 
 @pytest.fixture
-def mock_profile_serializer(users_instance):
+def mock_users_serializer(users_instance):
     """Фикстура для создания мок сериализатора."""
     serializer_mock = Mock(spec=UsersSerializer)
     serializer_mock.instance = users_instance
