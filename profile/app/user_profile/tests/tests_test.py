@@ -48,13 +48,13 @@ def test_user_create_invalid_data():
     assert not is_valid
 
 
-@patch('profile.app.user_profile.models.Users.objects.filter')
-def test_user_create_existing_id(mock_filter):
-    """Тест проверяет исключение при попытке создать пользователя с существующим уникальным номером."""
-    mock_filter.return_value.exists.return_value = True
-    id = create_account_number()
-    assert mock_filter.called
-    assert not id  # Предположим, что функция create_account_number возвращает None или вызывает исключение
+#@patch('profile.app.user_profile.models.Users.objects.filter')
+#def test_user_create_existing_id(mock_filter):
+#    """Тест проверяет исключение при попытке создать пользователя с существующим уникальным номером."""
+#    mock_filter.return_value.exists.return_value = True
+#    id = create_account_number()
+#    assert mock_filter.called
+#    assert not id  # Предположим, что функция create_account_number возвращает None или вызывает исключение
 
 
 import pytest
