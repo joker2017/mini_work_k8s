@@ -23,9 +23,9 @@ def account_instance(mock_user_instance):
 
 
 @pytest.fixture
-def mock_account_serializer(account_instance):
+def mock_profile_serializer(account_instance):
     """Фикстура для создания мок сериализатора."""
-    serializer_mock = Mock(spec=AccountSerializer)
+    serializer_mock = Mock(spec=UsersSerializer)
     serializer_mock.instance = account_instance
     serializer_mock.is_valid.return_value = True
     serializer_mock.save.return_value = account_instance
@@ -34,7 +34,7 @@ def mock_account_serializer(account_instance):
 
 
 @patch('profile.app.user_profile.models.Users.objects.filter')
-def test_create_account_number(mock_filter):
+def test_create_profile_number(mock_filter):
     """Тест проверяет создание номера аккаунта."""
     mock_filter.return_value.exists.return_value = False
     account_number = create_account_number()
@@ -42,10 +42,10 @@ def test_create_account_number(mock_filter):
     mock_filter.assert_called()
 
 
-def test_account_create_with_mocked_view(mock_account_serializer):
+def test_profile_create_with_mocked_view(mock_account_serializer):
     """Тест проверяет создание аккаунта с мокированным представлением."""
     request = RequestFactory().post('/fake-url/', data={'balance': '100.00', 'usernameid': 'test_user_id'})
-    with patch.object(AccountCreate, 'create', return_value=Response(
+    with patch.object(UsersCreate, 'create', return_value=Response(
             mock_account_serializer.data, status=status.HTTP_201_CREATED)) as mock_method:
         response = UsersCreate.as_view({'post': 'create'})(request)
         assert mock_method.called
