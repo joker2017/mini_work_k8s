@@ -5,9 +5,10 @@ from rest_framework.test import APIClient
 from django.test import RequestFactory
 from django.db import IntegrityError
 from django.db.models.deletion import ProtectedError
-from profile.app.user_profile.models import Users
-from profile.app.user_profile.views import UsersCreate, UsersUpdate, UsersDestroy
-from profile.app.user_profile.services import create_account_number
+from ..models import Users
+from ..models import Users
+from ..views import UsersCreate, UsersUpdate, UsersDestroy
+from ..services import create_account_number
 
 @pytest.fixture
 def mock_user_data():
