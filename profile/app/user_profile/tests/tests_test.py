@@ -69,21 +69,39 @@ from django.db.models.deletion import ProtectedError
 import pytest
 
 
-def test_users_destroy_protected_error():
-    # Создаем мок экземпляра пользователя
-    user_instance_mock = Mock()
+import pytest
+from unittest.mock import patch, MagicMock
+from django.db.models.deletion import ProtectedError
+from rest_framework import status
+from profile.app.user_profile.models import Users
+from profile.app.user_profile.views import UsersDestroy
 
-    # Мокируем метод get_object класса UsersDestroy для возврата мок экземпляра пользователя
-    with patch.object(UsersDestroy, 'get_object', return_value=user_instance_mock):
-        # Мокируем метод perform_destroy класса UsersDestroy для имитации исключения ProtectedError
-        with patch.object(UsersDestroy, 'perform_destroy', side_effect=ProtectedError):
-            users_destroy_view = UsersDestroy()
-            # Имитация запроса
-            request_mock = Mock()
+@pytest.fixture
+def user_instance():
+    # Создаем мок инстанс пользователя
+    user = MagicMock(spec=Users)
+    return user
 
-            # Вызов метода destroy и проверка, что было вызвано исключение PermissionDenied
-            with pytest.raises(PermissionDenied):
-                users_destroy_view.destroy(request_mock)
+@patch('profile.app.user_profile.models.Users.objects.get')
+def test_user_destroy_with_protected_error(mock_get, user_instance):
+    """
+    Тест проверяет исключение при попытке удалить пользователя с привязанными к нему аккаунтами.
+    """
+    # Настройка мока
+    mock_get.return_value = user_instance
+    user_instance.delete.side_effect = ProtectedError("Нельзя удалить клиента с привязанными счетами")
+
+    # Инициализация представления для удаления
+    view = UsersDestroy()
+    request = MagicMock()
+
+    # Попытка удаления и проверка вызова исключения
+    with pytest.raises(ProtectedError):
+        view.destroy(request, pk=user_instance.id)
+
+    # Проверяем, что мок метода delete был вызван
+    user_instance.delete.assert_called_once()
+
 
 
 import hashlib
