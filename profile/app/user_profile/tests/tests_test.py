@@ -62,14 +62,27 @@ from django.db.models.deletion import ProtectedError
 from profile.app.user_profile.models import Users
 
 
-# Пример тестовой функции без непосредственного мокирования метода delete.
-def test_user_destroy_with_protected_error():
-    # Создаем экземпляр пользователя (в контексте теста это будет мок или фикстура)
-    user = Users(id='test_user_id', full_names='Test User', username='testuser')
+@pytest.fixture
+def user_instance():
+    """Фикстура для создания экземпляра пользователя."""
+    return Users(id='test_user_id', full_names='Test User', username='testuser')
 
-    # Предполагаем, что попытка удаления приведет к ProtectedError
-    with pytest.raises(ProtectedError):
-        user.delete()  # В реальном тесте, этот вызов должен привести к ProtectedError из-за связанных записей.
+@patch('profile.app.user_profile.services.delete_user')
+def test_user_destroy_with_protected_error(mock_delete_user, user_instance):
+    """
+    Тест проверяет логику обработки исключения при попытке удаления пользователя с привязанными к нему аккаунтами.
+    """
+    # Настройка мока, чтобы при вызове delete_user выбрасывалось исключение UserDeleteError
+    mock_delete_user.side_effect = UserDeleteError("Нельзя удалить пользователя с привязанными счетами")
+
+    # Выполнение теста
+    with pytest.raises(UserDeleteError) as exc_info:
+        delete_user(user_instance.id)
+
+    # Проверка, что текст исключения содержит ожидаемое сообщение
+    assert "Нельзя удалить пользователя с привязанными счетами" in str(exc_info.value)
+    # Проверка, что мок delete_user был вызван с правильным ID пользователя
+    mock_delete_user.assert_called_once_with(user_instance.id)
 
 
 import hashlib
