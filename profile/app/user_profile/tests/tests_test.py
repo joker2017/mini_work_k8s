@@ -56,7 +56,7 @@ def test_user_create_existing_id(mock_filter):
     assert mock_filter.called
     assert not id  # Предположим, что функция create_account_number возвращает None или вызывает исключение
 
-
+from profile.app.user_profile.services import delete_user, UserDeleteError
 import pytest
 from django.db.models.deletion import ProtectedError
 from profile.app.user_profile.models import Users
