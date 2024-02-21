@@ -52,21 +52,37 @@ class UsersDetail(generics.ListAPIView):
         return self.queryset.filter(
             id=self.kwargs['id'])
 
-class UsersDestroy(generics.DestroyAPIView, generics.RetrieveAPIView):
-    queryset = Users.objects.all()
-    serializer_class = UsersSerializer
-    lookup_fields = 'id'
+import pytest
+from unittest.mock import patch, MagicMock
+from django.db.models.deletion import ProtectedError
+from rest_framework import status
+from profile.app.user_profile.models import Users
+from profile.app.user_profile.views import UsersDestroy
 
-    def get_queryset(self):
-        queryset = Users.objects.filter(id=self.kwargs['pk'])
-        return queryset
-           
-    def destroy(self, request, *args, **kwargs):
-        instance = self.get_object()
+@pytest.fixture
+def user_instance():
+    # Создаем мок инстанс пользователя
+    user = MagicMock(spec=Users)
+    return user
 
-        try:
-            self.perform_destroy(instance)
-        except ProtectedError as e:
-            return Response("Нельзя удалить клиента привязаными счетами", status=status.HTTP_403_FORBIDDEN)
-        return Response(status=status.HTTP_204_NO_CONTENT)
+@patch('profile.app.user_profile.models.Users.objects.get')
+def test_user_destroy_with_protected_error(mock_get, user_instance):
+    """
+    Тест проверяет исключение при попытке удалить пользователя с привязанными к нему аккаунтами.
+    """
+    # Настройка мока
+    mock_get.return_value = user_instance
+    user_instance.delete.side_effect = ProtectedError("Нельзя удалить клиента с привязанными счетами")
+
+    # Инициализация представления для удаления
+    view = UsersDestroy()
+    request = MagicMock()
+
+    # Попытка удаления и проверка вызова исключения
+    with pytest.raises(ProtectedError):
+        view.destroy(request, pk=user_instance.id)
+
+    # Проверяем, что мок метода delete был вызван
+    user_instance.delete.assert_called_once()
+
     
