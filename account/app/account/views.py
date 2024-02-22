@@ -56,15 +56,15 @@ class AccountDetail(generics.ListAPIView):
         # Filters the accounts by usernameid provided in the URL
         return self.queryset.filter(usernameid=self.kwargs['usernameid'])
 
-class AccountDestroy(generics.DestroyAPIView, generics.RetrieveAPIView):
+class AccountDestroy(generics.DestroyAPIView):
     """
     API endpoint for deleting an existing account.
     """
     queryset = Account.objects.all()
     serializer_class = AccountSerializer
-    lookup_fields = 'id'
-
-    def get_queryset(self):
+    #lookup_fields = 'id'
+    #generics.RetrieveAPIView
+    #def get_queryset(self):
         # Filters the account to be deleted by id provided in the URL
-        queryset = Account.objects.filter(id=self.kwargs['pk'])
-        return queryset
+    #    queryset = Account.objects.filter(id=self.kwargs['pk'])
+    #    return queryset

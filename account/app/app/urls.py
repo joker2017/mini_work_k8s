@@ -24,8 +24,8 @@ urlpatterns = [
     flagged_path('ACCOUNT_UPDATE_FLAG', 'account/update/<str:pk>/', AccountUpdate.as_view(), state=False),
 
     # Destroy an existing account. Enabled/Disabled based on ACCOUNT_DESTROY_FLAG.
-    flagged_path('ACCOUNT_DESTROY_FLAG', 'account/destroy/<str:pk>/', AccountDestroy.as_view(), state=False),
-
+   # flagged_path('ACCOUNT_DESTROY_FLAG', 'account/destroy/<str:pk>/', AccountDestroy.as_view(), state=False),
+    flagged_path('ACCOUNT_DESTROY_FLAG', 'account/destroy/<str:id>/', AccountDestroy.as_view(), state=False),
     # Retrieve the details of a specific account. Enabled/Disabled based on ACCOUNT_DETAIL_FLAG.
     flagged_path('ACCOUNT_DETAIL_FLAG', 'account/detail/<str:usernameid>/', AccountDetail.as_view(), state=False),
 ]
