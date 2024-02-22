@@ -76,7 +76,7 @@ runs:
     - name: Apply Django migrations and collect static files
       shell: bash
       run: |
-        ${{ steps.get_latest_pod.outputs.latest_pod }}
+
         APP_POD=${{ steps.get_latest_pod.outputs.latest_pod }}
         # Выполняем миграции внутри пода
         kubectl exec $APP_POD -n default --kubeconfig=${{ inputs.kubeconfig }} -- python ./manage.py makemigrations || { echo "Failed to make migrations"; exit 1; }
@@ -86,21 +86,27 @@ runs:
     - name: Create or update Django superuser
       shell: bash
       run: |
-          APP_POD=$(kubectl get pods -n default -l app=profile-rollout -o jsonpath='{.items[0].metadata.name}')
-          kubectl exec $APP_POD -n default --kubeconfig=${{ inputs.kubeconfig }} -- /bin/bash -c "python manage.py shell" <<EOF
+        APP_POD=APP_POD=${{ steps.get_latest_pod.outputs.latest_pod }}
+        kubectl exec $APP_POD -n default --kubeconfig=${{ inputs.kubeconfig }} -- /bin/bash -c "python ./manage.py shell" <<EOF
           from django.contrib.auth import get_user_model
           User = get_user_model()
-          username = '${{ inputs.DJANGO_SUPERUSER_USERNAME }}'
-          email = '${{ inputs.DJANGO_SUPERUSER_EMAIL }}'
-          password = '${{ inputs.DJANGO_SUPERUSER_PASSWORD }}'
-          user, created = User.objects.get_or_create(username=username)
-          if not created:
-            print(f"Superuser {username} already exists. Updating...")
-          user.email = email
-          user.set_password(password)
-          user.is_superuser = True
-          user.is_staff = True
-          user.save()
-          print(f"Superuser {username} updated")
+          username = 'your_superuser_username'
+          email = 'your_superuser_email'
+          password = 'your_superuser_password'
+          user, created = User.objects.get_or_create(username=username, defaults={'email': email})
+          if created:
+            user.set_password(password)
+            user.is_superuser = True
+            user.is_staff = True
+            user.save()
+            print(f"Superuser {username} created")
+          else:
+            user.email = email  # Обновляем email, если необходимо
+            user.set_password(password)  # Обновляем пароль на случай, если он был изменен
+            user.is_superuser = True
+            user.is_staff = True
+            user.save()
+            print(f"Superuser {username} updated")
           EOF
+
 
