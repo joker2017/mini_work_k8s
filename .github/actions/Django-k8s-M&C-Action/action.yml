@@ -83,13 +83,31 @@ runs:
         # Собираем статические файлы
         #kubectl exec $APP_POD -n default --kubeconfig=${{ inputs.kubeconfig }} -- python ./manage.py collectstatic --noinput || { echo "Failed to collect static files"; exit 1; }
 
-    - name: Create Django superuser if not exists
+    - name: Update or create Django superuser
       shell: bash
       run: |
         APP_POD=${{ steps.get_latest_pod.outputs.latest_pod }}
-        kubectl exec $APP_POD -n default --kubeconfig=${{ inputs.kubeconfig }} -- python ./manage.py shell <<EOF
-        from django.contrib.auth import get_user_model; 
-        User = get_user_model(); 
-        if not User.objects.filter(username='${{ inputs.DJANGO_SUPERUSER_USERNAME }}').exists(): 
-            User.objects.create_superuser('${{ inputs.DJANGO_SUPERUSER_USERNAME }}', '${{ inputs.DJANGO_SUPERUSER_EMAIL }}', '${{ inputs.DJANGO_SUPERUSER_PASSWORD }}')
+        kubectl exec $APP_POD -n default --kubeconfig=${{ inputs.kubeconfig }} -- python manage.py shell <<EOF
+        from django.contrib.auth import get_user_model
+        User = get_user_model()
+
+        username = '${{ inputs.DJANGO_SUPERUSER_USERNAME }}'
+        email = '${{ inputs.DJANGO_SUPERUSER_EMAIL }}'
+        password = '${{ inputs.DJANGO_SUPERUSER_PASSWORD }}'
+
+        user, created = User.objects.get_or_create(username=username)
+        if created:
+            print(f"Superuser {username} created")
+        else:
+            print(f"Superuser {username} already exists. Updating...")
+
+        user.email = email
+        user.set_password(password)
+        user.is_superuser = True
+        user.is_staff = True
+        user.save()
+
+        print(f"Superuser {username} updated")
         EOF
+ 
+    
