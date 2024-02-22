@@ -30,19 +30,19 @@ class AccountCreate(viewsets.GenericViewSet, mixins.CreateModelMixin):
         # Return the newly created account details with a 201 status code
         return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
 
-class AccountUpdate(generics.UpdateAPIView, generics.RetrieveAPIView):
+class AccountUpdate(generics.UpdateAPIView):
     """
     API endpoint for updating an existing account's details.
     """
     queryset = Account.objects.all()
     serializer_class = AccountSerializer
-    lookup_fields = 'id'
+    #lookup_fields = 'id'
 
-    def get_queryset(self):
-        # Filters the accounts by id provided in the URL
-        queryset = Account.objects.filter(id=self.kwargs['pk'])
-        return queryset
-
+    #def get_queryset(self):
+    #    # Filters the accounts by id provided in the URL
+    #    queryset = Account.objects.filter(id=self.kwargs['pk'])
+    #    return queryset
+#generics.RetrieveAPIView
 class AccountDetail(generics.RetrieveAPIView):
     """
     API endpoint that retrieves the details of a specific account,
