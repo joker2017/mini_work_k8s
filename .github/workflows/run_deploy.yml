@@ -53,7 +53,6 @@ jobs:
 
   deploy-in-k8s:
     runs-on: ubuntu-latest
-    needs: [build-app, lint-test]
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
