@@ -88,5 +88,5 @@ runs:
       shell:
       run: |
           APP_POD=${{ steps.get_latest_pod.outputs.latest_pod }}
-          kubectl exec $APP_POD -n default --kubeconfig=${{ inputs.kubeconfig }} -- ./manage.py createsuperuser --noinput --username ${{ inputs.DJANGO_SUPERUSER_USERNAME }} --email ${{ inputs.DJANGO_SUPERUSER_EMAIL }} --password ${{ inputs.DJANGO_SUPERUSER_PASSWORD }}
+          kubectl exec $APP_POD -n default --kubeconfig=${{ inputs.kubeconfig }} -- python ./manage.py createsuperuser --noinput --username ${{ inputs.DJANGO_SUPERUSER_USERNAME }} --email ${{ inputs.DJANGO_SUPERUSER_EMAIL }} --password ${{ inputs.DJANGO_SUPERUSER_PASSWORD }}
 
