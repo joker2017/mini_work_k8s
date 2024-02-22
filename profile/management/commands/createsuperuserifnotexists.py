@@ -5,7 +5,7 @@ from django.core.exceptions import ValidationError
 
 import django
 import os
-os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'site.settings')
+os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'app.settings')
 django.setup()
 
 class Command(BaseCommand):
