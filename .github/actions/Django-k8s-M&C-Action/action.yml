@@ -88,7 +88,7 @@ runs:
       shell: bash
       run: |
           APP_POD=$(kubectl get pods -n default -l app=profile-rollout -o jsonpath='{.items[0].metadata.name}')
-          kubectl exec $APP_POD -n default --kubeconfig=kubeconfig.yml -- ./python manage.py shell <<EOF
+          kubectl exec $APP_POD -n default --kubeconfig=${{ inputs.kubeconfig }} -- ./python manage.py shell <<EOF
           from django.contrib.auth import get_user_model
           User = get_user_model()
           username = '${{ secrets.DJANGO_SUPERUSER_USERNAME }}'
