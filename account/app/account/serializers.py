@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models3 import Account
+from .models import Account
 
 class AccountSerializer(serializers.ModelSerializer):
     """
