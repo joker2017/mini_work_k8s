@@ -18,7 +18,7 @@ class AccountCreate(viewsets.GenericViewSet, mixins.CreateModelMixin):
     a unique account number for each new account.
     """
     queryset = Account.objects.all()
-    serializer_class = AccountSerializerRegistr
+    serializer_class = AccountSerializer   #Registr
 
     def create(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)

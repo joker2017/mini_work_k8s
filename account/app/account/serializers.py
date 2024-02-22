@@ -15,9 +15,9 @@ class AccountSerializer(serializers.ModelSerializer):
         fields = ('balance', 'id')  # Explicitly specify fields to include
         read_only_fields = ('id',)  # 'usernameid' field should not be editable
 
-class AccountSerializerRegistr(serializers.ModelSerializer):
+#class AccountSerializerRegistr(serializers.ModelSerializer):
 
 
-    class Meta:
-        model = Account
-        fields = ('balance', 'id')  # Define fields to be included in the serialization
+    #class Meta:
+       # model = Account
+       # fields = ('balance', 'id')  # Define fields to be included in the serialization
