@@ -81,14 +81,13 @@ runs:
         # Выполняем миграции внутри пода
         kubectl exec $APP_POD -n default --kubeconfig=${{ inputs.kubeconfig }} -- python ./manage.py makemigrations || { echo "Failed to make migrations"; exit 1; }
         kubectl exec $APP_POD -n default --kubeconfig=${{ inputs.kubeconfig }} -- python ./manage.py migrate || { echo "Failed to apply migrations"; exit 1; }
-        # Собираем статические файлы
-        #kubectl exec $APP_POD -n default --kubeconfig=${{ inputs.kubeconfig }} -- python ./manage.py collectstatic --noinput || { echo "Failed to collect static files"; exit 1; }
+        
 
     - name: Create or update Django superuser
       shell: bash
       run: |
           APP_POD=$(kubectl get pods -n default -l app=profile-rollout -o jsonpath='{.items[0].metadata.name}')
-          kubectl exec $APP_POD -n default --kubeconfig=${{ inputs.kubeconfig }} -- ./python manage.py shell <<EOF
+          kubectl exec $APP_POD -n default --kubeconfig=${{ inputs.kubeconfig }} -- /bin/bash -c "python manage.py shell" <<EOF
           from django.contrib.auth import get_user_model
           User = get_user_model()
           username = '${{ inputs.DJANGO_SUPERUSER_USERNAME }}'
@@ -96,7 +95,7 @@ runs:
           password = '${{ inputs.DJANGO_SUPERUSER_PASSWORD }}'
           user, created = User.objects.get_or_create(username=username)
           if not created:
-              print(f"Superuser {username} already exists. Updating...")
+            print(f"Superuser {username} already exists. Updating...")
           user.email = email
           user.set_password(password)
           user.is_superuser = True
@@ -104,3 +103,4 @@ runs:
           user.save()
           print(f"Superuser {username} updated")
           EOF
+
