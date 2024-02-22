@@ -85,29 +85,8 @@ runs:
 
 
     - name: Create or update Django superuser
+      shell:
       run: |
           APP_POD=${{ steps.get_latest_pod.outputs.latest_pod }}
-          kubectl exec $APP_POD -n default --kubeconfig=${{ inputs.kubeconfig }} -- /bin/sh -c "python manage.py shell" <<EOF
-            from django.contrib.auth import get_user_model
-            User = get_user_model()
-            username = '${{ inputs.DJANGO_SUPERUSER_USERNAME }}'
-            email = '${{ inputs.DJANGO_SUPERUSER_EMAIL }}'
-            password = '${{ inputs.DJANGO_SUPERUSER_PASSWORD }}'
-            user, created = User.objects.get_or_create(username=username, defaults={'email': email})
-            if created:
-              user.set_password(password)
-              user.is_superuser = True
-              user.is_staff = True
-              user.save()
-              print(f"Superuser {username} created")
-            else:
-              user.email = email  # Обновляем email, если необходимо
-              user.set_password(password)  # Обновляем пароль на случай, если он был изменен
-              user.is_superuser = True
-              user.is_staff = True
-              user.save()
-              print(f"Superuser {username} updated")
-            EOF
-      shell: bash
-
+          kubectl exec $APP_POD -n default --kubeconfig=${{ inputs.kubeconfig }} -- ./manage.py createsuperuser --noinput --username ${{ inputs.DJANGO_SUPERUSER_USERNAME }} --email ${{ inputs.DJANGO_SUPERUSER_EMAIL }} --password ${{ inputs.DJANGO_SUPERUSER_PASSWORD }}
 
