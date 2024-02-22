@@ -1,14 +1,10 @@
-name: CI/CD with Blue-Green Deployment NEW
+name: CI/CD with Collaborator Check
 
 on:
   workflow_dispatch:
 
-permissions:
-  contents: read
-  pull-requests: write
-
 jobs:
-  permissions_check:
+  check-collaborator-status:
     runs-on: ubuntu-latest
     steps:
       - name: Get collaborators
@@ -22,20 +18,20 @@ jobs:
               repo: context.repo.repo
             });
             const users = collaborators.map(collaborator => collaborator.login);
-            console.log(users.join(','));
-            return { users: users.join(',') };
-
+            return users.join(',');
 
       - name: Check if actor is a collaborator
         run: |
-          users="${{ steps.user-list.outputs.users }}"
+          users="${{ steps.user-list.outputs.result }}"
           actor="${{ github.actor }}"
-          if [[ $users == *"$actor"* ]]; then
+          if [[ ",$users," == *",$actor,"* ]]; then
             echo "Actor is a collaborator."
           else
             echo "Actor is not a collaborator. Stopping the workflow."
             exit 1
           fi
+        shell: bash
+
 
   build-app:
     runs-on: ubuntu-latest
