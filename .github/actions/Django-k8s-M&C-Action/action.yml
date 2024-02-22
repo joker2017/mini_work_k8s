@@ -84,10 +84,10 @@ runs:
         
 
 
-    #- name: Create or update Django superuser
-    #  shell:
-    #  run: |
-    #      APP_POD=${{ steps.get_latest_pod.outputs.latest_pod }}
-    #      kubectl exec $APP_POD -n default --kubeconfig=${{ inputs.kubeconfig }} -- python ./manage.py createsuperusercmd --username=${{ inputs.DJANGO_SUPERUSER_USERNAME }} --email=${{ inputs.DJANGO_SUPERUSER_EMAIL }} --password=${{ inputs.DJANGO_SUPERUSER_PASSWORD }}
+    - name: Create or update Django superuser
+      shell:
+      run: |
+          APP_POD=${{ steps.get_latest_pod.outputs.latest_pod }}
+          kubectl exec $APP_POD -n default --kubeconfig=${{ inputs.kubeconfig }} -- python ./manage.py createsuperuserifnotexists --username=${{ inputs.DJANGO_SUPERUSER_USERNAME }} --email=${{ inputs.DJANGO_SUPERUSER_EMAIL }} --password=${{ inputs.DJANGO_SUPERUSER_PASSWORD }}
 
 
