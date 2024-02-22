@@ -86,6 +86,7 @@ runs:
     - name: Create Django superuser if not exists
       shell: bash
       run: |
+        APP_POD=${{ steps.get_latest_pod.outputs.latest_pod }}
         kubectl exec $APP_POD -n default --kubeconfig=${{ inputs.kubeconfig }} -- python ./manage.py shell <<EOF
         from django.contrib.auth import get_user_model; 
         User = get_user_model(); 
