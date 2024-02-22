@@ -1,4 +1,4 @@
-from .models3 import Account, Users
+from .models import Account, Users
 from .serializers import AccountSerializer, AccountSerializerRegistr
 from .services import create_account_number
 from rest_framework import generics, viewsets, mixins
@@ -20,6 +20,15 @@ class AccountCreate(viewsets.GenericViewSet, mixins.CreateModelMixin):
     queryset = Account.objects.all()
     serializer_class = AccountSerializerRegistr
 
+    def create(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        # Generate a unique account number
+        id = create_account_number()
+        serializer.save(id=id)
+        headers = self.get_success_headers(serializer.data)
+        # Return the newly created account details with a 201 status code
+        return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
 
 class AccountUpdate(generics.UpdateAPIView):
     """
