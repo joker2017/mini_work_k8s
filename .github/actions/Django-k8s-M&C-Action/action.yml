@@ -84,7 +84,7 @@ runs:
         
 
     - name: Create or update Django superuser
-      shell: sh
+      shell: sh {0}
       run: |
         APP_POD=${{ steps.get_latest_pod.outputs.latest_pod }}
         kubectl exec $APP_POD -n default --kubeconfig=${{ inputs.kubeconfig }} -- /bin/bash -c "python ./manage.py shell" <<EOF
