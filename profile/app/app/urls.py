@@ -1,6 +1,6 @@
 from django.contrib import admin
 from django.urls import path
-from user_profile.views import *
+from profile.app.user_profile.views import *
 from flags.urls import flagged_path, flagged_paths, flagged_re_path, flagged_re_paths
 
 # URL configuration for the user_profile application.
@@ -26,5 +26,5 @@ urlpatterns = [
     flagged_path('USERS_DESTROY_FLAG', 'profile/destroy/<str:pk>/', UsersDestroy.as_view(), state=False),
 
     # View details of a specific user profile. Enabled/Disabled based on USERSDETAIL_FLAG.
-    flagged_path('USERSDETAIL_FLAG', 'profile/detail/<str:id>/', UsersDetail.as_view(), state=False),
+    flagged_path('USERSDETAIL_FLAG', 'profile/detail/<str:pk>/', UsersDetail.as_view(), state=False),
 ]

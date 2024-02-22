@@ -1,6 +1,6 @@
 # models.py
 from rest_framework import serializers
-from .models import Users, Account
+#from .models import Users, Account
 import random
 from django.db import models
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager
