@@ -123,7 +123,7 @@ FLAGS = {
 
 
 
-CSRF_TRUSTED_ORIGINS = ["http://localhost:8300"]
+CSRF_TRUSTED_ORIGINS = ["*"]
 # Password validation
 # https://docs.djangoproject.com/en/4.2/ref/settings/#auth-password-validators
 
