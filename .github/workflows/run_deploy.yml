@@ -116,6 +116,9 @@ jobs:
         with:
           apps: profile
           kubeconfig: kubeconfig.yml
+          django_superuser_username: ${{ secrets.DJANGO_SUPERUSER_USERNAME }}
+          django_superuser_email: ${{ secrets.DJANGO_SUPERUSER_EMAIL }}
+          django_superuser_password: ${{ secrets.DJANGO_SUPERUSER_PASSWORD }}
 
 
       - name: Migrate and collectstatic account
@@ -123,11 +126,14 @@ jobs:
         with:
           apps: account
           kubeconfig: kubeconfig.yml
-
+          django_superuser_username: ${{ secrets.DJANGO_SUPERUSER_USERNAME }}
+          django_superuser_email: ${{ secrets.DJANGO_SUPERUSER_EMAIL }}
+          django_superuser_password: ${{ secrets.DJANGO_SUPERUSER_PASSWORD }}
 
       - name: Promote Rollout
         run: |
           kubectl-argo-rollouts promote account-rollout -n default --kubeconfig=kubeconfig.yml
           kubectl-argo-rollouts promote profile-rollout -n default --kubeconfig=kubeconfig.yml
+          
 
 

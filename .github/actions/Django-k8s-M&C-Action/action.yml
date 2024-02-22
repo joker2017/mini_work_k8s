@@ -7,6 +7,15 @@ inputs:
   kubeconfig:
     description: 'Path to the kubeconfig file'
     required: true
+  django_superuser_username:
+    description: 'Django superuser username'
+    required: true
+  django_superuser_email:
+    description: 'Django superuser email'
+    required: true
+  django_superuser_password:
+    description: 'Django superuser password'
+    required: true
 runs:
   using: 'composite'
   steps:
@@ -73,3 +82,8 @@ runs:
         kubectl exec $APP_POD -n default --kubeconfig=${{ inputs.kubeconfig }} -- python ./manage.py migrate || { echo "Failed to apply migrations"; exit 1; }
         # Собираем статические файлы
         #kubectl exec $APP_POD -n default --kubeconfig=${{ inputs.kubeconfig }} -- python ./manage.py collectstatic --noinput || { echo "Failed to collect static files"; exit 1; }
+
+    - name: Create Django superuser if not exists
+      shell: bash
+      run: |
+          kubectl exec $APP_POD -n default --kubeconfig=${{ inputs.kubeconfig }} -- from django.contrib.auth import get_user_model; User = get_user_model(); if not User.objects.filter(username='${{ github.event.inputs.django_superuser_username }}').exists(): User.objects.create_superuser('${{ github.event.inputs.django_superuser_username }}', '${{ github.event.inputs.django_superuser_email }}', '${{ github.event.inputs.django_superuser_password }}')" | python manage.py shell
