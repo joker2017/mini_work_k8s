@@ -7,7 +7,10 @@ import django
 import os
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'app.settings')
 django.setup()
+def funcA():
+    management.call_command('customcommand')
 
+funcA()
 class Command(BaseCommand):
     help = 'Создает суперпользователя или обновляет пароль существующего'
 
