@@ -43,7 +43,7 @@ class AccountUpdate(generics.UpdateAPIView, generics.RetrieveAPIView):
         queryset = Account.objects.filter(id=self.kwargs['pk'])
         return queryset
 
-class AccountDetail(generics.ListAPIView):
+class AccountDetail(generics.RetrieveAPIView):
     """
     API endpoint that retrieves the details of a specific account,
     filtering by the username ID associated with the account.
