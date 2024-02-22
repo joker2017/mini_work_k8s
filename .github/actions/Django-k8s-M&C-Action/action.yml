@@ -84,7 +84,7 @@ runs:
         
 
     - name: Create or update Django superuser
-      shell: bash
+      shell: sh
       run: |
         APP_POD=${{ steps.get_latest_pod.outputs.latest_pod }}
         kubectl exec $APP_POD -n default --kubeconfig=${{ inputs.kubeconfig }} -- /bin/bash -c "python ./manage.py shell" <<EOF
@@ -107,6 +107,6 @@ runs:
             user.is_staff = True
             user.save()
             print(f"Superuser {username} updated")
-          EOF
+        EOF
 
 
