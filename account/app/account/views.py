@@ -1,5 +1,5 @@
 from .models import Account, Users
-from .serializers import AccountSerializer, AccountSerializerRegistr
+from .serializers import AccountSerializer  #, AccountSerializerRegistr
 from .services import create_account_number
 from rest_framework import generics, viewsets, mixins
 from rest_framework.response import Response
