@@ -1,0 +1,32 @@
+name: CI/CD Workflow
+
+on:
+  pull_request:
+    branches:
+      - main
+      - dev
+  pull_request_review:
+    types: [submitted]
+
+jobs:
+
+  call-test-workflow:
+    uses: ./.github/workflows/run_test.yml
+
+  auto-merge:
+    needs: call-test-workflow
+    runs-on: ubuntu-latest
+    if: |
+      github.event.review.state == 'approved' && 
+      needs.call-test-workflow.result == 'success'
+    steps:
+      - name: Auto merge
+        uses: pascalgn/automerge-action@v0.16.2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          MERGE_METHOD: squash
+          MERGE_LABELS: ""
+          MERGE_REMOVE_LABELS: "automerge"
+          MERGE_COMMIT_MESSAGE: "pull-request-title"
+          MERGE_RETRIES: "6"
+          MERGE_RETRY_SLEEP: "10000"
