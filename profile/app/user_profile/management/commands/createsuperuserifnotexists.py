@@ -42,3 +42,6 @@ class Command(BaseCommand):
                 self.stdout.write(self.style.SUCCESS(f'Суперпользователь "{username}" успешно создан.'))
             except ValidationError as e:
                 raise CommandError(e)
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
