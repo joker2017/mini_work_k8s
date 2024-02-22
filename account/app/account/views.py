@@ -50,11 +50,11 @@ class AccountDetail(generics.ListAPIView):
     """
     queryset = Account.objects.all()
     serializer_class = AccountSerializer
-    lookup_fields = 'usernameid'
+    #lookup_fields = 'usernameid'
 
-    def get_queryset(self):
+    #def get_queryset(self):
         # Filters the accounts by usernameid provided in the URL
-        return self.queryset.filter(usernameid=self.kwargs['usernameid'])
+    #    return self.queryset.filter(usernameid=self.kwargs['usernameid'])
 
 class AccountDestroy(generics.DestroyAPIView):
     """
