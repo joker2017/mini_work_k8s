@@ -1,4 +1,4 @@
-from .models import Account, Users
+from .models3 import Account, Users
 from .serializers import AccountSerializer, AccountSerializerRegistr
 from .services import create_account_number
 from rest_framework import generics, viewsets, mixins
@@ -20,15 +20,6 @@ class AccountCreate(viewsets.GenericViewSet, mixins.CreateModelMixin):
     queryset = Account.objects.all()
     serializer_class = AccountSerializerRegistr
 
-    def create(self, request, *args, **kwargs):
-        serializer = self.get_serializer(data=request.data)
-        serializer.is_valid(raise_exception=True)
-        # Generate a unique account number
-        id = create_account_number()
-        serializer.save(id=id)
-        headers = self.get_success_headers(serializer.data)
-        # Return the newly created account details with a 201 status code
-        return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
 
 class AccountUpdate(generics.UpdateAPIView):
     """
@@ -36,13 +27,7 @@ class AccountUpdate(generics.UpdateAPIView):
     """
     queryset = Account.objects.all()
     serializer_class = AccountSerializer
-    #lookup_fields = 'id'
 
-    #def get_queryset(self):
-    #    # Filters the accounts by id provided in the URL
-    #    queryset = Account.objects.filter(id=self.kwargs['pk'])
-    #    return queryset
-#generics.RetrieveAPIView
 class AccountDetail(generics.RetrieveAPIView):
     """
     API endpoint that retrieves the details of a specific account,
@@ -50,11 +35,7 @@ class AccountDetail(generics.RetrieveAPIView):
     """
     queryset = Account.objects.all()
     serializer_class = AccountSerializer
-    #lookup_fields = 'usernameid'
 
-    #def get_queryset(self):
-        # Filters the accounts by usernameid provided in the URL
-    #    return self.queryset.filter(usernameid=self.kwargs['usernameid'])
 
 class AccountDestroy(generics.DestroyAPIView):
     """
@@ -62,9 +43,3 @@ class AccountDestroy(generics.DestroyAPIView):
     """
     queryset = Account.objects.all()
     serializer_class = AccountSerializer
-    #lookup_fields = 'id'
-    #generics.RetrieveAPIView
-    #def get_queryset(self):
-        # Filters the account to be deleted by id provided in the URL
-    #    queryset = Account.objects.filter(id=self.kwargs['pk'])
-    #    return queryset

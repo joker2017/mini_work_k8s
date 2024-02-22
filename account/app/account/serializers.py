@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Account
+from .models3 import Account
 
 class AccountSerializer(serializers.ModelSerializer):
     """
@@ -12,18 +12,12 @@ class AccountSerializer(serializers.ModelSerializer):
     """
     class Meta:
         model = Account
-        fields = ('balance', 'id', 'usernameid')  # Explicitly specify fields to include
-        read_only_fields = ('usernameid',)  # 'usernameid' field should not be editable
+        fields = ('balance', 'id')  # Explicitly specify fields to include
+        read_only_fields = ('id',)  # 'usernameid' field should not be editable
 
 class AccountSerializerRegistr(serializers.ModelSerializer):
-    """
-    Registration Serializer for Account model.
 
-    Similar to AccountSerializer but tailored for account registration scenarios.
-    It specifies which fields should be included when creating a new account
-    through the API. This might be used in different API endpoints where the
-    account creation process requires specific fields.
-    """
+
     class Meta:
         model = Account
-        fields = ('balance', 'id', 'usernameid')  # Define fields to be included in the serialization
+        fields = ('balance', 'id')  # Define fields to be included in the serialization
