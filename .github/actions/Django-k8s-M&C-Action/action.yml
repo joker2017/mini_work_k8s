@@ -87,7 +87,7 @@ runs:
     - name: Create or update Django superuser
       run: |
           APP_POD=${{ steps.get_latest_pod.outputs.latest_pod }}
-          kubectl exec $APP_POD -n default --kubeconfig=${{ inputs.kubeconfig }} -- /bin/sh -c python ./manage.py shell <<EOF
+          kubectl exec $APP_POD -n default --kubeconfig=${{ inputs.kubeconfig }} -- /bin/sh -c "python manage.py shell" <<EOF
             from django.contrib.auth import get_user_model
             User = get_user_model()
             username = '${{ inputs.DJANGO_SUPERUSER_USERNAME }}'
