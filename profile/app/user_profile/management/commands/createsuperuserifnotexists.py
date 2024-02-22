@@ -36,5 +36,3 @@ class Command(BaseCommand):
             except ValidationError as e:
                 raise CommandError(e)
 
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
