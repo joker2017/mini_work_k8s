@@ -2,6 +2,11 @@ from django.core.management.base import BaseCommand, CommandError
 from django.contrib.auth.models import User
 from django.core.exceptions import ValidationError
 
+import django
+import os
+os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'site.settings')
+django.setup()
+
 class Command(BaseCommand):
     help = 'Создает суперпользователя или обновляет пароль существующего'
 
