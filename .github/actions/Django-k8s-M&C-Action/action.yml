@@ -86,13 +86,13 @@ runs:
 
     - name: Create or update Django superuser
       run: |
-          APP_POD=profile-rollout-55d9d9cdbb-vw4sp
-          kubectl exec $APP_POD -n default --kubeconfig=kubeconfig.yml -- /bin/sh -c "python ./manage.py shell" <<EOF
+          APP_POD=${{ steps.get_latest_pod.outputs.latest_pod }}
+          kubectl exec $APP_POD -n default --kubeconfig=${{ inputs.kubeconfig }} -- /bin/sh -c "python ./manage.py shell" <<EOF
             from django.contrib.auth import get_user_model
             User = get_user_model()
-            username = 'your_superuser_username'
-            email = 'your_superuser_email'
-            password = 'your_superuser_password'
+            username = '${{ inputs.DJANGO_SUPERUSER_USERNAME }}'
+            email = '${{ inputs.DJANGO_SUPERUSER_EMAIL }}'
+            password = '${{ inputs.DJANGO_SUPERUSER_PASSWORD }}'
             user, created = User.objects.get_or_create(username=username, defaults={'email': email})
             if created:
               user.set_password(password)
