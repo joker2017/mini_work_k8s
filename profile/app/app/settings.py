@@ -12,11 +12,12 @@ https://docs.djangoproject.com/en/4.2/ref/settings/
 
 from pathlib import Path
 import os
+import logging
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-CSRF_TRUSTED_ORIGINS = ["http://localhost:1337"]
+CSRF_TRUSTED_ORIGINS = ["http://localhost:8300"]
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/4.2/howto/deployment/checklist/
 
@@ -24,9 +25,9 @@ CSRF_TRUSTED_ORIGINS = ["http://localhost:1337"]
 SECRET_KEY = 'django-insecure-q7+s2k(oj5w2a(2d-4(2s^9-^1y2to_v(ir^zr+2&gphw3sa41'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
-ALLOWED_HOSTS = ['*', '158.160.127.41', 'localhost']
+ALLOWED_HOSTS = ['*', 'localhost']
 
 
 # Application definition
@@ -40,7 +41,6 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'user_profile',
     'profile',
-    #'account',
     'flags',
     'rest_framework',
     'django_filters',
@@ -116,7 +116,6 @@ DATABASES = {
     }
 }
 
-print(DATABASES)
 
 # Password validation
 # https://docs.djangoproject.com/en/4.2/ref/settings/#auth-password-validators
@@ -148,27 +147,16 @@ USE_I18N = True
 
 USE_TZ = True
 
-
-
-
 STATIC_DIR = os.path.join(BASE_DIR, 'static2')
 STATIC_URL = '/static2/'
-
 STATIC_ROOT = os.path.join(BASE_DIR, 'static2')
-
 MEDIA_URL = "/media/"
 MEDIA_ROOT = os.path.join(BASE_DIR, "media")
-
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 
 
-
-print(f"BASE_DIR: {BASE_DIR}")
-print(f"STATIC_ROOT: {STATIC_ROOT}")
-import logging
 logger = logging.getLogger(__name__)
-
 logger.debug(f"BASE_DIR: {BASE_DIR}")
 logger.debug(f"STATIC_ROOT: {STATIC_ROOT}")
 LOGGING = {
@@ -182,7 +170,7 @@ LOGGING = {
     'loggers': {
         'django': {
             'handlers': ['console'],
-            'level': 'DEBUG',  # Измените уровень логирования здесь
+            'level': 'DEBUG',
         },
     },
 }
