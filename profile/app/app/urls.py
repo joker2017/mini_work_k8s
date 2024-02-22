@@ -1,6 +1,6 @@
 from django.contrib import admin
 from django.urls import path
-from profile.app.user_profile.views import *
+from user_profile.views import *
 from flags.urls import flagged_path, flagged_paths, flagged_re_path, flagged_re_paths
 
 # URL configuration for the user_profile application.
