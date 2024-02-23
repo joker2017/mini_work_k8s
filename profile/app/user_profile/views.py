@@ -72,7 +72,7 @@ class UsersDestroy(generics.DestroyAPIView, generics.RetrieveAPIView):
         #return Response(status=status.HTTP_204_NO_CONTENT)  # Return success response for deletion
 
 
-      def destroy(self, request, *args, **kwargs):
+    def destroy(self, request, *args, **kwargs):
           instance = self.get_object()
           if instance.accounts.exists():
              # Связанные аккаунты существуют, возвращаем ошибку

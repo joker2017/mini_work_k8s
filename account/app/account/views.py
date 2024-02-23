@@ -1,9 +1,8 @@
 from .models import Account, Users
-from .serializers import AccountSerializer  #, AccountSerializerRegistr
-from .services import create_account_number
+from .serializers import AccountSerializer
 from rest_framework import generics, viewsets, mixins
-from rest_framework.response import Response
-from rest_framework import status
+
+
 
 class AccountList(viewsets.GenericViewSet, mixins.ListModelMixin):
     """
