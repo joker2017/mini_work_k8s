@@ -16,18 +16,18 @@ class UsersListView(generics.ListAPIView):
 
 
 # View for creating new users
-class UsersCreate(viewsets.GenericViewSet, mixins.CreateModelMixin):
+class UsersCreate(generics.CreateAPIView):
     queryset = Users.objects.all()  # Queryset that includes all users
     serializer_class = UsersSerializer  # Serializer class for user data
 
-    def create(self, request, *args, **kwargs):
-        serializer = self.get_serializer(data=request.data)  # Get serializer for request data
-        serializer.is_valid(raise_exception=True)  # Validate serializer data
+    #def create(self, request, *args, **kwargs):
+    #    serializer = self.get_serializer(data=request.data)  # Get serializer for request data
+    #    serializer.is_valid(raise_exception=True)  # Validate serializer data
 
-        id = create_account_number()  # Generate a unique account number
-        serializer.save(id=id)  # Save the user with the generated account number
-        headers = self.get_success_headers(serializer.data)  # Get success headers for response
-        return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)  # Return success response
+     #   id = create_account_number()  # Generate a unique account number
+     #   serializer.save(id=id)  # Save the user with the generated account number
+      #  headers = self.get_success_headers(serializer.data)  # Get success headers for response
+      #  return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)  # Return success response
 
 
 # View for updating existing user data

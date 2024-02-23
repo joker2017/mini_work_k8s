@@ -17,7 +17,7 @@ urlpatterns = [
     flagged_path('SEARCHS_FLAG', 'profile/usersearch/', UsersListView.as_view(), state=False),
 
     # Create a new user profile. Enabled/Disabled based on USERS_CREATE_FLAG.
-    flagged_path('USERS_CREATE_FLAG', 'profile/create/', UsersCreate.as_view({'post': 'create'}), state=False),
+    flagged_path('USERS_CREATE_FLAG', 'profile/create/', UsersCreate.as_view(), state=False),
 
     # Update an existing user profile. Enabled/Disabled based on USERS_UPDATE_FLAG.
     flagged_path('USERS_UPDATE_FLAG', 'profile/update/<str:pk>/', UsersUpdate.as_view(), state=False),
