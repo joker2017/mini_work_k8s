@@ -12,7 +12,9 @@ class AccountList(viewsets.GenericViewSet, mixins.ListModelMixin):
     serializer_class = AccountSerializer
     queryset = Account.objects.all()
 
-class AccountCreate(viewsets.GenericViewSet, mixins.CreateModelMixin):
+#class AccountCreate(viewsets.GenericViewSet, mixins.CreateModelMixin):
+class AccountCreate(generics.CreateAPIView, generics.RetrieveAPIView):
+
     """
     API endpoint for creating a new account. Automatically generates
     a unique account number for each new account.
@@ -46,7 +48,7 @@ class AccountDetail(generics.RetrieveAPIView):
     serializer_class = AccountSerializer
 
 
-class AccountDestroy(generics.DestroyAPIView):
+class AccountDestroy(generics.DestroyAPIView, generics.RetrieveAPIView):
     """
     API endpoint for deleting an existing account.
     """
