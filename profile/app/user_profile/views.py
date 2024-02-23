@@ -39,7 +39,7 @@ class UsersDetail(generics.RetrieveAPIView):
 class UsersDestroy(generics.DestroyAPIView, generics.RetrieveAPIView):
     queryset = Users.objects.all()  # Queryset that includes all users
     serializer_class = UsersSerializer  # Serializer class for user data
-    #lookup_fields = 'id'  # Field to look up user
+    lookup_fields = 'id'  # Field to look up user
 
 
     def destroy(self, request, *args, **kwargs):

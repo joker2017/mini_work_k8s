@@ -71,8 +71,7 @@ class Account(models.Model):
         max_digits=20,
         decimal_places=2
     )
-    usernameid = models.ForeignKey('Users', default='null', on_delete=models.PROTECT, null=True, related_name='accounts',
-                                   blank=True)
+    usernameid = models.ForeignKey('Users', default='null', on_delete=models.PROTECT, null=True, related_name='accounts', blank=True)
 
     def save(self, *args, **kwargs):
         if not self.id:
@@ -93,3 +92,5 @@ def __str__(self):
 class Meta:
         managed = False
         db_table = 'account_account'
+
+
