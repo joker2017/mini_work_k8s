@@ -1,15 +1,24 @@
 from .models import Account, Users
 from .serializers import AccountSerializer
 from rest_framework import generics, viewsets, mixins
+from rest_framework import generics, viewsets, mixins, filters
 
 
-
-class AccountList(viewsets.GenericViewSet, mixins.ListModelMixin):
+#class AccountList(viewsets.GenericViewSet, mixins.ListModelMixin):
     """
     API endpoint that allows accounts to be viewed.
     """
-    serializer_class = AccountSerializer
-    queryset = Account.objects.all()
+#    serializer_class = AccountSerializer
+#    queryset = Account.objects.all()
+
+
+
+class AccountListView(generics.ListAPIView):
+    queryset = Account.objects.all()  # Queryset that includes all users
+    serializer_class = AccountSerializer  # Serializer class for user data
+    filter_backends = [filters.SearchFilter]  # Backend filter for searching
+    search_fields = ['=id', '=balacnce']  # Fields to search against
+
 
 class AccountCreate(generics.CreateAPIView):
 

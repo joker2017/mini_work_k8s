@@ -55,11 +55,11 @@ class UsersDetail(generics.RetrieveAPIView):
 class UsersDetail(generics.ListAPIView):
     queryset = Users.objects.all()
     serializer_class = UsersSerializer
-    lookup_fields = 'id'
+    #lookup_fields = 'id'
 
-    def get_queryset(self):
-        return self.queryset.filter(
-            id=self.kwargs['id'])
+    #def get_queryset(self):
+       # return self.queryset.filter(
+            #id=self.kwargs['id'])
 
 
 class UsersDestroy(generics.DestroyAPIView, generics.RetrieveAPIView):
