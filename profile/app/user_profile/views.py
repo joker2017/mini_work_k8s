@@ -41,24 +41,10 @@ class UsersDestroy(generics.DestroyAPIView, generics.RetrieveAPIView):
     serializer_class = UsersSerializer  # Serializer class for user data
     #lookup_fields = 'id'  # Field to look up user
 
-    #def get_queryset(self):
-     #   queryset = Users.objects.filter(id=self.kwargs['pk'])  # Filter queryset by user ID
-    #    return queryset
-
-    #def destroy(self, request, *args, **kwargs):
-      #  instance = self.get_object()  # Get the instance to be deleted
-
-        #try:
-        #    self.perform_destroy(instance)  # Attempt to delete the instance
-        #except ProtectedError as e:
-            # Return error response if instance cannot be deleted due to protected error
-        #    return Response("Cannot delete the client with attached accounts", status=status.HTTP_403_FORBIDDEN)
-        #return Response(status=status.HTTP_204_NO_CONTENT)  # Return success response for deletion
-
 
     def destroy(self, request, *args, **kwargs):
           instance = self.get_object()
-          if instance.users.exists():
+          if instance.accounts.exists():
              # Связанные аккаунты существуют, возвращаем ошибку
              return Response({"detail": "Невозможно удалить пользователя с привязанными аккаунтами"}, status=status.HTTP_403_FORBIDDEN)
 

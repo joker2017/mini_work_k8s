@@ -71,7 +71,7 @@ class Account(models.Model):
         max_digits=20,
         decimal_places=2
     )
-    usernameid = models.ForeignKey('Users', default='null', on_delete=models.PROTECT, null=True, related_name='users',
+    usernameid = models.ForeignKey('Users', default='null', on_delete=models.PROTECT, null=True, related_name='accounts',
                                    blank=True)
 
     def save(self, *args, **kwargs):
