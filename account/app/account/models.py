@@ -63,5 +63,21 @@ class Account(models.Model):
     usernameid = models.ForeignKey('Users', default='null', on_delete=models.PROTECT, null=True, related_name='users',
                                    blank=True)
 
-    def __str__(self):
-        return '__all__'
+    def save(self, *args, **kwargs):
+        if not self.id:
+            self.id = self.generate_unique_id_number()
+        super().save(*args, **kwargs)
+
+    @staticmethod
+    def generate_unique_id_number():
+        unique_id = ''.join([str(random.randint(0, 9)) for _ in range(20)])
+        while Account.objects.filter(id=unique_id).exists():
+            unique_id = ''.join([str(random.randint(0, 9)) for _ in range(20)])
+        return unique_id
+
+
+def __str__(self):
+        return f"Account ID: {self.id}, Balance: {self.balance}, User: {self.user.usernameid}"
+
+    #def __str__(self):
+        #return '__all__'
