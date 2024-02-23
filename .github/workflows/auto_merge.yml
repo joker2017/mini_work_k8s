@@ -1,4 +1,4 @@
-name: CI/CD Workflow
+name: Auto_merge
 
 on:
   pull_request:

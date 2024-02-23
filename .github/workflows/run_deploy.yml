@@ -1,4 +1,4 @@
-name: CI/CD with Collaborator Check
+name: Run deploy
 
 on:
   workflow_dispatch:
