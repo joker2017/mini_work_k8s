@@ -9,7 +9,7 @@ from django.db import IntegrityError
 from account.app.account.views import AccountCreate, AccountDestroy
 from account.app.account.serializers import AccountSerializer
 from account.app.account.services import create_account_number
-from account.app.account.models3 import Users, Account
+from account.app.account.models import Users, Account
 
 
 @pytest.fixture
