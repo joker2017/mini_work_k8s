@@ -12,7 +12,7 @@ class AccountSerializer(serializers.ModelSerializer):
     """
     class Meta:
         model = Account
-        fields = ('balance', 'id')  # Explicitly specify fields to include
+        fields = ('balance', 'id', 'usernameid')  # Explicitly specify fields to include
         read_only_fields = ('id',)  # 'usernameid' field should not be editable
 
 #class AccountSerializerRegistr(serializers.ModelSerializer):
