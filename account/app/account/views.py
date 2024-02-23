@@ -17,7 +17,7 @@ class AccountListView(generics.ListAPIView):
     queryset = Account.objects.all()  # Queryset that includes all users
     serializer_class = AccountSerializer  # Serializer class for user data
     filter_backends = [filters.SearchFilter]  # Backend filter for searching
-    search_fields = ['=id', '=balance']  # Fields to search against
+    search_fields = ['=id', '=balance', '=usernameid']  # Fields to search against
 
 
 class AccountCreate(generics.CreateAPIView):
