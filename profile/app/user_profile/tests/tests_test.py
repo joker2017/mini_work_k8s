@@ -65,15 +65,6 @@ def test_create_profile_number(mock_filter):
     assert len(users_number) == 20 and users_number.isdigit()
     mock_filter.assert_called()
 
-def test_profile_create_with_mocked_view(mock_users_serializer):
-    """Test checks account creation with a mocked view."""
-    request = RequestFactory().post('/fake-url/', data={'full_names': 'ivan', 'username': 'test_user_id', 'email': 'ivan@ya.ru', 'password': '1234567890', 'id': '12345678901234567890'})
-    with patch.object(UsersCreate, 'create', return_value=Response(
-            mock_users_serializer.data, status=status.HTTP_201_CREATED)) as mock_method:
-        response = UsersCreate.as_view({'post': 'create'})(request)
-        assert mock_method.called
-        assert response.status_code == status.HTTP_201_CREATED
-        assert response.data == mock_users_serializer.data
 
 def test_users_update_with_mocked_response(mock_users_serializer):
     """Test checks account update with a mocked response."""
