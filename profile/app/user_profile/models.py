@@ -40,7 +40,7 @@ class Users(models.Model):
     @staticmethod
     def generate_unique_id_number():
         unique_id = ''.join([str(random.randint(0, 9)) for _ in range(20)])
-        while User.objects.filter(id=unique_id).exists():
+        while Users.objects.filter(id=unique_id).exists():
             unique_id = ''.join([str(random.randint(0, 9)) for _ in range(20)])
         return unique_id
 
