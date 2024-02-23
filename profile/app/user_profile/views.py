@@ -58,7 +58,7 @@ class UsersDestroy(generics.DestroyAPIView, generics.RetrieveAPIView):
 
     def destroy(self, request, *args, **kwargs):
           instance = self.get_object()
-          if instance.accounts.exists():
+          if instance.users.exists():
              # Связанные аккаунты существуют, возвращаем ошибку
              return Response({"detail": "Невозможно удалить пользователя с привязанными аккаунтами"}, status=status.HTTP_403_FORBIDDEN)
 
