@@ -15,7 +15,7 @@ urlpatterns = [
     path('account/admin/', admin.site.urls),
 
     # List all accounts. Enabled/Disabled based on ACCOUNT_LIST_FLAG.
-    flagged_path('ACCOUNT_LIST_FLAG', 'account/list/', AccountList.as_view({'get': 'list'}), state=False),
+    flagged_path('ACCOUNT_LIST_FLAG', 'account/list/', AccountListView.as_view(), state=False),
 
     # Create a new account. Enabled/Disabled based on ACCOUNT_CREATE_FLAG.
     flagged_path('ACCOUNT_CREATE_FLAG', 'account/create/', AccountCreate.as_view(), state=False),
