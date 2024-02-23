@@ -90,6 +90,6 @@ class Account(models.Model):
 def __str__(self):
         return f"Account ID: {self.id}, Balance: {self.balance}, User: {self.user.usernameid}"
 
-    class Meta:
+class Meta:
         managed = False
         db_table = 'account_account'
