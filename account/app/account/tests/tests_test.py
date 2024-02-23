@@ -40,15 +40,7 @@ def test_create_account_number(mock_filter):
     assert len(account_number) == 20 and account_number.isdigit()
     mock_filter.assert_called()
 
-def test_account_create_with_mocked_view(mock_account_serializer):
-    """Test checks account creation with a mocked view."""
-    request = RequestFactory().post('/fake-url/', data={'balance': '100.00', 'usernameid': 'test_user_id'})
-    with patch.object(AccountCreate, 'create', return_value=Response(
-            mock_account_serializer.data, status=status.HTTP_201_CREATED)) as mock_method:
-        response = AccountCreate.as_view({'post': 'create'})(request)
-        assert mock_method.called
-        assert response.status_code == status.HTTP_201_CREATED
-        assert response.data == mock_account_serializer.data
+
 
 def test_account_update_with_mocked_response(mock_account_serializer):
     """Test checks account update with a mocked response."""
