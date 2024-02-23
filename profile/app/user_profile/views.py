@@ -57,9 +57,9 @@ class UsersDestroy(generics.DestroyAPIView, generics.RetrieveAPIView):
     serializer_class = UsersSerializer  # Serializer class for user data
     lookup_fields = 'id'  # Field to look up user
 
-    def get_queryset(self):
-        queryset = Users.objects.filter(id=self.kwargs['pk'])  # Filter queryset by user ID
-        return queryset
+    #def get_queryset(self):
+     #   queryset = Users.objects.filter(id=self.kwargs['pk'])  # Filter queryset by user ID
+    #    return queryset
 
     def destroy(self, request, *args, **kwargs):
         instance = self.get_object()  # Get the instance to be deleted
