@@ -76,7 +76,7 @@ class Account(models.Model):
         decimal_places=2
     )
     usernameid = models.ForeignKey('Users', default='null', on_delete=models.PROTECT, null=True, related_name='accounts', blank=True)
-    usernameid = models.ForeignKey('Users', default='null', on_delete=models.PROTECT, null=True, related_name='accounts', blank=True)
+
 
     def save(self, *args, **kwargs):
         if not self.id:
@@ -91,6 +91,6 @@ class Account(models.Model):
         return unique_id
 
 
-def __str__(self):
+    def __str__(self):
         return f"Account ID: {self.id}, Balance: {self.balance}, User: {self.user.usernameid}"
 
