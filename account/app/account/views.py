@@ -30,7 +30,7 @@ class AccountCreate(viewsets.GenericViewSet, mixins.CreateModelMixin):
         # Return the newly created account details with a 201 status code
         return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
 
-class AccountUpdate(generics.UpdateAPIView):
+class AccountUpdate(generics.UpdateAPIView, generics.RetrieveAPIView):
     """
     API endpoint for updating an existing account's details.
     """

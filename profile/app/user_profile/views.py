@@ -34,21 +34,21 @@ class UsersCreate(viewsets.GenericViewSet, mixins.CreateModelMixin):
 class UsersUpdate(generics.UpdateAPIView, generics.RetrieveAPIView):
     queryset = Users.objects.all()  # Queryset that includes all users
     serializer_class = UsersSerializer  # Serializer class for user data
-    lookup_fields = 'id'  # Field to look up user
+    #lookup_fields = 'id'  # Field to look up user
 
-    def get_queryset(self):
-        queryset = Users.objects.filter(id=self.kwargs['pk'])  # Filter queryset by user ID
-        return queryset
+    #def get_queryset(self):
+        #queryset = Users.objects.filter(id=self.kwargs['pk'])  # Filter queryset by user ID
+       # return queryset
 
 
 # View for retrieving detail of a specific user
-class UsersDetail(generics.ListAPIView):
+class UsersDetail(generics.RetrieveAPIView):
     queryset = Users.objects.all()  # Queryset that includes all users
     serializer_class = UsersSerializer  # Serializer class for user data
-    lookup_fields = 'id'  # Field to look up user
+    #lookup_fields = 'id'  # Field to look up user
 
-    def get_queryset(self):
-        return self.queryset.filter(id=self.kwargs['id'])  # Filter queryset by user ID
+    #def get_queryset(self):
+       # return self.queryset.filter(id=self.kwargs['id'])  # Filter queryset by user ID
 
 
 # View for deleting a user
