@@ -13,7 +13,7 @@ class AccountList(viewsets.GenericViewSet, mixins.ListModelMixin):
     queryset = Account.objects.all()
 
 #class AccountCreate(viewsets.GenericViewSet, mixins.CreateModelMixin):
-class AccountCreate(generics.CreateAPIView, generics.RetrieveAPIView):
+class AccountCreate(generics.CreateAPIView):
 
     """
     API endpoint for creating a new account. Automatically generates

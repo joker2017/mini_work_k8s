@@ -79,5 +79,3 @@ class Account(models.Model):
 def __str__(self):
         return f"Account ID: {self.id}, Balance: {self.balance}, User: {self.user.usernameid}"
 
-    #def __str__(self):
-        #return '__all__'
