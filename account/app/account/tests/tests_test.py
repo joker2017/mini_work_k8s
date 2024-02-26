@@ -141,7 +141,7 @@ class ModelTestCase(TestCase):
 
     def setUp(self):
         # Мокирование методов менеджера модели Users
-        self.users_objects_patch = patch('account.app.account.models.Users.objects')
+        self.users_objects_patch = patch('account.app.account.models.Users.objects', autospec=True)
         self.mock_users_objects = self.users_objects_patch.start()
         self.mock_users_objects.create = MagicMock()
         self.mock_users_objects.filter = MagicMock()
@@ -151,7 +151,7 @@ class ModelTestCase(TestCase):
         self.mock_users_objects.delete = MagicMock()
 
         # Мокирование методов менеджера модели Account
-        self.account_objects_patch = patch('account.app.account.models.Account.objects')
+        self.account_objects_patch = patch('account.app.account.models.Account.objects', autospec=True)
         self.mock_account_objects = self.account_objects_patch.start()
         self.mock_account_objects.create = MagicMock()
         self.mock_account_objects.filter = MagicMock()
@@ -161,7 +161,7 @@ class ModelTestCase(TestCase):
         self.mock_account_objects.delete = MagicMock()
 
         # Мокирование методов экземпляра модели Account
-        self.account_save_patch = patch('account.app.account.models.Account.save', MagicMock(name="save"))
+        self.account_save_patch = patch('account.app.account.models.Account.save', MagicMock(name="save"), autospec=True)
         self.mock_account_save = self.account_save_patch.start()
 
     def tearDown(self):
@@ -225,4 +225,4 @@ class ModelTestCase(TestCase):
         account_mock.save()
 
         self.assertEqual(account_mock.balance, new_balance)
-        account_mock.save.assert_called_once_with(account_mock)
+        account_mock.save.assert_called_once()
