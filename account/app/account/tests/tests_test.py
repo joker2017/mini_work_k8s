@@ -133,3 +133,4 @@ def test_user_password_hashing(user_data):
         expected_hashed_password = sha256(user_data['password'].encode('utf-8')).hexdigest()
         assert saved_password == expected_hashed_password
 #тест122kk
+#ugjgjg
