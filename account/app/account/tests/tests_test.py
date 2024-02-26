@@ -139,16 +139,12 @@ from unittest.mock import patch, MagicMock
 from account.app.account.models import Users, Account
 
 class UsersModelTestCase(TestCase):
-    @patch('account.app.account.models.Users.objects.create')
     @patch('account.app.account.models.Users.generate_unique_id_number')
     @patch('account.app.account.models.make_password')
-    @patch('account.app.account.models.Users')
-    @patch('account.app.account.models.Users.save', MagicMock(name="save"))
-    def test_user_creation(self, mock_make_password, mock_generate_unique_id_number, mock_create):
+    @patch('account.app.account.models.Users.objects.create')
+    def test_user_creation(self, mock_create, mock_make_password, mock_generate_unique_id_number):
         """
-        Тест проверяет создание пользователя, убедившись, что при создании пользователя
-        вызываются методы для генерации уникального ID и хеширования пароля, и что
-        взаимодействие с базой данных полностью замокировано.
+        Тест проверяет создание пользователя с мокированием зависимостей.
         """
         mock_generate_unique_id_number.return_value = 'unique_id_123'
         mock_make_password.return_value = 'hashed_password'
@@ -159,19 +155,14 @@ class UsersModelTestCase(TestCase):
 
         mock_generate_unique_id_number.assert_called_once()
         mock_make_password.assert_called_once_with("plainpassword")
-        # Проверяем, что метод create был вызван вместо save
         mock_create.assert_called_once_with(full_names="Test User", username="testuser", email="test@example.com", password='hashed_password', id='unique_id_123')
 
 class AccountModelTestCase(TestCase):
-    @patch('account.app.account.models.Account.objects.create')
     @patch('account.app.account.models.Account.generate_unique_id_number')
-    @patch('account.app.account.models.Account')
-    @patch('account.app.account.models.Account.save', MagicMock(name="save"))
-    def test_account_creation(self, mock_generate_unique_id_number, mock_create):
+    @patch('account.app.account.models.Account.objects.create')
+    def test_account_creation(self, mock_create, mock_generate_unique_id_number):
         """
-        Тест проверяет создание аккаунта, убедившись, что при создании аккаунта
-        вызывается метод для генерации уникального ID, и что взаимодействие с базой данных
-        полностью замокировано.
+        Тест проверяет создание аккаунта с мокированием зависимостей.
         """
         mock_generate_unique_id_number.return_value = 'account_id_123'
         user_mock = MagicMock(spec=Users)
@@ -181,21 +172,18 @@ class AccountModelTestCase(TestCase):
         account.save()
 
         mock_generate_unique_id_number.assert_called_once()
-        # Проверяем, что метод create был вызван вместо save
         mock_create.assert_called_once_with(balance=100.00, usernameid=user_mock, id='account_id_123')
 
 class AccountBalanceUpdateTestCase(TestCase):
-    @patch('account.app.account.models.Account.save', MagicMock(name="save"))
-    @patch('account.app.account.models.Account')
     def test_balance_update(self):
         """
-        Тест проверяет обновление баланса в модели Account без взаимодействия с базой данных,
-        мокируя метод save.
+        Тест проверяет обновление баланса в модели Account без взаимодействия с базой данных.
         """
         user_mock = MagicMock(spec=Users)
-        account = Account(balance=100.00, usernameid=user_mock)
+        account = MagicMock(spec=Account, balance=100.00, usernameid=user_mock)
         new_balance = 150.00
         account.balance = new_balance
         account.save()
 
         self.assertEqual(account.balance, new_balance)
+        account.save.assert_called_once()
