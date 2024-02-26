@@ -136,23 +136,37 @@
 
 from django.test import TestCase
 from unittest.mock import patch, MagicMock
-from account.app.account.models import Users, Account
-
 
 class ModelTestCase(TestCase):
 
-    @patch('account.app.account.models.Users.objects.create')
-    @patch('account.app.account.models.Users.generate_unique_id_number')
-    @patch('account.app.account.models.make_password')
-    def test_user_creation(self, mock_make_password, mock_generate_unique_id_number, mock_create):
+    def setUp(self):
+        # Мокирование менеджера объектов для модели Users
+        patcher_users = patch('account.app.account.models.Users.objects', autospec=True)
+        self.mock_users_manager = patcher_users.start()
+        self.addCleanup(patcher_users.stop)
+
+        # Мокирование для генерации ID и хеширования пароля
+        self.mock_generate_unique_id_number = patch('account.app.account.models.Users.generate_unique_id_number', autospec=True).start()
+        self.mock_make_password = patch('account.app.account.models.make_password', autospec=True).start()
+        self.addCleanup(patch.stopall)
+
+        # Мокирование менеджера объектов для модели Account
+        patcher_account = patch('account.app.account.models.Account.objects', autospec=True)
+        self.mock_account_manager = patcher_account.start()
+        self.addCleanup(patcher_account.stop)
+
+        # Мокирование метода save модели Account
+        self.mock_account_save = patch('account.app.account.models.Account.save', autospec=True).start()
+
+    def test_user_creation(self):
         """
         Тест проверяет создание пользователя с мокированием зависимостей.
         """
-        mock_generate_unique_id_number.return_value = 'unique_id_123'
-        mock_make_password.return_value = 'hashed_password'
+        self.mock_generate_unique_id_number.return_value = 'unique_id_123'
+        self.mock_make_password.return_value = 'hashed_password'
         mock_user = MagicMock(spec=Users)
+        self.mock_users_manager.create.return_value = mock_user
 
-        mock_create.return_value = mock_user
         user_data = {
             "full_names": "Test User",
             "username": "testuser",
@@ -160,38 +174,35 @@ class ModelTestCase(TestCase):
             "password": "plainpassword"
         }
 
-        # Имитация создания пользователя через мокированный метод create
-        user = mock_create(**user_data)
+        # Имитация создания пользователя
+        user = Users.objects.create(**user_data)
 
-        mock_generate_unique_id_number.assert_called_once()
-        mock_make_password.assert_called_once_with("plainpassword")
-        mock_create.assert_called_once_with(**user_data, password='hashed_password', id='unique_id_123')
+        self.mock_generate_unique_id_number.assert_called_once()
+        self.mock_make_password.assert_called_once_with("plainpassword")
+        self.mock_users_manager.create.assert_called_once_with(**user_data, password='hashed_password', id='unique_id_123')
         self.assertEqual(user, mock_user)
 
-    @patch('account.app.account.models.Account.objects.create')
-    @patch('account.app.account.models.Account.generate_unique_id_number')
-    def test_account_creation(self, mock_generate_unique_id_number, mock_create):
+    def test_account_creation(self):
         """
         Тест проверяет создание аккаунта с мокированием зависимостей.
         """
-        mock_generate_unique_id_number.return_value = 'account_id_123'
+        self.mock_generate_unique_id_number.return_value = 'account_id_123'
         mock_account = MagicMock(spec=Account)
         user_mock = MagicMock(spec=Users)
+        self.mock_account_manager.create.return_value = mock_account
 
-        mock_create.return_value = mock_account
         account_data = {
             "balance": 100.00,
             "usernameid": user_mock
         }
 
-        # Имитация создания аккаунта через мокированный метод create
-        account = mock_create(**account_data)
+        # Имитация создания аккаунта
+        account = Account.objects.create(**account_data)
 
-        mock_generate_unique_id_number.assert_called_once()
-        mock_create.assert_called_once_with(**account_data, id='account_id_123')
+        self.mock_generate_unique_id_number.assert_called_once()
+        self.mock_account_manager.create.assert_called_once_with(**account_data, id='account_id_123')
         self.assertEqual(account, mock_account)
 
-    @patch('account.app.account.models.Account.save', MagicMock(name="save"))
     def test_balance_update(self):
         """
         Тест проверяет обновление баланса в модели Account без взаимодействия с базой данных.
@@ -203,4 +214,4 @@ class ModelTestCase(TestCase):
         account_mock.save()
 
         self.assertEqual(account_mock.balance, new_balance)
-        account_mock.save.assert_called_once()
+        account_mock.save.assert_called_once_with(account_mock)
