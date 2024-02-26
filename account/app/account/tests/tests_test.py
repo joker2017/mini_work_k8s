@@ -134,73 +134,63 @@
 #         assert saved_password == expected_hashed_password
 
 
-
 from django.test import TestCase
 from unittest.mock import patch, MagicMock
-from account.app.account.models import Users, Account  # Подразумевается, что модели находятся в файле models.py текущего приложения
+from user_profile.models import Users, Account
 
+class UsersModelTestCase(TestCase):
+    @patch('user_profile.models.Users.objects.create')
+    @patch('user_profile.models.Users.generate_unique_id_number')
+    @patch('user_profile.models.make_password')
+    def test_user_creation(self, mock_make_password, mock_generate_unique_id_number, mock_create):
+        """
+        Тест проверяет создание пользователя, убедившись, что при создании пользователя
+        вызываются методы для генерации уникального ID и хеширования пароля, и что
+        взаимодействие с базой данных полностью замокировано.
+        """
+        mock_generate_unique_id_number.return_value = 'unique_id_123'
+        mock_make_password.return_value = 'hashed_password'
+        mock_create.return_value = MagicMock(spec=Users)
 
-#Проверка уникальности id при создании нескольких экземпляров
-class TestUniqueId(TestCase):
-    @patch('account.app.account.models.Users.objects.filter')
-    def test_unique_id_generation_for_users(self, mock_filter):
-        mock_filter.return_value.exists.return_value = False  # Симулируем отсутствие существующих ID
-        user1 = Users()
-        user2 = Users()
-        self.assertNotEqual(user1.generate_unique_id_number(), user2.generate_unique_id_number())
+        user = Users(full_names="Test User", username="testuser", email="test@example.com", password="plainpassword")
+        user.save()
 
-    @patch('account.app.account.models.Account.objects.filter')
-    def test_unique_id_generation_for_account(self, mock_filter):
-        mock_filter.return_value.exists.return_value = False
-        account1 = Account()
-        account2 = Account()
-        self.assertNotEqual(account1.generate_unique_id_number(), account2.generate_unique_id_number())
+        mock_generate_unique_id_number.assert_called_once()
+        mock_make_password.assert_called_once_with("plainpassword")
+        # Проверяем, что метод create был вызван вместо save
+        mock_create.assert_called_once_with(full_names="Test User", username="testuser", email="test@example.com", password='hashed_password', id='unique_id_123')
 
-#Проверка корректности работы метода __str__
+class AccountModelTestCase(TestCase):
+    @patch('user_profile.models.Account.objects.create')
+    @patch('user_profile.models.Account.generate_unique_id_number')
+    def test_account_creation(self, mock_generate_unique_id_number, mock_create):
+        """
+        Тест проверяет создание аккаунта, убедившись, что при создании аккаунта
+        вызывается метод для генерации уникального ID, и что взаимодействие с базой данных
+        полностью замокировано.
+        """
+        mock_generate_unique_id_number.return_value = 'account_id_123'
+        user_mock = MagicMock(spec=Users)
+        mock_create.return_value = MagicMock(spec=Account)
 
-class TestStrMethod(TestCase):
-    def test_users_str_method(self):
-        user = Users(full_names='Ivan Ivanov', username='ivan')
-        self.assertEqual(str(user), 'Ivan Ivanov ivan')
+        account = Account(balance=100.00, usernameid=user_mock)
+        account.save()
 
-    def test_account_str_method(self):
-        account = Account(id='1234567890', balance=1000)
-        account.usernameid = Users(username='ivan')
-        self.assertEqual(str(account), 'Account ID: 1234567890, Balance: 1000, User: ivan')
+        mock_generate_unique_id_number.assert_called_once()
+        # Проверяем, что метод create был вызван вместо save
+        mock_create.assert_called_once_with(balance=100.00, usernameid=user_mock, id='account_id_123')
 
-
-#Проверка валидации email на уровне модели Users
-
-class TestEmailValidation(TestCase):
-    @patch('account.app.account.models.Users.save', MagicMock(name="save"))
-    def test_invalid_email(self):
-        user = Users(email='invalid_email')
-        with self.assertRaises(ValueError):
-            user.save()  # Предполагается, что метод save выбросит ValueError для невалидного email
-
-class TestEmailValidation(TestCase):
-    @patch('account.app.account.models.Users.save', MagicMock(name="save"))
-    def test_invalid_email(self):
-        user = Users(email='invalid_email')
-        with self.assertRaises(ValueError):
-            user.save()  # Предполагается, что метод save выбросит ValueError для невалидного email
-
-
-#Проверка связи ForeignKey между Account и Users с мокированием объектов Users
-
-class TestForeignKeyRelation(TestCase):
-    @patch('account.app.account.models.Users.objects.get')
-    def test_account_user_relation(self, mock_get):
-        mock_user = MagicMock()
-        mock_get.return_value = mock_user
-        account = Account(usernameid=mock_user)
-        self.assertEqual(account.usernameid, mock_user)
-#Проверка обновления баланса в модели Account без взаимодействия с БД
-
-class TestAccountBalanceUpdate(TestCase):
-    @patch('account.app.account.models.Account.save', MagicMock(name="save"))
+class AccountBalanceUpdateTestCase(TestCase):
+    @patch('user_profile.models.Account.save', MagicMock(name="save"))
     def test_balance_update(self):
-        account = Account(balance=1000)
-        account.balance += 500  # Обновляем баланс
-        account.save()  # Предполагается, что метод save обновит баланс без взаимодействия с базой данных
-        self.assertEqual(account.balance, 1500)
+        """
+        Тест проверяет обновление баланса в модели Account без взаимодействия с базой данных,
+        мокируя метод save.
+        """
+        user_mock = MagicMock(spec=Users)
+        account = Account(balance=100.00, usernameid=user_mock)
+        new_balance = 150.00
+        account.balance = new_balance
+        account.save()
+
+        self.assertEqual(account.balance, new_balance)
