@@ -142,6 +142,7 @@ class UsersModelTestCase(TestCase):
     @patch('account.app.account.models.Users.objects.create')
     @patch('account.app.account.models.Users.generate_unique_id_number')
     @patch('account.app.account.models.make_password')
+    @patch('account.app.account.models.Users')
     def test_user_creation(self, mock_make_password, mock_generate_unique_id_number, mock_create):
         """
         Тест проверяет создание пользователя, убедившись, что при создании пользователя
@@ -163,6 +164,7 @@ class UsersModelTestCase(TestCase):
 class AccountModelTestCase(TestCase):
     @patch('account.app.account.models.Account.objects.create')
     @patch('account.app.account.models.Account.generate_unique_id_number')
+    @patch('account.app.account.models.Account')
     def test_account_creation(self, mock_generate_unique_id_number, mock_create):
         """
         Тест проверяет создание аккаунта, убедившись, что при создании аккаунта
@@ -182,6 +184,7 @@ class AccountModelTestCase(TestCase):
 
 class AccountBalanceUpdateTestCase(TestCase):
     @patch('account.app.account.models.Account.save', MagicMock(name="save"))
+    @patch('account.app.account.models.Account')
     def test_balance_update(self):
         """
         Тест проверяет обновление баланса в модели Account без взаимодействия с базой данных,
