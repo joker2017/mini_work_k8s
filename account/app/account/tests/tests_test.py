@@ -133,11 +133,11 @@
 #         expected_hashed_password = sha256(user_data['password'].encode('utf-8')).hexdigest()
 #         assert saved_password == expected_hashed_password
 
-import unittest
+from django.test import TestCase
 from unittest.mock import patch, MagicMock
 from account.app.account.models import Users, Account
 
-class ModelTestCase(unittest.TestCase):
+class ModelTestCase(TestCase):
 
     def setUp(self):
         # Мокирование методов и атрибутов модели Users
@@ -147,7 +147,8 @@ class ModelTestCase(unittest.TestCase):
         self.patcher_generate_unique_id_number = patch('account.app.account.models.Users.generate_unique_id_number')
         self.mock_generate_unique_id_number = self.patcher_generate_unique_id_number.start()
 
-        self.patcher_make_password = patch('account.app.account.models.make_password')
+        # Правильное мокирование функции make_password из Django
+        self.patcher_make_password = patch('django.contrib.auth.hashers.make_password')
         self.mock_make_password = self.patcher_make_password.start()
 
         # Мокирование методов и атрибутов модели Account
@@ -158,10 +159,13 @@ class ModelTestCase(unittest.TestCase):
         self.mock_account_save = self.patcher_account_save.start()
 
     def tearDown(self):
-        patch.stopall()
+        self.patcher_users_create.stop()
+        self.patcher_generate_unique_id_number.stop()
+        self.patcher_make_password.stop()
+        self.patcher_account_create.stop()
+        self.patcher_account_save.stop()
 
     def test_user_creation(self):
-        """Тестирование создания пользователя."""
         user_data = {
             "full_names": "Test User",
             "username": "testuser",
@@ -175,11 +179,12 @@ class ModelTestCase(unittest.TestCase):
 
         user = Users.objects.create(**user_data)
 
+        self.mock_generate_unique_id_number.assert_called_once()
+        self.mock_make_password.assert_called_once_with("plainpassword")
         self.mock_users_create.assert_called_once_with(**user_data, password='hashed_password', id='unique_id_123')
         self.assertEqual(user, mock_user)
 
     def test_account_creation(self):
-        """Тестирование создания аккаунта."""
         account_data = {
             "balance": 100.00,
             "usernameid": MagicMock(spec=Users)
@@ -190,19 +195,16 @@ class ModelTestCase(unittest.TestCase):
 
         account = Account.objects.create(**account_data)
 
+        self.mock_generate_unique_id_number.assert_called_once()
         self.mock_account_create.assert_called_once_with(**account_data, id='account_id_123')
         self.assertEqual(account, mock_account)
 
     def test_balance_update(self):
-        """Тестирование обновления баланса аккаунта."""
-        account_mock = MagicMock(spec=Account, balance=100.00, usernameid=MagicMock(spec=Users))
+        mock_account = MagicMock(spec=Account, balance=100.00)
         new_balance = 150.00
-        account_mock.balance = new_balance
+        mock_account.balance = new_balance
 
-        account_mock.save()
+        mock_account.save()
 
-        self.assertEqual(account_mock.balance, new_balance)
-        account_mock.save.assert_called_once_with(account_mock)
-
-if __name__ == '__main__':
-    unittest.main()
+        self.assertEqual(mock_account.balance, new_balance)
+        mock_account.save.assert_called_once()
