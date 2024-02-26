@@ -140,23 +140,34 @@ from unittest.mock import patch, MagicMock
 class ModelTestCase(TestCase):
 
     def setUp(self):
-        # Мокирование менеджера объектов для модели Users
-        patcher_users = patch('account.app.account.models.Users.objects', autospec=True)
-        self.mock_users_manager = patcher_users.start()
-        self.addCleanup(patcher_users.stop)
+        # Мокирование методов менеджера модели Users
+        self.users_objects_patch = patch('account.app.account.models.Users.objects')
+        self.mock_users_objects = self.users_objects_patch.start()
+        self.mock_users_objects.create = MagicMock()
+        self.mock_users_objects.filter = MagicMock()
+        self.mock_users_objects.get = MagicMock()
+        self.mock_users_objects.all = MagicMock()
+        self.mock_users_objects.update = MagicMock()
+        self.mock_users_objects.delete = MagicMock()
 
-        # Мокирование для генерации ID и хеширования пароля
-        self.mock_generate_unique_id_number = patch('account.app.account.models.Users.generate_unique_id_number', autospec=True).start()
-        self.mock_make_password = patch('account.app.account.models.make_password', autospec=True).start()
-        self.addCleanup(patch.stopall)
+        # Мокирование методов менеджера модели Account
+        self.account_objects_patch = patch('account.app.account.models.Account.objects')
+        self.mock_account_objects = self.account_objects_patch.start()
+        self.mock_account_objects.create = MagicMock()
+        self.mock_account_objects.filter = MagicMock()
+        self.mock_account_objects.get = MagicMock()
+        self.mock_account_objects.all = MagicMock()
+        self.mock_account_objects.update = MagicMock()
+        self.mock_account_objects.delete = MagicMock()
 
-        # Мокирование менеджера объектов для модели Account
-        patcher_account = patch('account.app.account.models.Account.objects', autospec=True)
-        self.mock_account_manager = patcher_account.start()
-        self.addCleanup(patcher_account.stop)
+        # Мокирование методов экземпляра модели Account
+        self.account_save_patch = patch('account.app.account.models.Account.save', MagicMock(name="save"))
+        self.mock_account_save = self.account_save_patch.start()
 
-        # Мокирование метода save модели Account
-        self.mock_account_save = patch('account.app.account.models.Account.save', autospec=True).start()
+    def tearDown(self):
+        self.users_objects_patch.stop()
+        self.account_objects_patch.stop()
+        self.account_save_patch.stop()
 
     def test_user_creation(self):
         """
