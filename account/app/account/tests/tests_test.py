@@ -136,12 +136,12 @@
 
 from django.test import TestCase
 from unittest.mock import patch, MagicMock
-from user_profile.models import Users, Account
+from account.app.account.models import Users, Account
 
 class UsersModelTestCase(TestCase):
-    @patch('user_profile.models.Users.objects.create')
-    @patch('user_profile.models.Users.generate_unique_id_number')
-    @patch('user_profile.models.make_password')
+    @patch('account.app.account.models.Users.objects.create')
+    @patch('account.app.account.models.Users.generate_unique_id_number')
+    @patch('account.app.account.models.make_password')
     def test_user_creation(self, mock_make_password, mock_generate_unique_id_number, mock_create):
         """
         Тест проверяет создание пользователя, убедившись, что при создании пользователя
@@ -161,8 +161,8 @@ class UsersModelTestCase(TestCase):
         mock_create.assert_called_once_with(full_names="Test User", username="testuser", email="test@example.com", password='hashed_password', id='unique_id_123')
 
 class AccountModelTestCase(TestCase):
-    @patch('user_profile.models.Account.objects.create')
-    @patch('user_profile.models.Account.generate_unique_id_number')
+    @patch('account.app.account.models.Account.objects.create')
+    @patch('account.app.account.models.Account.generate_unique_id_number')
     def test_account_creation(self, mock_generate_unique_id_number, mock_create):
         """
         Тест проверяет создание аккаунта, убедившись, что при создании аккаунта
@@ -181,7 +181,7 @@ class AccountModelTestCase(TestCase):
         mock_create.assert_called_once_with(balance=100.00, usernameid=user_mock, id='account_id_123')
 
 class AccountBalanceUpdateTestCase(TestCase):
-    @patch('user_profile.models.Account.save', MagicMock(name="save"))
+    @patch('account.app.account.models.Account.save', MagicMock(name="save"))
     def test_balance_update(self):
         """
         Тест проверяет обновление баланса в модели Account без взаимодействия с базой данных,
